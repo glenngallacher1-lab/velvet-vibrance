@@ -97,14 +97,16 @@ h1, h2, h3, h4 {
   padding: 2rem;
 }
 
-.entry-logo {
-  width: 85vw;
-  max-width: 900px;
-  object-fit: contain;
-  display: block;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
+.entry-wordmark {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 10vw, 9rem);
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 60px rgba(139, 26, 26, 0.8), 0 0 120px rgba(139, 26, 26, 0.4);
+  margin: 0;
 }
 
 #enter-btn {
