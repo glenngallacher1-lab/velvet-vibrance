@@ -247,26 +247,4 @@
   });
 })();
 
-/* ── H. Staggered card animation ────────────────────────────── */
-(function initCardStagger() {
-  const cards = document.querySelectorAll('.collective-card');
-  const observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry, i) {
-      if (entry.isIntersecting) {
-        setTimeout(function () {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-        }, 100 * entry.target.dataset.index);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  cards.forEach(function (card, i) {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease, border-color 0.35s, box-shadow 0.35s';
-    card.dataset.index = i;
-    observer.observe(card);
-  });
-})();
+/* collective-card stagger removed — collective is now a photo gallery */
