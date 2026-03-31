@@ -48,7 +48,7 @@
             );
           }
         }
-        // Tint toward velvet red/gold — boost red channel, reduce blue
+        // Tint toward velvet red/gold
         color = vec3(color.r * 1.8 + color.g * 0.3, color.g * 0.4, color.b * 0.1);
         gl_FragColor = vec4(color, 1.0);
       }
@@ -78,7 +78,7 @@
 
     animate();
 
-    // Pause shader when entry screen is hidden (performance)
+    // Pause shader when entry screen is hidden
     window._stopShader = function () {
       cancelAnimationFrame(animId);
     };
@@ -97,18 +97,16 @@
 
 /* ── B. Entry Screen ─────────────────────────────────────────── */
 (function initEntry() {
-  const entry = document.getElementById('entry-screen');
+  const entry    = document.getElementById('entry-screen');
   const enterBtn = document.getElementById('enter-btn');
 
   if (!entry || !enterBtn) return;
 
-  // Lock scroll while entry is showing
   document.body.classList.add('entry-open');
 
   function dismiss() {
     entry.classList.add('hidden');
     document.body.classList.remove('entry-open');
-    // Stop the shader after fade to save GPU
     setTimeout(function () {
       if (typeof window._stopShader === 'function') window._stopShader();
     }, 900);
@@ -116,7 +114,6 @@
 
   enterBtn.addEventListener('click', dismiss);
 
-  // Also allow pressing Space or Enter
   document.addEventListener('keydown', function (e) {
     if ((e.key === ' ' || e.key === 'Enter') && !entry.classList.contains('hidden')) {
       dismiss();
@@ -133,7 +130,6 @@
       const target = document.querySelector(targetId);
       if (!target) return;
       e.preventDefault();
-      // Close mobile nav if open
       const mobileNav = document.querySelector('.mobile-nav');
       if (mobileNav) mobileNav.classList.remove('open');
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -156,7 +152,6 @@
 
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  // Hamburger menu
   const hamburger = document.querySelector('.nav-hamburger');
   const mobileNav = document.querySelector('.mobile-nav');
   if (hamburger && mobileNav) {
@@ -180,7 +175,7 @@
       }
     });
   }, {
-    threshold: 0.12,
+    threshold: 0.1,
     rootMargin: '0px 0px -40px 0px'
   });
 
@@ -189,20 +184,26 @@
 
 /* ── F. Gallery Lightbox ─────────────────────────────────────── */
 (function initLightbox() {
-  const lightbox     = document.getElementById('lightbox');
-  const lightboxImg  = document.getElementById('lightbox-img');
+  const lightbox      = document.getElementById('lightbox');
+  const lightboxImg   = document.getElementById('lightbox-img');
   const lightboxClose = document.getElementById('lightbox-close');
 
   if (!lightbox || !lightboxImg) return;
 
-  document.querySelectorAll('.gallery-item').forEach(function (item) {
-    item.addEventListener('click', function () {
-      const src = this.querySelector('img').src;
-      lightboxImg.src = src;
-      lightbox.classList.add('active');
-      document.body.style.overflow = 'hidden';
+  // Attach to gallery section items only (not collective grid)
+  const gallerySection = document.getElementById('gallery');
+  if (gallerySection) {
+    gallerySection.querySelectorAll('.rg-item').forEach(function (item) {
+      const img = item.querySelector('img');
+      if (!img) return;
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', function () {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
     });
-  });
+  }
 
   function closeLightbox() {
     lightbox.classList.remove('active');
@@ -231,20 +232,14 @@
     if (!input || !input.value.trim()) return;
 
     btn.textContent = 'JOINED';
-    btn.style.background = '#2a7a2a';
-    btn.style.borderColor = '#2a7a2a';
     btn.style.color = '#fff';
     input.value = '';
-    input.placeholder = 'YOU\'RE IN THE FREQUENCY';
+    input.placeholder = "YOU'RE IN THE FREQUENCY";
 
     setTimeout(function () {
       btn.textContent = 'JOIN';
-      btn.style.background = '';
-      btn.style.borderColor = '';
       btn.style.color = '';
       input.placeholder = 'YOUR EMAIL ADDRESS';
     }, 4000);
   });
 })();
-
-/* collective-card stagger removed — collective is now a photo gallery */
