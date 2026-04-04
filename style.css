@@ -692,3 +692,132 @@ h1, h2, h3, h4 {
     padding: 0;
   }
 }
+
+/* ── Events Section ─────────────────────────────────────────── */
+#events {
+  padding: 6rem 2rem;
+  background: var(--dark-mid);
+}
+
+.events-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.events-headline {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--gold);
+  letter-spacing: 6px;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.events-empty {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+  text-align: center;
+  grid-column: 1 / -1;
+  padding: 3rem 0;
+}
+
+.event-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.event-card:hover {
+  border-color: rgba(212,175,55,0.5);
+  transform: translateY(-4px);
+}
+
+.event-poster-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.event-poster {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+  cursor: grab;
+  transition: transform var(--transition);
+}
+
+.event-card:hover .event-poster { transform: scale(1.03); }
+
+.event-poster-hint {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.6rem;
+  background: rgba(0,0,0,0.7);
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.event-card:hover .event-poster-hint { opacity: 1; }
+
+.event-info {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.event-date {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.event-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.event-venue {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.event-tickets {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-decoration: none;
+  border: 1px solid rgba(212,175,55,0.4);
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  transition: background var(--transition);
+  align-self: flex-start;
+}
+
+.event-tickets:hover { background: rgba(212,175,55,0.1); }

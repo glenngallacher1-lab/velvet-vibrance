@@ -28,6 +28,7 @@
   <nav class="mobile-nav">
     <a href="#about">About</a>
     <a href="#collective">Collective</a>
+    <a href="#events">Events</a>
     <a href="#gallery">Gallery</a>
     <a href="#join">Contact</a>
   </nav>
@@ -41,6 +42,7 @@
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#collective">Collective</a></li>
+      <li><a href="#events">Events</a></li>
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#join">Contact</a></li>
     </ul>
@@ -131,6 +133,20 @@
 
     </div>
 
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       UPCOMING EVENTS
+  ════════════════════════════════════════════════════════ -->
+  <section id="events">
+    <div class="events-inner">
+      <p class="events-headline">UPCOMING EVENTS</p>
+      <div class="events-grid" id="events-grid">
+        <!-- Populated by events.json -->
+        <p class="events-empty" id="events-empty" style="display:none;">No upcoming events. Check back soon.</p>
+      </div>
+    </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════
@@ -229,5 +245,43 @@
   </footer>
 
   <script src="script.js"></script>
+
+  <script>
+    // Load events from events.json
+    fetch('events.json?t=' + Date.now())
+      .then(r => r.json())
+      .then(events => {
+        const grid = document.getElementById('events-grid');
+        const empty = document.getElementById('events-empty');
+        if (!events || events.length === 0) { empty.style.display = 'block'; return; }
+        events.forEach(ev => {
+          const card = document.createElement('div');
+          card.className = 'event-card';
+          card.innerHTML = `
+            <div class="event-poster-wrap">
+              <img src="${ev.poster}" alt="${ev.name}" class="event-poster" draggable="true"
+                ondragstart="handlePosterDrag(event, '${ev.poster}')"
+                title="Drag to copy poster">
+              <div class="event-poster-hint">drag to share</div>
+            </div>
+            <div class="event-info">
+              <p class="event-date">${ev.date}</p>
+              <p class="event-name">${ev.name}</p>
+              <p class="event-venue">${ev.venue}</p>
+              ${ev.tickets ? `<a href="${ev.tickets}" target="_blank" class="event-tickets">GET TICKETS →</a>` : ''}
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      })
+      .catch(() => {
+        document.getElementById('events-empty').style.display = 'block';
+      });
+
+    function handlePosterDrag(e, src) {
+      e.dataTransfer.setData('text/uri-list', src);
+      e.dataTransfer.setData('text/plain', src);
+    }
+  </script>
 </body>
 </html>
