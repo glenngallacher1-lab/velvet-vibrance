@@ -552,7 +552,7 @@
       ).join('');
 
       html = html.replace(
-        /(<div class="raw-grid">)([\s\S]*?)(<\/div>\s*<\/section>\s*<!-- Lightbox)/,
+        /(<div class="raw-grid">)([\s\S]*?)(<\/div>\n\n  <\/section>\n\n  <!-- Lightbox)/,
         `$1${newItems}\n\n    $3`
       );
 
