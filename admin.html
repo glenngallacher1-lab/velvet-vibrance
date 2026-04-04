@@ -435,8 +435,9 @@
 
     try {
       const res  = await fetch(base + 'events.json', { headers: H });
+      if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
-      await fetch(base + 'events.json', {
+      const putRes = await fetch(base + 'events.json', {
         method:'PUT', headers: H,
         body: JSON.stringify({
           message: 'admin: update events',
@@ -444,6 +445,7 @@
           sha: data.sha
         })
       });
+      if (!putRes.ok) throw new Error(String(putRes.status));
       toast('Events published live ✓');
     } catch(err) {
       toast('Something went wrong', true);
@@ -570,7 +572,15 @@
       toast('Gallery published live ✓');
     } catch(err) {
       console.error(err);
-      toast('Something went wrong', true);
+      if (err.message && err.message.includes('401')) {
+        toast('Token rejected — check it has write access', true);
+      } else if (err.message && err.message.includes('404')) {
+        toast('Repo not found — check token repo permissions', true);
+      } else if (err.message && err.message.includes('422')) {
+        toast('Nothing changed — already up to date', false);
+      } else {
+        toast('Error: ' + (err.message || 'check console for details'), true);
+      }
     }
 
     btn.disabled = false; btn.textContent = 'PUBLISH CHANGES →';
