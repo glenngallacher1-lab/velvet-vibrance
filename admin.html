@@ -77,12 +77,14 @@
     .token-save-btn { background: var(--gold); color: var(--dark); border: none; border-radius: 7px; padding: 0.55rem 1.1rem; font-family: var(--font-b); font-weight: 600; font-size: 0.72rem; letter-spacing: 1px; cursor: pointer; white-space: nowrap; }
 
     /* ── Gallery grid ──────────────────────────────────────── */
-    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.8rem; margin-bottom: 1.5rem; }
-    .photo-item { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
-    .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .photo-remove { position: absolute; top: 0.4rem; right: 0.4rem; background: rgba(0,0,0,0.75); border: 1px solid rgba(255,95,95,0.5); color: var(--red); border-radius: 6px; padding: 0.2rem 0.5rem; font-size: 0.7rem; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 240px; gap: 2px; margin-bottom: 1.5rem; }
+    .photo-item { position: relative; overflow: hidden; background: #111; }
+    .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.6s ease; filter: saturate(0.8); }
+    .photo-item:hover img { transform: scale(1.04); filter: saturate(1); }
+    .photo-remove { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,95,95,0.6); color: var(--red); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.68rem; cursor: pointer; opacity: 0; transition: opacity 0.2s; z-index: 2; }
     .photo-item:hover .photo-remove { opacity: 1; }
-    .photo-name { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.65); font-size: 0.62rem; padding: 0.3rem 0.4rem; color: var(--muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+    .photo-name { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); font-size: 0.62rem; padding: 1rem 0.5rem 0.4rem; color: var(--muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; opacity: 0; transition: opacity 0.2s; }
+    .photo-item:hover .photo-name { opacity: 1; }
 
     /* ── Upload area ───────────────────────────────────────── */
     .upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
