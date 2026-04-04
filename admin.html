@@ -177,6 +177,7 @@
       <div class="token-row">
         <input type="password" id="gh-token-input" placeholder="github_pat_...">
         <button class="token-save-btn" onclick="saveToken()">SAVE TOKEN</button>
+        <button class="token-save-btn" style="background:#333;color:#fff;margin-left:0.4rem;" onclick="testToken()">TEST</button>
       </div>
     </div>
 
@@ -584,6 +585,27 @@
     }
 
     btn.disabled = false; btn.textContent = 'PUBLISH CHANGES →';
+  }
+
+  // ── Test token
+  async function testToken() {
+    const token = localStorage.getItem('vv_gh_token') || document.getElementById('gh-token-input').value.trim();
+    if (!token) { toast('Enter a token first', true); return; }
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      const perms = data.permissions;
+      if (perms && perms.push) toast('Token OK — has write access ✓');
+      else toast('Token valid but NO write access', true);
+    } else if (res.status === 401) {
+      toast('Token invalid or expired', true);
+    } else if (res.status === 404) {
+      toast('Repo not found — wrong permissions', true);
+    } else {
+      toast('Error ' + res.status + ': ' + (data.message || 'unknown'), true);
+    }
   }
 
   // ── Toast ─────────────────────────────────────────────────
