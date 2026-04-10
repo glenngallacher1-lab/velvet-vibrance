@@ -313,7 +313,23 @@ h1, h2, h3, h4 {
 .overlay-link:nth-child(3) span { transition-delay: 0.22s; }
 .overlay-link:nth-child(4) span { transition-delay: 0.29s; }
 
-.overlay-link:hover span { color: var(--gold); }
+.overlay-link:hover span {
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(212,175,55,0.35);
+}
+
+/* Underline draw on hover */
+.overlay-link::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--gold);
+  width: 0;
+  transition: width 0.5s var(--ease-out);
+  margin-top: -0.15em;
+}
+
+.overlay-link:hover::after { width: 100%; }
 
 .overlay-footer {
   display: flex;
@@ -336,7 +352,15 @@ h1, h2, h3, h4 {
   color: var(--text-muted);
   text-decoration: none;
   transition: color var(--transition);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s var(--ease-out), color 0.25s ease;
 }
+
+.nav-overlay.open .overlay-footer a { opacity: 1; transform: translateY(0); }
+.nav-overlay.open .overlay-footer a:nth-child(1) { transition-delay: 0.38s; }
+.nav-overlay.open .overlay-footer a:nth-child(2) { transition-delay: 0.44s; }
+.nav-overlay.open .overlay-footer a:nth-child(3) { transition-delay: 0.50s; }
 
 .overlay-footer a:hover { color: var(--text-primary); }
 
@@ -461,10 +485,29 @@ h1, h2, h3, h4 {
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.85) 0%,
-    rgba(0,0,0,0.2) 55%,
-    rgba(0,0,0,0.08) 100%
+    rgba(0,0,0,0.88) 0%,
+    rgba(0,0,0,0.22) 55%,
+    rgba(0,0,0,0.06) 100%
   );
+}
+
+/* second parallax vignette layer */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 60%, transparent 35%, rgba(0,0,0,0.65) 100%);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* subtle noise texture */
+.hero-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
 }
 
 .hero-content {
@@ -680,14 +723,24 @@ h1, h2, h3, h4 {
   border: 1px solid rgba(212,175,55,0.15);
   border-radius: 14px;
   overflow: hidden;
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  transition: border-color 0.4s ease, box-shadow 0.5s ease;
   transform-style: preserve-3d;
   will-change: transform;
+  /* cascade entrance — set by JS */
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.event-card.card-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out),
+              border-color 0.4s ease, box-shadow 0.5s ease;
 }
 
 .event-card:hover {
-  border-color: rgba(212,175,55,0.45);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,175,55,0.1);
+  border-color: rgba(212,175,55,0.5);
+  box-shadow: 0 0 40px rgba(212,175,55,0.12), 0 28px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(212,175,55,0.12);
 }
 
 .event-poster-wrap {
@@ -706,7 +759,7 @@ h1, h2, h3, h4 {
 }
 
 .event-card:hover .event-poster {
-  transform: scale(1.04);
+  transform: scale(1.1);
   filter: saturate(1);
 }
 
@@ -796,7 +849,7 @@ h1, h2, h3, h4 {
 .raw-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 360px;
+  grid-auto-rows: 300px;
   gap: 3px;
 }
 
@@ -805,6 +858,13 @@ h1, h2, h3, h4 {
   overflow: hidden;
   background: #0a0a0a;
   cursor: pointer;
+  /* clip-path cascade entrance — driven by JS */
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1s var(--ease-out);
+}
+
+.rg-item.rg-revealed {
+  clip-path: inset(0% 0 0 0);
 }
 
 /* Tall / wide variants for masonry feel */
@@ -817,14 +877,21 @@ h1, h2, h3, h4 {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.7s var(--ease-out), filter 0.7s ease;
-  filter: saturate(0.75) brightness(0.9);
+  transition: transform 0.8s var(--ease-out), filter 0.8s ease;
+  /* start grayscale; gallery-section enter will lift it via JS class */
+  filter: grayscale(0.9) saturate(0.4) brightness(0.85);
 }
 
 .rg-item:hover img,
 .rg-item:hover video {
-  transform: scale(1.06);
-  filter: saturate(1) brightness(1);
+  transform: scale(1.12);
+  filter: grayscale(0) saturate(1.1) brightness(1.05);
+}
+
+/* when gallery section is in view, images shift toward colour */
+#gallery.gallery-active .rg-item img,
+#gallery.gallery-active .rg-item video {
+  filter: grayscale(0.2) saturate(0.85) brightness(0.92);
 }
 
 /* Overlay with caption */
@@ -1204,4 +1271,104 @@ h1, h2, h3, h4 {
   #nav { padding: 1.2rem 1.5rem; }
   .hero-content { padding: 2.5rem 1.5rem; }
   .about-text   { padding: 4rem 1.5rem; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   WORD-LEVEL STAGGER ANIMATION
+════════════════════════════════════════════════════════════ */
+.word-split .word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.word-split .word-inner {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(22px) skewX(-5deg);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+
+.word-split.words-visible .word-inner {
+  opacity: 1;
+  transform: translateY(0) skewX(0deg);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SECTION DEPTH-OF-FIELD BLUR
+════════════════════════════════════════════════════════════ */
+.section-dof {
+  transition: filter 0.7s ease, opacity 0.7s ease;
+}
+
+.section-dof.dof-blur {
+  filter: blur(3px) brightness(0.65);
+  opacity: 0.75;
+}
+
+/* ════════════════════════════════════════════════════════════
+   JOIN — VV WATERMARK
+════════════════════════════════════════════════════════════ */
+#join {
+  position: relative;
+}
+
+.join-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.join-watermark span {
+  font-family: var(--font-display);
+  font-size: clamp(14rem, 35vw, 32rem);
+  font-weight: 900;
+  font-style: italic;
+  color: var(--gold);
+  opacity: 0.028;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  user-select: none;
+}
+
+.join-inner { position: relative; z-index: 1; }
+
+/* Input underline flash on focus */
+.join-input:focus {
+  border-bottom-color: var(--gold);
+  box-shadow: 0 1px 0 var(--gold);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FOOTER SOCIAL — ARROW REVEAL
+════════════════════════════════════════════════════════════ */
+.footer-social a {
+  position: relative;
+  padding-left: 0;
+  transition: color var(--transition), padding-left 0.35s var(--ease-out);
+}
+
+.footer-social a::before {
+  content: '→ ';
+  position: absolute;
+  left: 0;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.3s ease, transform 0.35s var(--ease-out);
+  color: var(--gold);
+}
+
+.footer-social a:hover {
+  color: var(--text-primary);
+  padding-left: 1.3em;
+}
+
+.footer-social a:hover::before {
+  opacity: 1;
+  transform: translateX(0);
 }

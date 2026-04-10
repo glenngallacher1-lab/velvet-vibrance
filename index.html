@@ -76,6 +76,8 @@
   <section id="hero">
     <div class="hero-bg" id="hero-bg"></div>
     <div class="hero-overlay"></div>
+    <div class="hero-vignette" id="hero-vignette"></div>
+    <div class="hero-noise"></div>
     <div class="hero-content">
       <p class="hero-eyebrow">Music · Art · Fashion · Love</p>
       <h1 class="hero-headline">
@@ -93,7 +95,7 @@
   <!-- ══════════════════════════════════════════════════════════
        ABOUT / PHILOSOPHY
   ══════════════════════════════════════════════════════════ -->
-  <section id="about">
+  <section id="about" class="section-dof">
     <div class="about-grid">
 
       <div class="about-text">
@@ -121,7 +123,7 @@
   <!-- ══════════════════════════════════════════════════════════
        UPCOMING EVENTS
   ══════════════════════════════════════════════════════════ -->
-  <section id="events">
+  <section id="events" class="section-dof">
     <div class="events-inner">
       <div class="section-header reveal-up">
         <p class="section-eyebrow">Schedule</p>
@@ -142,11 +144,11 @@
       <h2 class="section-title">THE FREQUENCY</h2>
     </div>
     <div class="raw-grid"><!-- GALLERY-ITEMS-START -->
-      <div class="rg-item">
+      <div class="rg-item rg-wide">
         <img src="crowd-pink.png" alt="The crowd moves as one" loading="lazy" />
         <div class="rg-overlay"><span>The crowd moves as one</span></div>
       </div>
-      <div class="rg-item">
+      <div class="rg-item rg-tall">
         <img src="dj-orange.png" alt="In the booth" loading="lazy" />
         <div class="rg-overlay"><span>In the booth</span></div>
       </div>
@@ -158,7 +160,7 @@
         <img src="dj-headphones.png" alt="Locked in" loading="lazy" />
         <div class="rg-overlay"><span>Locked in</span></div>
       </div>
-      <div class="rg-item">
+      <div class="rg-item rg-wide">
         <img src="dj-crowd.jpeg" alt="DJ raises the room" loading="lazy" />
         <div class="rg-overlay"><span>DJ raises the room</span></div>
       </div>
@@ -179,7 +181,8 @@
   <!-- ══════════════════════════════════════════════════════════
        JOIN THE FREQUENCY
   ══════════════════════════════════════════════════════════ -->
-  <section id="join">
+  <section id="join" class="section-dof">
+    <div class="join-watermark" aria-hidden="true"><span>VV</span></div>
     <div class="join-inner">
       <p class="section-eyebrow reveal-up">Stay Connected</p>
       <p class="join-headline reveal-clip"><span>JOIN THE</span><span>FREQUENCY</span></p>
@@ -195,11 +198,11 @@
   ══════════════════════════════════════════════════════════ -->
   <footer id="footer">
     <div class="footer-inner">
-      <div class="footer-left">
+      <div class="footer-left reveal-up">
         <span class="footer-monogram">VV</span>
         <span class="footer-copy">&copy; VELVET VIBRANCE</span>
       </div>
-      <div class="footer-social">
+      <div class="footer-social reveal-up" style="--delay:0.1s">
         <a href="https://www.instagram.com/v.v.collective?igsh=MWlsNHI1YTZoeDNzaw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
         <a href="#">TikTok</a>
         <a href="#">SoundCloud</a>
@@ -241,7 +244,8 @@
           `;
           grid.appendChild(card);
         });
-        if (typeof window.initCard3D === 'function') window.initCard3D();
+        if (typeof window.initCard3D   === 'function') window.initCard3D();
+        if (typeof window.staggerCards === 'function') window.staggerCards();
       })
       .catch(() => {
         document.getElementById('events-empty').style.display = 'block';
