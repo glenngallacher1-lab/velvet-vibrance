@@ -83,10 +83,7 @@
         <span class="hl-line"><span>BLEEDS</span></span>
         <span class="hl-line"><span>INTO GOLD</span></span>
       </h1>
-      <a href="#about" class="hero-cta btn-dual btn-elastic">
-        <span class="btn-text-top">Discover More</span>
-        <span class="btn-text-bot">Discover More</span>
-      </a>
+      <a href="#about" class="hero-cta">Discover More</a>
     </div>
     <div class="hero-scroll-cue">
       <span class="scroll-comet"></span>
@@ -188,10 +185,7 @@
       <p class="join-headline reveal-clip"><span>JOIN THE</span><span>FREQUENCY</span></p>
       <form class="join-form" id="join-form">
         <input type="email" class="join-input" placeholder="Your email address" required autocomplete="email" />
-        <button type="submit" class="join-btn btn-dual btn-elastic">
-          <span class="btn-text-top">JOIN</span>
-          <span class="btn-text-bot">JOIN</span>
-        </button>
+        <button type="submit" class="join-btn">JOIN</button>
       </form>
     </div>
   </section>
@@ -242,7 +236,7 @@
               <p class="event-date">${ev.date}</p>
               <p class="event-name">${ev.name}</p>
               <p class="event-venue">${ev.venue}</p>
-              ${ev.tickets ? `<a href="${ev.tickets}" target="_blank" class="event-tickets btn-dual btn-elastic"><span class="btn-text-top">GET TICKETS →</span><span class="btn-text-bot">GET TICKETS →</span></a>` : ''}
+              ${ev.tickets ? `<a href="${ev.tickets}" target="_blank" class="event-tickets">GET TICKETS →</a>` : ''}
             </div>
           `;
           grid.appendChild(card);

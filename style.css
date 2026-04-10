@@ -185,28 +185,31 @@ h1, h2, h3, h4 {
 
 /* ── Dual-text Button ───────────────────────────────────────── */
 .btn-dual {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
+  position: relative;
+  display: inline-block;
   overflow: hidden;
   cursor: pointer;
   text-decoration: none;
 }
 
-.btn-dual .btn-text-top,
-.btn-dual .btn-text-bot {
+.btn-dual .btn-text-top {
   display: block;
   transition: transform 0.5s var(--ease-out);
-  line-height: 1;
   white-space: nowrap;
 }
 
 .btn-dual .btn-text-bot {
   position: absolute;
-  transform: translateY(120%);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transform: translateY(110%);
+  transition: transform 0.5s var(--ease-out);
 }
 
-.btn-dual:hover .btn-text-top { transform: translateY(-120%); }
+.btn-dual:hover .btn-text-top { transform: translateY(-110%); }
 .btn-dual:hover .btn-text-bot { transform: translateY(0); }
 
 /* ── Elastic Button ─────────────────────────────────────────── */
@@ -227,11 +230,15 @@ h1, h2, h3, h4 {
   font-weight: 500;
   letter-spacing: 0.38em;
   text-transform: uppercase;
-  padding: 0.6rem 0;
-  position: relative;
-  height: 2.2rem;
+  padding: 0.55rem 0;
   opacity: 0;
   animation: fadeUp 1s var(--ease-out) 0.7s forwards;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+#enter-btn .btn-text-bot {
+  font-size: 0.68rem;
+  letter-spacing: 0.38em;
 }
 
 #enter-btn:hover { color: var(--gold); border-bottom-color: var(--gold); }
@@ -514,9 +521,7 @@ h1, h2, h3, h4 {
 }
 
 .hero-cta {
-  display: inline-flex;
-  position: relative;
-  height: 2rem;
+  display: inline-block;
   font-family: var(--font-body);
   font-size: 0.68rem;
   font-weight: 500;
@@ -529,7 +534,6 @@ h1, h2, h3, h4 {
   opacity: 0;
   animation: fadeUp 0.8s var(--ease-out) 0.9s forwards;
   transition: color var(--transition), border-color var(--transition);
-  align-items: flex-end;
 }
 
 .hero-cta:hover { color: var(--gold); border-bottom-color: var(--gold); }
