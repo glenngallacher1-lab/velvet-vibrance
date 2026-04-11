@@ -48,77 +48,74 @@
   document.body.classList.add('entry-open');
 
   /* ── 1. Build SVG paths ───────────────────────────────────── */
+  // These bezier paths span ~2200 SVG units in path length.
+  // We use a fixed dasharray (no getTotalLength) so it works before layout.
+  // Dash = 660 units (30%), gap = 1540 units (70%), total period = 2200.
+  var ESTIMATED_LEN = 2200;
+  var DASH          = Math.round(ESTIMATED_LEN * 0.3);  // 660
+  var GAP           = ESTIMATED_LEN - DASH;             // 1540
+
   var svgNS = 'http://www.w3.org/2000/svg';
   var svg   = document.createElementNS(svgNS, 'svg');
-  svg.setAttribute('viewBox', '0 0 696 316');
+  // Wide viewBox that covers the full path extent so paths fill the screen
+  svg.setAttribute('viewBox', '-600 -420 1900 1420');
   svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
   svg.setAttribute('fill', 'none');
+  svg.setAttribute('overflow', 'visible');
 
-  var styleEl = document.createElement('style');
-  var keyframesCSS = '';
+  var styleEl    = document.createElement('style');
+  var keyframes  = '';
+  var pathIndex  = 0;
 
-  // Generate 36 paths per side (position = 1 and position = -1)
   [1, -1].forEach(function (position) {
     for (var i = 0; i < 36; i++) {
-      var x  = 380 - i * 5 * position;
-      var d  = 'M-' + x + ' -' + (189 + i * 6) +
-               'C-' + x + ' -' + (189 + i * 6) +
-               ' -' + (312 - i * 5 * position) + ' ' + (216 - i * 6) +
-               ' '  + (152 - i * 5 * position) + ' ' + (343 - i * 6) +
-               'C'  + (616 - i * 5 * position) + ' ' + (470 - i * 6) +
-               ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6) +
-               ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6);
+      var x = 380 - i * 5 * position;
+      var d = 'M-' + x + ' -' + (189 + i * 6) +
+              'C-' + x + ' -' + (189 + i * 6) +
+              ' -' + (312 - i * 5 * position) + ' ' + (216 - i * 6) +
+              ' '  + (152 - i * 5 * position) + ' ' + (343 - i * 6) +
+              'C'  + (616 - i * 5 * position) + ' ' + (470 - i * 6) +
+              ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6) +
+              ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6);
 
-      var opacity     = 0.12 + i * 0.022;
-      var strokeWidth = (0.5 + i * 0.03).toFixed(2);
-      var duration    = (20 + Math.random() * 10).toFixed(1);
-      var delay       = (Math.random() * -20).toFixed(1); // negative = already in progress
+      // Vivid red: low-i paths are thin + light, high-i thick + saturated
+      var opacity     = 0.18 + i * 0.024;
+      if (opacity > 1) opacity = 1;
+      var strokeWidth = (0.6 + i * 0.04).toFixed(2);
+      var duration    = (18 + i * 0.28 + Math.random() * 6).toFixed(1);
+      // Stagger start points so not all dashes begin at the same place
+      var startOffset = -Math.round(Math.random() * ESTIMATED_LEN);
+      var name        = 'ep' + pathIndex;
 
       var path = document.createElementNS(svgNS, 'path');
       path.setAttribute('d', d);
-      path.setAttribute('stroke', 'rgba(160,20,20,' + opacity.toFixed(3) + ')');
+      path.setAttribute('stroke', 'rgba(220,30,30,' + opacity.toFixed(3) + ')');
       path.setAttribute('stroke-width', strokeWidth);
+      path.setAttribute('stroke-dasharray', DASH + ' ' + GAP);
+      path.setAttribute('stroke-dashoffset', startOffset);
       path.setAttribute('fill', 'none');
 
-      // We'll set dasharray/dashoffset after appending (need getTotalLength)
-      path.dataset.duration = duration;
-      path.dataset.delay    = delay;
+      keyframes += '@keyframes ' + name + '{' +
+        '0%{stroke-dashoffset:' + startOffset + '}' +
+        '100%{stroke-dashoffset:' + (startOffset - ESTIMATED_LEN) + '}' +
+        '}';
+
+      path.style.animation = name + ' ' + duration + 's linear infinite';
       svg.appendChild(path);
+      pathIndex++;
     }
   });
 
-  pathsLayer.appendChild(svg);
-
-  // Now inject per-path keyframes using getTotalLength
-  var paths = svg.querySelectorAll('path');
-  paths.forEach(function (path, idx) {
-    var len      = path.getTotalLength();
-    var dash     = len * 0.3; // traveling dash = 30% of path length
-    var duration = path.dataset.duration;
-    var delay    = path.dataset.delay;
-    var animName = 'pathTravel' + idx;
-
-    path.setAttribute('stroke-dasharray', dash + ' ' + len);
-    path.setAttribute('stroke-dashoffset', '0');
-
-    keyframesCSS +=
-      '@keyframes ' + animName + ' {' +
-      '  0%   { stroke-dashoffset: 0; }' +
-      '  100% { stroke-dashoffset: -' + len + '; }' +
-      '}';
-
-    path.style.animation = animName + ' ' + duration + 's linear ' + delay + 's infinite';
-  });
-
-  styleEl.textContent = keyframesCSS;
+  styleEl.textContent = keyframes;
   document.head.appendChild(styleEl);
+  pathsLayer.appendChild(svg);
 
   /* ── 2. Letter-by-letter title animation ─────────────────── */
   var TEXT       = 'VELVET VIBRANCE';
-  var BASE_DELAY = 0.15; // seconds before first letter
-  var STAGGER    = 0.055; // seconds between each letter
-
+  var BASE_DELAY = 0.2;
+  var STAGGER    = 0.06;
   var letterIndex = 0;
+
   TEXT.split('').forEach(function (char) {
     if (char === ' ') {
       var space = document.createElement('span');
@@ -128,33 +125,23 @@
       var span = document.createElement('span');
       span.className = 'entry-letter';
       span.textContent = char;
-      var delay = BASE_DELAY + letterIndex * STAGGER;
-      span.style.animationDelay = delay.toFixed(3) + 's';
+      span.style.animationDelay = (BASE_DELAY + letterIndex * STAGGER).toFixed(3) + 's';
       titleEl.appendChild(span);
       letterIndex++;
     }
   });
 
-  /* ── 3. Auto-dismiss with sweep-up after letters finish ───── */
-  // Total letter animation time + a short hold
-  var lastLetterDelay = BASE_DELAY + (letterIndex - 1) * STAGGER; // seconds
-  var letterDuration  = 0.7;  // matches CSS animation duration
-  var hold            = 0.55; // pause at full display
-  var sweepDelay      = (lastLetterDelay + letterDuration + hold) * 1000; // ms
+  /* ── 3. Auto-dismiss — sweep up when letters finish ─────── */
+  var sweepDelay = (BASE_DELAY + (letterIndex - 1) * STAGGER + 0.7 + 0.6) * 1000;
 
   function dismiss() {
     if (entry.classList.contains('sweep-out')) return;
     entry.classList.add('sweep-out');
     document.body.classList.remove('entry-open');
-    // Remove from DOM after sweep completes (1.1s transition)
-    setTimeout(function () {
-      entry.style.display = 'none';
-    }, 1200);
+    setTimeout(function () { entry.style.display = 'none'; }, 1200);
   }
 
   setTimeout(dismiss, sweepDelay);
-
-  // Allow early skip via click or keypress
   entry.addEventListener('click', dismiss);
   document.addEventListener('keydown', function (e) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') dismiss();
