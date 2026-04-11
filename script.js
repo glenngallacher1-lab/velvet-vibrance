@@ -38,62 +38,127 @@
 })();
 
 
-/* ── C. Entry Screen — Auto-Progress Loader ─────────────────── */
+/* ── C. Entry Screen — Background Paths + Letter Spring ─────── */
 (function initEntry() {
-  const entry    = document.getElementById('entry-screen');
-  const fill     = document.getElementById('entry-progress-fill');
-  const counter  = document.getElementById('entry-counter');
+  var entry      = document.getElementById('entry-screen');
+  var pathsLayer = document.getElementById('entry-paths-layer');
+  var titleEl    = document.getElementById('entry-title');
   if (!entry) return;
 
   document.body.classList.add('entry-open');
 
-  // Allow skip on click or keypress
+  /* ── 1. Build SVG paths ───────────────────────────────────── */
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var svg   = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', '0 0 696 316');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+  svg.setAttribute('fill', 'none');
+
+  var styleEl = document.createElement('style');
+  var keyframesCSS = '';
+
+  // Generate 36 paths per side (position = 1 and position = -1)
+  [1, -1].forEach(function (position) {
+    for (var i = 0; i < 36; i++) {
+      var x  = 380 - i * 5 * position;
+      var d  = 'M-' + x + ' -' + (189 + i * 6) +
+               'C-' + x + ' -' + (189 + i * 6) +
+               ' -' + (312 - i * 5 * position) + ' ' + (216 - i * 6) +
+               ' '  + (152 - i * 5 * position) + ' ' + (343 - i * 6) +
+               'C'  + (616 - i * 5 * position) + ' ' + (470 - i * 6) +
+               ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6) +
+               ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6);
+
+      var opacity     = 0.12 + i * 0.022;
+      var strokeWidth = (0.5 + i * 0.03).toFixed(2);
+      var duration    = (20 + Math.random() * 10).toFixed(1);
+      var delay       = (Math.random() * -20).toFixed(1); // negative = already in progress
+
+      var path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('stroke', 'rgba(160,20,20,' + opacity.toFixed(3) + ')');
+      path.setAttribute('stroke-width', strokeWidth);
+      path.setAttribute('fill', 'none');
+
+      // We'll set dasharray/dashoffset after appending (need getTotalLength)
+      path.dataset.duration = duration;
+      path.dataset.delay    = delay;
+      svg.appendChild(path);
+    }
+  });
+
+  pathsLayer.appendChild(svg);
+
+  // Now inject per-path keyframes using getTotalLength
+  var paths = svg.querySelectorAll('path');
+  paths.forEach(function (path, idx) {
+    var len      = path.getTotalLength();
+    var dash     = len * 0.3; // traveling dash = 30% of path length
+    var duration = path.dataset.duration;
+    var delay    = path.dataset.delay;
+    var animName = 'pathTravel' + idx;
+
+    path.setAttribute('stroke-dasharray', dash + ' ' + len);
+    path.setAttribute('stroke-dashoffset', '0');
+
+    keyframesCSS +=
+      '@keyframes ' + animName + ' {' +
+      '  0%   { stroke-dashoffset: 0; }' +
+      '  100% { stroke-dashoffset: -' + len + '; }' +
+      '}';
+
+    path.style.animation = animName + ' ' + duration + 's linear ' + delay + 's infinite';
+  });
+
+  styleEl.textContent = keyframesCSS;
+  document.head.appendChild(styleEl);
+
+  /* ── 2. Letter-by-letter title animation ─────────────────── */
+  var TEXT       = 'VELVET VIBRANCE';
+  var BASE_DELAY = 0.15; // seconds before first letter
+  var STAGGER    = 0.055; // seconds between each letter
+
+  var letterIndex = 0;
+  TEXT.split('').forEach(function (char) {
+    if (char === ' ') {
+      var space = document.createElement('span');
+      space.className = 'entry-letter-space';
+      titleEl.appendChild(space);
+    } else {
+      var span = document.createElement('span');
+      span.className = 'entry-letter';
+      span.textContent = char;
+      var delay = BASE_DELAY + letterIndex * STAGGER;
+      span.style.animationDelay = delay.toFixed(3) + 's';
+      titleEl.appendChild(span);
+      letterIndex++;
+    }
+  });
+
+  /* ── 3. Auto-dismiss with sweep-up after letters finish ───── */
+  // Total letter animation time + a short hold
+  var lastLetterDelay = BASE_DELAY + (letterIndex - 1) * STAGGER; // seconds
+  var letterDuration  = 0.7;  // matches CSS animation duration
+  var hold            = 0.55; // pause at full display
+  var sweepDelay      = (lastLetterDelay + letterDuration + hold) * 1000; // ms
+
   function dismiss() {
-    if (entry.classList.contains('hidden')) return;
-    entry.classList.add('hidden');
+    if (entry.classList.contains('sweep-out')) return;
+    entry.classList.add('sweep-out');
     document.body.classList.remove('entry-open');
+    // Remove from DOM after sweep completes (1.1s transition)
+    setTimeout(function () {
+      entry.style.display = 'none';
+    }, 1200);
   }
 
+  setTimeout(dismiss, sweepDelay);
+
+  // Allow early skip via click or keypress
   entry.addEventListener('click', dismiss);
   document.addEventListener('keydown', function (e) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') dismiss();
   });
-
-  // Animate 0 → 100 over ~2.8s with ease-out feel, then auto-dismiss
-  var DURATION  = 2800;    // ms for counter to reach 100
-  var HOLD      = 380;     // ms to hold at 100% before dismissing
-  var startTime = null;
-  var lastPct   = 0;
-
-  function easeOut(t) {
-    // Cubic ease-out — quick start, slows near 100%
-    return 1 - Math.pow(1 - t, 2.8);
-  }
-
-  function tick(timestamp) {
-    if (!startTime) startTime = timestamp;
-    var elapsed  = timestamp - startTime;
-    var raw      = Math.min(elapsed / DURATION, 1);
-    var pct      = Math.round(easeOut(raw) * 100);
-
-    if (pct !== lastPct) {
-      lastPct = pct;
-      if (fill)   fill.style.width   = pct + '%';
-      if (counter) counter.textContent = 'LOADING — ' + pct + '%';
-    }
-
-    if (raw < 1) {
-      requestAnimationFrame(tick);
-    } else {
-      // Hold at 100% briefly, then dismiss
-      setTimeout(dismiss, HOLD);
-    }
-  }
-
-  // Start counter after the entry content has faded in (0.8s delay matches CSS)
-  setTimeout(function () {
-    requestAnimationFrame(tick);
-  }, 900);
 })();
 
 /* ── D. Hamburger / Nav Overlay ─────────────────────────────── */
