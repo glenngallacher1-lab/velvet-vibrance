@@ -561,7 +561,7 @@ h1, h2, h3, h4 {
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 85vh;
+  grid-template-rows: minmax(85vh, auto);
 }
 
 .about-text {
@@ -601,12 +601,11 @@ h1, h2, h3, h4 {
 
 .about-image {
   overflow: hidden;
-  display: flex;
 }
 
 .about-img-inner {
-  flex: 1;
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -614,14 +613,13 @@ h1, h2, h3, h4 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
+  object-position: center 30%;
   display: block;
   filter: saturate(0.85) contrast(1.06);
-  transform: scale(1.08);
   transition: transform 0.8s var(--ease-out);
 }
 
-.about-image:hover .about-img-inner img { transform: scale(1); }
+.about-image:hover .about-img-inner img { transform: scale(1.04); }
 
 /* ════════════════════════════════════════════════════════════
    SECTION HEADER
