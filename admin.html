@@ -1,1507 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VV Admin — Velvet Vibrance</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VELVET VIBRANCE — Under Maintenance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
       --velvet: #8B1A1A;
-      --gold: #D4AF37;
-      --gold-light: #F0C842;
-      --dark: #000;
-      --dark-mid: #0a0505;
-      --card: rgba(255,255,255,0.04);
-      --border: rgba(212,175,55,0.18);
-      --border-hover: rgba(212,175,55,0.45);
-      --text: #f5ede0;
-      --muted: rgba(245,237,224,0.45);
-      --red: #ff5f5f;
-      --green: #4ade80;
-      --font-d: 'Playfair Display', Georgia, serif;
-      --font-b: 'Inter', system-ui, sans-serif;
-      --radius: 12px;
-      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --gold:   #D4AF37;
+      --dark:   #000000;
+      --text:   #f5ede0;
+      --muted:  rgba(245,237,224,0.42);
+      --ease:   cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
+    html, body {
+      height: 100%;
       background: var(--dark);
       color: var(--text);
-      font-family: var(--font-b);
-      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
-    }
-
-    /* ════════════ LOGIN ════════════ */
-    #login-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      gap: 1.5rem;
-      padding: 2rem;
-      background: radial-gradient(ellipse at 50% 40%, #1a0505 0%, #000 65%);
-    }
-
-    .login-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      border: 2px solid var(--gold);
-      object-fit: cover;
-      box-shadow: 0 0 50px rgba(212,175,55,0.2);
-    }
-
-    .login-title {
-      font-family: var(--font-d);
-      color: var(--gold);
-      font-size: 1.5rem;
-      letter-spacing: 4px;
-      font-style: italic;
-    }
-
-    .login-sub {
-      color: var(--muted);
-      font-size: 0.65rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-top: -1rem;
-    }
-
-    .login-box {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .login-box label {
-      color: var(--muted);
-      font-size: 0.65rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-
-    .pw-row {
-      display: flex;
-      gap: 0.6rem;
-    }
-
-    .pw-row input {
-      flex: 1;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      color: var(--text);
-      padding: 0.75rem 1rem;
-      font-family: var(--font-b);
-      font-size: 0.95rem;
-      transition: border-color 0.2s;
-    }
-
-    .pw-row input:focus {
-      outline: none;
-      border-color: var(--gold);
-    }
-
-    .login-btn {
-      background: var(--gold);
-      color: #000;
-      border: none;
-      border-radius: 9px;
-      padding: 0.75rem 1.3rem;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    .login-btn:hover { background: var(--gold-light); }
-    .login-btn:active { transform: scale(0.96); }
-
-    #login-error {
-      display: none;
-      color: var(--red);
-      font-size: 0.75rem;
-      padding: 0.65rem 1rem;
-      border: 1px solid rgba(255,95,95,0.25);
-      border-radius: 8px;
-      background: rgba(255,95,95,0.07);
-      text-align: center;
-    }
-
-    /* ════════════ SHELL ════════════ */
-    #admin-panel { display: none; }
-
-    .admin-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,0.8);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(16px);
-    }
-
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    .header-brand img {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid rgba(212,175,55,0.4);
-      object-fit: cover;
-    }
-
-    .header-title {
-      font-family: var(--font-d);
-      color: var(--gold);
-      font-size: 1rem;
-      letter-spacing: 2px;
-      font-style: italic;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .site-link {
-      color: var(--muted);
-      font-size: 0.65rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(212,175,55,0.2);
-      padding-bottom: 1px;
-      transition: color 0.2s;
-    }
-
-    .site-link:hover { color: var(--gold); }
-
-    .logout-btn {
-      background: transparent;
-      border: 1px solid rgba(255,95,95,0.3);
-      color: var(--red);
-      border-radius: 8px;
-      padding: 0.38rem 0.9rem;
-      font-family: var(--font-b);
-      font-size: 0.68rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .logout-btn:hover { background: rgba(255,95,95,0.08); }
-
-    /* ════════════ TABS ════════════ */
-    .tabs {
-      display: flex;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,0.5);
-      padding: 0 2rem;
-      overflow-x: auto;
-    }
-
-    .tab {
-      padding: 1rem 1.6rem;
-      font-size: 0.68rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      cursor: pointer;
-      color: var(--muted);
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: color 0.2s, border-color 0.2s;
-      white-space: nowrap;
-    }
-
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-
-    /* ════════════ MAIN CONTENT ════════════ */
-    main {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
-    }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    /* ════════════ CARDS ════════════ */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.6rem;
-      margin-bottom: 1.6rem;
-      transition: border-color 0.2s;
-    }
-
-    .card:hover { border-color: var(--border-hover); }
-
-    .card-label {
-      color: var(--gold);
-      font-size: 0.6rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-bottom: 1.3rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .card-label .count-badge {
-      background: rgba(212,175,55,0.15);
-      border: 1px solid rgba(212,175,55,0.3);
-      color: var(--gold);
-      font-size: 0.6rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 50px;
-      letter-spacing: 1px;
-    }
-
-    /* ════════════ GITHUB TOKEN SETUP ════════════ */
-    #config-warning {
-      background: rgba(212,175,55,0.04);
-      border: 1px solid rgba(212,175,55,0.25);
-      border-radius: var(--radius);
-      padding: 1.3rem 1.6rem;
-      font-size: 0.8rem;
-      line-height: 1.85;
-      color: var(--muted);
-      margin-bottom: 1.6rem;
-    }
-
-    #config-warning strong { color: var(--gold); }
-
-    code {
-      background: rgba(255,255,255,0.08);
-      border-radius: 4px;
-      padding: 1px 6px;
-      color: #7dd3fc;
-      font-family: 'Courier New', monospace;
-      font-size: 0.85em;
-    }
-
-    .token-row {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .token-row input {
-      flex: 1;
-      min-width: 200px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: 0.6rem 0.9rem;
-      font-family: var(--font-b);
-      font-size: 0.82rem;
-    }
-
-    .token-row input:focus { outline: none; border-color: var(--gold); }
-
-    .token-save-btn {
-      background: var(--gold);
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 0.6rem 1.2rem;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-
-    .token-save-btn:hover { background: var(--gold-light); }
-
-    .btn-secondary {
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 0.6rem 1.1rem;
-      font-family: var(--font-b);
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-
-    .btn-secondary:hover { background: rgba(255,255,255,0.1); }
-
-    /* ════════════ EVENT FORM ════════════ */
-    .event-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .form-field.full { grid-column: 1 / -1; }
-
-    .form-field label {
-      color: var(--muted);
-      font-size: 0.62rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .form-field input {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      color: var(--text);
-      padding: 0.7rem 0.9rem;
-      font-family: var(--font-b);
-      font-size: 0.88rem;
-      transition: border-color 0.2s;
-    }
-
-    .form-field input:focus { outline: none; border-color: var(--gold); }
-    .form-field input::placeholder { color: rgba(245,237,224,0.25); }
-
-    .poster-upload-area {
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      position: relative;
-      min-height: 100px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .poster-upload-area:hover,
-    .poster-upload-area.drag-over {
-      border-color: var(--gold);
-      background: rgba(212,175,55,0.04);
-    }
-
-    .poster-upload-area p { color: var(--muted); font-size: 0.78rem; letter-spacing: 1px; }
-    .poster-upload-area .upload-icon { font-size: 1.6rem; }
-
-    .poster-preview {
-      width: 100%;
-      max-height: 200px;
-      object-fit: contain;
-      border-radius: 8px;
-      margin-top: 0.5rem;
-      display: none;
-    }
-
-    #poster-file-input { display: none; }
-
-    /* ════════════ EVENT LIST ════════════ */
-    .event-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .event-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.9rem 1rem;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      transition: border-color 0.2s;
-    }
-
-    .event-row:hover { border-color: var(--border-hover); }
-
-    .event-row-poster {
-      width: 44px;
-      height: 58px;
-      object-fit: cover;
-      border-radius: 6px;
-      flex-shrink: 0;
-      cursor: grab;
-      border: 1px solid var(--border);
-    }
-
-    .event-row-info { flex: 1; min-width: 0; }
-
-    .event-row-name {
-      font-family: var(--font-d);
-      font-size: 0.95rem;
-      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    .event-row-date  { color: var(--gold); font-size: 0.68rem; letter-spacing: 2px; margin-top: 2px; }
-    .event-row-venue { color: var(--muted); font-size: 0.72rem; margin-top: 2px; }
-
-    .event-row-remove {
-      background: transparent;
-      border: 1px solid rgba(255,95,95,0.25);
-      color: var(--red);
-      border-radius: 7px;
-      padding: 0.35rem 0.75rem;
-      font-size: 0.68rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: background 0.2s;
-    }
-
-    .event-row-remove:hover { background: rgba(255,95,95,0.1); }
-
-    /* ════════════ INSTAGRAM GRID (Gallery) ════════════ */
-    .insta-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      margin-bottom: 1.5rem;
-    }
-
-    .grid-cell {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      overflow: hidden;
-      background: #111;
-      cursor: grab;
-      border-radius: 2px;
-    }
-
-    .grid-cell.grid-cell--new {
-      outline: 2px solid var(--gold);
-      outline-offset: -2px;
-    }
-
-    .grid-cell.grid-cell--removed {
-      opacity: 0.3;
+    /* ── Animated red paths background ── */
+    .bg-paths {
+      position: fixed;
+      inset: 0;
       pointer-events: none;
+      z-index: 0;
     }
 
-    .grid-cell.drag-over-cell {
-      outline: 2px solid var(--gold);
-    }
-
-    .grid-cell img,
-    .grid-cell video {
+    .bg-paths svg {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      display: block;
-      pointer-events: none;
-      transition: transform 0.4s ease, filter 0.4s ease;
-      filter: saturate(0.8);
+      overflow: visible;
     }
 
-    .grid-cell:hover img,
-    .grid-cell:hover video {
-      transform: scale(1.06);
-      filter: saturate(1);
-    }
-
-    /* Cell overlay */
-    .cell-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
+    /* ── Center content ── */
+    .stage {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.4rem;
+      min-height: 100vh;
+      padding: 2rem;
+      text-align: center;
+      gap: 2rem;
+    }
+
+    /* ── Logo ── */
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
       opacity: 0;
-      transition: opacity 0.2s;
+      animation: fadeUp 0.9s var(--ease) 0.2s forwards;
     }
 
-    .grid-cell:hover .cell-overlay { opacity: 1; }
-
-    .cell-remove-btn {
-      background: rgba(255,95,95,0.9);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 0.35rem 0.7rem;
-      font-size: 0.65rem;
-      font-family: var(--font-b);
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: background 0.2s;
+    /* ── Divider line ── */
+    .divider {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, transparent, rgba(212,175,55,0.5), transparent);
+      opacity: 0;
+      animation: fadeUp 0.9s var(--ease) 0.4s forwards;
     }
 
-    .cell-remove-btn:hover { background: var(--red); }
+    /* ── Main heading ── */
+    .heading {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 8vw, 7rem);
+      font-weight: 900;
+      font-style: italic;
+      line-height: 0.95;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      text-shadow: 0 0 80px rgba(139,26,26,0.5);
+      opacity: 0;
+      animation: fadeUp 1s var(--ease) 0.5s forwards;
+    }
 
-    .cell-drag-handle {
-      color: rgba(245,237,224,0.6);
+    .heading em {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    /* ── Subline ── */
+    .subline {
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+      max-width: 340px;
+      line-height: 2;
+      opacity: 0;
+      animation: fadeUp 0.9s var(--ease) 0.75s forwards;
+    }
+
+    /* ── Gold status badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      border: 1px solid rgba(212,175,55,0.28);
+      border-radius: 99px;
+      padding: 0.55rem 1.4rem;
       font-size: 0.6rem;
-      letter-spacing: 1px;
-      cursor: grab;
-    }
-
-    /* Badge labels */
-    .cell-badge {
-      position: absolute;
-      top: 0.4rem;
-      left: 0.4rem;
-      font-size: 0.55rem;
-      font-family: var(--font-b);
-      letter-spacing: 2px;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-weight: 600;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .cell-badge--new {
-      background: var(--gold);
-      color: #000;
-    }
-
-    .cell-badge--video {
-      background: rgba(0,0,0,0.75);
-      color: var(--gold);
-      border: 1px solid rgba(212,175,55,0.4);
-    }
-
-    /* Video play icon */
-    .cell-play-icon {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .cell-play-icon::after {
-      content: '▶';
-      width: 36px;
-      height: 36px;
-      background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(212,175,55,0.5);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      color: var(--gold);
-      line-height: 36px;
-      text-align: center;
-      text-indent: 2px;
-    }
-
-    /* ════════════ UPLOAD AREA ════════════ */
-    .upload-zone {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 2.5rem 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 1.5rem;
-    }
-
-    .upload-zone:hover,
-    .upload-zone.drag-over {
-      border-color: var(--gold);
-      background: rgba(212,175,55,0.04);
-    }
-
-    .upload-zone-icon {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .upload-zone p {
-      color: var(--muted);
-      font-size: 0.82rem;
-      letter-spacing: 0.5px;
-      line-height: 1.7;
-    }
-
-    .upload-zone .upload-types {
-      color: rgba(212,175,55,0.6);
-      font-size: 0.68rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 0.4rem;
-    }
-
-    #media-file-input { display: none; }
-
-    /* ════════════ GALLERY STATS ════════════ */
-    .gallery-stats {
-      display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1.3rem;
-      flex-wrap: wrap;
-    }
-
-    .stat-pill {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.65rem;
-      letter-spacing: 2px;
-      color: var(--muted);
-    }
-
-    .stat-pill span { color: var(--gold); font-weight: 600; }
-
-    /* ════════════ BUTTONS ════════════ */
-    .btn-gold {
-      background: var(--gold);
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      padding: 0.85rem 2rem;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    .btn-gold:hover { background: var(--gold-light); }
-    .btn-gold:active { transform: scale(0.97); }
-    .btn-gold:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--gold);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.85rem 2rem;
-      font-family: var(--font-b);
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .btn-outline:hover {
-      background: rgba(212,175,55,0.07);
-      border-color: var(--border-hover);
-    }
-
-    .actions-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.8rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    /* ════════════ TOAST ════════════ */
-    #toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--gold);
-      color: #000;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      padding: 1rem 1.8rem;
-      border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-      transform: translateY(80px);
+      color: rgba(212,175,55,0.7);
       opacity: 0;
-      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      animation: fadeUp 0.9s var(--ease) 1s forwards;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--velvet);
+      box-shadow: 0 0 8px rgba(139,26,26,0.9);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(245,237,224,0.15);
+      padding-bottom: 2px;
+      transition: color 0.3s, border-color 0.3s;
+      opacity: 0;
+      animation: fadeUp 0.9s var(--ease) 1.2s forwards;
+    }
+
+    .back-link:hover {
+      color: var(--gold);
+      border-color: rgba(212,175,55,0.5);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Scroll progress stub ── */
+    #scroll-progress {
+      position: fixed; top: 0; left: 0;
+      height: 1px; width: 100%;
+      background: linear-gradient(90deg, var(--velvet), var(--gold));
       z-index: 9999;
-      pointer-events: none;
-      max-width: 320px;
-    }
-
-    #toast.show   { transform: translateY(0); opacity: 1; }
-    #toast.error  { background: var(--red); color: #fff; }
-    #toast.success{ background: #16a34a; color: #fff; }
-
-    /* ════════════ EMPTY STATE ════════════ */
-    .empty-state {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      padding: 2.5rem 0;
-    }
-
-    /* ════════════ HELP TEXT ════════════ */
-    .help-text {
-      font-size: 0.72rem;
-      color: var(--muted);
-      line-height: 1.7;
-      padding: 1rem 1.2rem;
-      border-left: 2px solid rgba(212,175,55,0.25);
-      margin-bottom: 1.3rem;
-    }
-
-    .help-text strong { color: var(--text); }
-
-    /* ════════════ RESPONSIVE ════════════ */
-    @media (max-width: 600px) {
-      .event-form { grid-template-columns: 1fr; }
-      .form-field.full { grid-column: 1; }
-      .actions-row { justify-content: stretch; }
-      .actions-row .btn-gold,
-      .actions-row .btn-outline { flex: 1; text-align: center; }
-      .admin-header { padding: 1rem; }
-      main { padding: 1.5rem 1rem 3rem; }
-      .header-right .site-link { display: none; }
-      .insta-grid { grid-template-columns: repeat(3, 1fr); gap: 2px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ════════ LOGIN ════════ -->
-<div id="login-screen">
-  <img src="vv-logo.jpeg" alt="Velvet Vibrance" class="login-logo">
-  <div class="login-title">Velvet Vibrance</div>
-  <div class="login-sub">Admin Panel</div>
-  <div class="login-box">
-    <label for="pw-input">Password</label>
-    <div class="pw-row">
-      <input type="password" id="pw-input" placeholder="Enter password" autofocus>
-      <button class="login-btn" onclick="checkPassword()">ENTER</button>
-    </div>
-    <div id="login-error">Incorrect password. Try again.</div>
-  </div>
-</div>
+  <div id="scroll-progress"></div>
 
-<!-- ════════ ADMIN ════════ -->
-<div id="admin-panel">
+  <!-- Animated red path background -->
+  <div class="bg-paths" id="bg-paths"></div>
 
-  <div class="admin-header">
-    <div class="header-brand">
-      <img src="vv-logo.jpeg" alt="VV">
-      <span class="header-title">Velvet Vibrance</span>
-    </div>
-    <div class="header-right">
-      <a href="index.html" target="_blank" class="site-link">View Site ↗</a>
-      <button class="logout-btn" onclick="logout()">Sign Out</button>
-    </div>
+  <div class="stage">
+    <p class="logo">Velvet Vibrance</p>
+    <div class="divider"></div>
+    <h1 class="heading">Under<br /><em>Maintenance</em></h1>
+    <p class="subline">We're refining the experience.<br />Back shortly.</p>
+    <span class="badge">
+      <span class="badge-dot"></span>
+      Work in progress
+    </span>
+    <a href="/" class="back-link">← Return to site</a>
   </div>
 
-  <div class="tabs">
-    <div class="tab active"   onclick="switchTab('gallery')">Gallery</div>
-    <div class="tab"          onclick="switchTab('events')">Events</div>
-    <div class="tab"          onclick="switchTab('settings')">Settings</div>
-  </div>
+  <script>
+    (function () {
+      var container = document.getElementById('bg-paths');
+      var svgNS = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('viewBox', '-600 -420 1900 1420');
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('overflow', 'visible');
 
-  <main>
+      var DASH = 660, GAP = 1540, LEN = 2200;
+      var styleEl = document.createElement('style');
+      var keyframes = '';
+      var idx = 0;
 
-    <!-- ════════ GALLERY TAB ════════ -->
-    <div class="tab-panel active" id="panel-gallery">
+      [1, -1].forEach(function (pos) {
+        for (var i = 0; i < 36; i++) {
+          var x = 380 - i * 5 * pos;
+          var d = 'M-' + x + ' -' + (189 + i * 6) +
+                  'C-' + x + ' -' + (189 + i * 6) +
+                  ' -' + (312 - i * 5 * pos) + ' ' + (216 - i * 6) +
+                  ' '  + (152 - i * 5 * pos) + ' ' + (343 - i * 6) +
+                  'C'  + (616 - i * 5 * pos) + ' ' + (470 - i * 6) +
+                  ' '  + (684 - i * 5 * pos) + ' ' + (875 - i * 6) +
+                  ' '  + (684 - i * 5 * pos) + ' ' + (875 - i * 6);
 
-      <div class="help-text">
-        <strong>How to update the gallery:</strong> Upload photos or videos below — they'll appear in the grid.
-        Drag items to reorder. Click a cell to remove it. When you're happy, hit <strong>Publish</strong> to push live.
-      </div>
+          var opacity  = Math.min(0.18 + i * 0.024, 1).toFixed(3);
+          var sw       = (0.6 + i * 0.04).toFixed(2);
+          var dur      = (18 + i * 0.28 + Math.random() * 6).toFixed(1);
+          var start    = -Math.round(Math.random() * LEN);
+          var name     = 'mp' + idx;
 
-      <div class="card">
-        <div class="card-label">
-          Gallery
-          <span class="count-badge" id="gallery-count">0 items</span>
-        </div>
+          var path = document.createElementNS(svgNS, 'path');
+          path.setAttribute('d', d);
+          path.setAttribute('stroke', 'rgba(220,30,30,' + opacity + ')');
+          path.setAttribute('stroke-width', sw);
+          path.setAttribute('stroke-dasharray', DASH + ' ' + GAP);
+          path.setAttribute('stroke-dashoffset', start);
+          path.setAttribute('fill', 'none');
 
-        <div class="gallery-stats" id="gallery-stats">
-          <div class="stat-pill">Photos: <span id="stat-photos">0</span></div>
-          <div class="stat-pill">Videos: <span id="stat-videos">0</span></div>
-          <div class="stat-pill">New: <span id="stat-new">0</span></div>
-        </div>
+          keyframes += '@keyframes ' + name + '{' +
+            '0%{stroke-dashoffset:' + start + '}' +
+            '100%{stroke-dashoffset:' + (start - LEN) + '}}';
 
-        <div class="insta-grid" id="insta-grid"></div>
-
-        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('media-file-input').click()">
-          <span class="upload-zone-icon">+</span>
-          <p>Tap or drag to add photos &amp; videos</p>
-          <p class="upload-types">JPG · PNG · WEBP · MP4 · MOV</p>
-        </div>
-        <input type="file" id="media-file-input" accept="image/*,video/*" multiple onchange="handleMediaSelect(this)">
-      </div>
-
-      <div class="actions-row">
-        <button class="btn-outline" onclick="renderGallery()">Reset Preview</button>
-        <button class="btn-gold" id="publish-gallery-btn" onclick="publishGallery()">Publish Gallery →</button>
-      </div>
-
-    </div>
-
-    <!-- ════════ EVENTS TAB ════════ -->
-    <div class="tab-panel" id="panel-events">
-
-      <div class="help-text">
-        <strong>Adding an event:</strong> Fill in the details, upload a poster image, then click <strong>Add Event</strong>.
-        Once your list looks right, click <strong>Publish</strong> to go live on the site.
-      </div>
-
-      <!-- Add event form -->
-      <div class="card">
-        <div class="card-label">Add New Event</div>
-        <div class="event-form">
-          <div class="form-field">
-            <label>Event Name</label>
-            <input type="text" id="ev-name" placeholder="e.g. Velvet Night Vol. 5">
-          </div>
-          <div class="form-field">
-            <label>Date</label>
-            <input type="text" id="ev-date" placeholder="e.g. SAT 14 JUNE 2025">
-          </div>
-          <div class="form-field">
-            <label>Venue</label>
-            <input type="text" id="ev-venue" placeholder="e.g. The Warehouse, Denver">
-          </div>
-          <div class="form-field">
-            <label>Ticket Link (optional)</label>
-            <input type="url" id="ev-tickets" placeholder="https://...">
-          </div>
-          <div class="form-field full">
-            <label>Event Poster</label>
-            <div class="poster-upload-area" id="poster-drop"
-              onclick="document.getElementById('poster-file-input').click()">
-              <span class="upload-icon">🖼</span>
-              <p>Click or drag poster here</p>
-              <img id="poster-preview" class="poster-preview" src="" alt="Poster preview">
-            </div>
-            <input type="file" id="poster-file-input" accept="image/*" onchange="handlePosterSelect(this)">
-          </div>
-        </div>
-        <div class="actions-row">
-          <button class="btn-gold" onclick="addEvent()">Add Event</button>
-        </div>
-      </div>
-
-      <!-- Event list -->
-      <div class="card">
-        <div class="card-label">
-          Upcoming Events
-          <span class="count-badge" id="events-count">0 events</span>
-        </div>
-        <div class="event-list" id="event-list">
-          <div class="empty-state" id="events-empty-admin">No events yet. Add one above.</div>
-        </div>
-        <div class="actions-row">
-          <button class="btn-gold" id="publish-events-btn" onclick="publishEvents()">Publish Events →</button>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ════════ SETTINGS TAB ════════ -->
-    <div class="tab-panel" id="panel-settings">
-
-      <div class="card">
-        <div class="card-label">GitHub Token</div>
-        <div id="config-warning">
-          <strong>One-time setup:</strong> To publish changes to the live site, paste a GitHub Personal Access Token below.<br><br>
-          <strong>How to get one:</strong> Go to <strong>github.com → Settings → Developer settings → Fine-grained tokens</strong> and create a token with <code>Contents: Read &amp; Write</code> permission on the <code>velvet-vibrance</code> repo.
-          <div class="token-row">
-            <input type="password" id="gh-token-input" placeholder="github_pat_...">
-            <button class="token-save-btn" onclick="saveToken()">Save Token</button>
-            <button class="btn-secondary" onclick="testToken()">Test</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">About This Panel</div>
-        <div class="help-text" style="margin:0; border:none; padding:0;">
-          <strong>Gallery:</strong> Upload photos and videos. Drag to reorder. Publish to go live.<br>
-          <strong>Events:</strong> Add upcoming shows with poster images and ticket links.<br>
-          <strong>Publish:</strong> Saves directly to GitHub and updates the site within seconds.<br><br>
-          Questions? Ask Glenn.
-        </div>
-      </div>
-
-    </div>
-
-  </main>
-</div>
-
-<div id="toast"></div>
-
-<script>
-  /* ════════ CONFIG ════════ */
-  const PW_HASH    = 'd8078da636aa1ad05f5addc7fd85f1955bb8a9bb952057fb7bc21e965ca5ed24';
-  const REPO_OWNER = 'glenngallacher1-lab';
-  const REPO_NAME  = 'velvet-vibrance';
-  const RAW_BASE   = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
-
-  /* ════════ STATE ════════ */
-  // Gallery items: { file, alt, type: 'image'|'video' }
-  const GALLERY_ITEMS = [
-    { file: 'crowd-pink.png',     alt: 'The crowd moves as one',        type: 'image' },
-    { file: 'dj-orange.png',      alt: 'In the booth',                  type: 'image' },
-    { file: 'laser-show.jpeg',    alt: 'Lasers cut through the dark',   type: 'image' },
-    { file: 'dj-headphones.png',  alt: 'Locked in',                     type: 'image' },
-    { file: 'dj-crowd.jpeg',      alt: 'DJ raises the room',            type: 'image' },
-    { file: 'crowd-outdoor.jpeg', alt: 'The frequency moves outside',   type: 'image' }
-  ];
-
-  let events        = [];
-  let pendingMedia  = [];          // { file, base64, name, type: 'image'|'video' }
-  let removedItems  = new Set();   // filenames
-  let posterBase64  = null;
-  let posterFileName = null;
-  let dragSrcIndex  = null;
-
-  /* ════════ AUTH ════════ */
-  async function hash(s) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-
-  async function checkPassword() {
-    const h = await hash(document.getElementById('pw-input').value);
-    if (h === PW_HASH) {
-      sessionStorage.setItem('vv_auth', '1');
-      showAdmin();
-    } else {
-      document.getElementById('login-error').style.display = 'block';
-      document.getElementById('pw-input').value = '';
-      document.getElementById('pw-input').focus();
-    }
-  }
-
-  document.getElementById('pw-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkPassword();
-  });
-
-  function showAdmin() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-panel').style.display  = 'block';
-    if (localStorage.getItem('vv_gh_token')) {
-      document.getElementById('config-warning').style.display = 'none';
-    }
-    loadEvents();
-    renderGallery();
-  }
-
-  function logout() {
-    sessionStorage.removeItem('vv_auth');
-    location.reload();
-  }
-
-  /* ════════ TABS ════════ */
-  function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach((t, i) =>
-      t.classList.toggle('active', ['gallery','events','settings'][i] === tab)
-    );
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(`panel-${tab}`).classList.add('active');
-  }
-
-  /* ════════ TOKEN ════════ */
-  function saveToken() {
-    const v = document.getElementById('gh-token-input').value.trim();
-    if (!v) return;
-    localStorage.setItem('vv_gh_token', v);
-    document.getElementById('config-warning').style.display = 'none';
-    toast('Token saved ✓', 'success');
-  }
-
-  async function testToken() {
-    const token = localStorage.getItem('vv_gh_token') || document.getElementById('gh-token-input').value.trim();
-    if (!token) { toast('Enter a token first', 'error'); return; }
-    toast('Testing token...');
-    const res  = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`, {
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }
-    });
-    const data = await res.json();
-    if (res.ok) {
-      if (data.permissions && data.permissions.push) toast('Token OK — has write access ✓', 'success');
-      else toast('Token valid but NO write access', 'error');
-    } else if (res.status === 401) {
-      toast('Token invalid or expired', 'error');
-    } else if (res.status === 404) {
-      toast('Repo not found — check token permissions', 'error');
-    } else {
-      toast('Error ' + res.status, 'error');
-    }
-  }
-
-  /* ════════ EVENTS ════════ */
-  async function loadEvents() {
-    try {
-      const res = await fetch(`${RAW_BASE}events.json?t=${Date.now()}`);
-      events = await res.json();
-    } catch { events = []; }
-    renderEvents();
-  }
-
-  function renderEvents() {
-    const list  = document.getElementById('event-list');
-    const empty = document.getElementById('events-empty-admin');
-    const badge = document.getElementById('events-count');
-    list.innerHTML = '';
-    badge.textContent = events.length + (events.length === 1 ? ' event' : ' events');
-    if (events.length === 0) { list.appendChild(empty); return; }
-    events.forEach((ev, i) => {
-      const row = document.createElement('div');
-      row.className = 'event-row';
-      row.innerHTML = `
-        <img src="${ev.poster}" alt="${ev.name}" class="event-row-poster" draggable="true"
-          ondragstart="dragPoster(event,'${ev.poster}')" title="Drag to share poster">
-        <div class="event-row-info">
-          <div class="event-row-name">${ev.name}</div>
-          <div class="event-row-date">${ev.date}</div>
-          <div class="event-row-venue">${ev.venue}</div>
-        </div>
-        <button class="event-row-remove" onclick="removeEvent(${i})">Remove</button>
-      `;
-      list.appendChild(row);
-    });
-  }
-
-  function dragPoster(e, src) {
-    e.dataTransfer.setData('text/uri-list', src);
-    e.dataTransfer.setData('text/plain', src);
-  }
-
-  function handlePosterSelect(input) {
-    const file = input.files[0];
-    if (!file) return;
-    posterFileName = file.name;
-    const reader = new FileReader();
-    reader.onload = e => {
-      posterBase64 = e.target.result.split(',')[1];
-      const preview = document.getElementById('poster-preview');
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-      document.querySelector('#poster-drop p').style.display = 'none';
-      document.querySelector('#poster-drop .upload-icon').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // Poster drag-over
-  const posterDrop = document.getElementById('poster-drop');
-  posterDrop.addEventListener('dragover',  e => { e.preventDefault(); posterDrop.classList.add('drag-over'); });
-  posterDrop.addEventListener('dragleave', () => posterDrop.classList.remove('drag-over'));
-  posterDrop.addEventListener('drop', e => {
-    e.preventDefault();
-    posterDrop.classList.remove('drag-over');
-    const fakeInput = { files: e.dataTransfer.files };
-    handlePosterSelect(fakeInput);
-  });
-
-  async function addEvent() {
-    const name    = document.getElementById('ev-name').value.trim();
-    const date    = document.getElementById('ev-date').value.trim();
-    const venue   = document.getElementById('ev-venue').value.trim();
-    const tickets = document.getElementById('ev-tickets').value.trim();
-
-    if (!name || !date || !venue) { toast('Fill in name, date and venue', 'error'); return; }
-    if (!posterBase64)            { toast('Add a poster image', 'error'); return; }
-
-    const token = localStorage.getItem('vv_gh_token');
-    if (!token) {
-      switchTab('settings');
-      toast('Enter your GitHub token in Settings first', 'error');
-      return;
-    }
-
-    toast('Uploading poster...');
-    const H    = apiHeaders(token);
-    const base = apiBase();
-    const posterPath = `posters/${Date.now()}-${posterFileName}`;
-
-    try {
-      await fetch(base + posterPath, {
-        method: 'PUT', headers: H,
-        body: JSON.stringify({ message: `admin: add poster ${posterFileName}`, content: posterBase64 })
-      });
-
-      const posterUrl = `${RAW_BASE}${posterPath}`;
-      events.push({ name, date, venue, tickets, poster: posterUrl });
-      renderEvents();
-      resetEventForm();
-      toast('Event added — hit Publish to go live ✓', 'success');
-    } catch(err) {
-      toast('Upload failed: ' + err.message, 'error');
-    }
-  }
-
-  function resetEventForm() {
-    document.getElementById('ev-name').value    = '';
-    document.getElementById('ev-date').value    = '';
-    document.getElementById('ev-venue').value   = '';
-    document.getElementById('ev-tickets').value = '';
-    document.getElementById('poster-preview').style.display = 'none';
-    const pEl = document.querySelector('#poster-drop p');
-    const iEl = document.querySelector('#poster-drop .upload-icon');
-    if (pEl) pEl.style.display = '';
-    if (iEl) iEl.style.display = '';
-    document.getElementById('poster-file-input').value = '';
-    posterBase64 = null;
-    posterFileName = null;
-  }
-
-  function removeEvent(i) {
-    if (!confirm('Remove "' + events[i].name + '"?')) return;
-    events.splice(i, 1);
-    renderEvents();
-    toast('Event removed — Publish to update site');
-  }
-
-  async function publishEvents() {
-    const token = getToken(); if (!token) return;
-    const btn = document.getElementById('publish-events-btn');
-    btn.disabled = true; btn.textContent = 'Publishing...';
-
-    try {
-      const res  = await fetch(apiBase() + 'events.json', { headers: apiHeaders(token) });
-      if (!res.ok) throw new Error(res.status);
-      const data = await res.json();
-      const put  = await fetch(apiBase() + 'events.json', {
-        method: 'PUT', headers: apiHeaders(token),
-        body: JSON.stringify({
-          message: 'admin: update events',
-          content: btoa(JSON.stringify(events, null, 2)),
-          sha: data.sha
-        })
-      });
-      if (!put.ok) throw new Error(put.status);
-      toast('Events live on site ✓', 'success');
-    } catch(err) {
-      handleApiError(err);
-    }
-
-    btn.disabled = false; btn.textContent = 'Publish Events →';
-  }
-
-  /* ════════ GALLERY ════════ */
-  function renderGallery() {
-    const grid = document.getElementById('insta-grid');
-    grid.innerHTML = '';
-
-    const allItems = [
-      ...GALLERY_ITEMS.filter(p => !removedItems.has(p.file)),
-      ...pendingMedia.map(p => ({ ...p, isPending: true }))
-    ];
-
-    allItems.forEach((item, i) => {
-      const cell = document.createElement('div');
-      cell.className = 'grid-cell';
-      if (item.isPending)          cell.classList.add('grid-cell--new');
-      if (removedItems.has(item.file)) cell.classList.add('grid-cell--removed');
-
-      const isVideo = item.type === 'video';
-      const srcUrl  = item.isPending
-        ? (isVideo ? 'data:video/mp4;base64,' + item.base64 : 'data:image/jpeg;base64,' + item.base64)
-        : item.file;
-
-      let mediaEl;
-      if (isVideo) {
-        mediaEl = document.createElement('video');
-        mediaEl.src = srcUrl;
-        mediaEl.muted = true;
-        mediaEl.loop  = true;
-        mediaEl.playsInline = true;
-        mediaEl.preload = 'metadata';
-        cell.addEventListener('mouseenter', () => mediaEl.play());
-        cell.addEventListener('mouseleave', () => { mediaEl.pause(); mediaEl.currentTime = 0; });
-      } else {
-        mediaEl = document.createElement('img');
-        mediaEl.src     = srcUrl;
-        mediaEl.alt     = item.alt || '';
-        mediaEl.loading = 'lazy';
-      }
-
-      cell.appendChild(mediaEl);
-
-      // Badges
-      if (item.isPending) {
-        const badge = document.createElement('div');
-        badge.className = 'cell-badge cell-badge--new';
-        badge.textContent = 'NEW';
-        cell.appendChild(badge);
-      }
-      if (isVideo) {
-        const vBadge = document.createElement('div');
-        vBadge.className = 'cell-badge cell-badge--video';
-        vBadge.style.top = item.isPending ? '1.5rem' : '0.4rem';
-        vBadge.textContent = 'VIDEO';
-        cell.appendChild(vBadge);
-
-        const playIcon = document.createElement('div');
-        playIcon.className = 'cell-play-icon';
-        cell.appendChild(playIcon);
-      }
-
-      // Overlay controls
-      const overlay = document.createElement('div');
-      overlay.className = 'cell-overlay';
-      overlay.innerHTML = `
-        <button class="cell-remove-btn">Remove</button>
-        <span class="cell-drag-handle">⠿ drag to reorder</span>
-      `;
-      overlay.querySelector('.cell-remove-btn').addEventListener('click', e => {
-        e.stopPropagation();
-        if (item.isPending) {
-          const pi = pendingMedia.findIndex(p => p.name === item.name && p.type === item.type);
-          if (pi !== -1) pendingMedia.splice(pi, 1);
-        } else {
-          removedItems.add(item.file);
+          path.style.animation = name + ' ' + dur + 's linear infinite';
+          svg.appendChild(path);
+          idx++;
         }
-        renderGallery();
-        toast('Item removed — Publish to update site');
-      });
-      cell.appendChild(overlay);
-
-      // Drag to reorder
-      cell.draggable = true;
-      cell.dataset.index = i;
-      cell.addEventListener('dragstart', e => {
-        dragSrcIndex = i;
-        e.dataTransfer.effectAllowed = 'move';
-        cell.style.opacity = '0.4';
-      });
-      cell.addEventListener('dragend', () => { cell.style.opacity = ''; });
-      cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drag-over-cell'); });
-      cell.addEventListener('dragleave', () => cell.classList.remove('drag-over-cell'));
-      cell.addEventListener('drop', e => {
-        e.preventDefault();
-        cell.classList.remove('drag-over-cell');
-        if (dragSrcIndex === null || dragSrcIndex === i) return;
-        reorderGallery(dragSrcIndex, i);
       });
 
-      grid.appendChild(cell);
-    });
-
-    // Update stats
-    const photoCount = GALLERY_ITEMS.filter(p => !removedItems.has(p.file) && p.type === 'image').length
-                     + pendingMedia.filter(p => p.type === 'image').length;
-    const videoCount = GALLERY_ITEMS.filter(p => !removedItems.has(p.file) && p.type === 'video').length
-                     + pendingMedia.filter(p => p.type === 'video').length;
-    const total      = photoCount + videoCount;
-
-    document.getElementById('gallery-count').textContent = total + (total === 1 ? ' item' : ' items');
-    document.getElementById('stat-photos').textContent   = photoCount;
-    document.getElementById('stat-videos').textContent   = videoCount;
-    document.getElementById('stat-new').textContent      = pendingMedia.length;
-  }
-
-  function reorderGallery(fromIdx, toIdx) {
-    // Build combined ordered list
-    const combined = [
-      ...GALLERY_ITEMS.filter(p => !removedItems.has(p.file)),
-      ...pendingMedia.map(p => ({ ...p, isPending: true }))
-    ];
-
-    const moved = combined.splice(fromIdx, 1)[0];
-    combined.splice(toIdx, 0, moved);
-
-    // Rebuild GALLERY_ITEMS and pendingMedia from new order
-    GALLERY_ITEMS.length = 0;
-    pendingMedia = [];
-    combined.forEach(item => {
-      if (item.isPending) {
-        const { isPending, ...rest } = item;
-        pendingMedia.push(rest);
-      } else {
-        GALLERY_ITEMS.push(item);
-      }
-    });
-
-    dragSrcIndex = null;
-    renderGallery();
-  }
-
-  function handleMediaSelect(input) {
-    const files = Array.from(input.files);
-    files.forEach(file => {
-      const isVideo = file.type.startsWith('video/');
-      if (isVideo && file.size > 50 * 1024 * 1024) {
-        toast(`${file.name} is over 50MB — too large to upload via API`, 'error');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = e => {
-        const base64 = e.target.result.split(',')[1];
-        pendingMedia.push({ file, base64, name: file.name, type: isVideo ? 'video' : 'image', alt: file.name.split('.')[0].replace(/[-_]/g,' ') });
-        renderGallery();
-      };
-      reader.readAsDataURL(file);
-    });
-    input.value = '';
-  }
-
-  // Drag & drop on upload zone
-  const uploadZone = document.getElementById('upload-zone');
-  uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-  uploadZone.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadZone.classList.remove('drag-over');
-    handleMediaSelect({ files: e.dataTransfer.files });
-  });
-
-  async function publishGallery() {
-    const token = getToken(); if (!token) return;
-    const btn = document.getElementById('publish-gallery-btn');
-    btn.disabled = true; btn.textContent = 'Publishing...';
-
-    const H    = apiHeaders(token);
-    const base = apiBase();
-
-    try {
-      // Upload new media files
-      let uploadCount = 0;
-      for (const p of pendingMedia) {
-        toast(`Uploading ${p.name}... (${++uploadCount}/${pendingMedia.length})`);
-        const res = await fetch(base + p.name, {
-          method: 'PUT', headers: H,
-          body: JSON.stringify({
-            message: `admin: add ${p.type} ${p.name}`,
-            content: p.base64
-          })
-        });
-        if (!res.ok) throw new Error(res.status + ' uploading ' + p.name);
-        GALLERY_ITEMS.push({ file: p.name, alt: p.alt || p.name.split('.')[0], type: p.type });
-      }
-      pendingMedia = [];
-
-      // Build new gallery HTML items
-      const activeItems = GALLERY_ITEMS.filter(p => !removedItems.has(p.file));
-      const newItemsHTML = activeItems.map(p => {
-        if (p.type === 'video') {
-          return `
-      <div class="rg-item rg-video">
-        <video src="${p.file}" loop muted playsinline></video>
-        <div class="rg-overlay"><span>${p.alt}</span></div>
-      </div>`;
-        } else {
-          return `
-      <div class="rg-item">
-        <img src="${p.file}" alt="${p.alt}" loading="lazy" />
-        <div class="rg-overlay"><span>${p.alt}</span></div>
-      </div>`;
-        }
-      }).join('');
-
-      // Fetch and update index.html
-      toast('Updating site...');
-      const iRes  = await fetch(base + 'index.html', { headers: H });
-      if (!iRes.ok) throw new Error('Could not fetch index.html');
-      const iData = await iRes.json();
-      let html    = atob(iData.content.replace(/\n/g, ''));
-
-      html = html.replace(
-        /<!-- GALLERY-ITEMS-START -->[\s\S]*?<!-- GALLERY-ITEMS-END -->/,
-        `<!-- GALLERY-ITEMS-START -->${newItemsHTML}\n<!-- GALLERY-ITEMS-END -->`
-      );
-
-      const putRes = await fetch(base + 'index.html', {
-        method: 'PUT', headers: H,
-        body: JSON.stringify({
-          message: 'admin: update gallery',
-          content: btoa(unescape(encodeURIComponent(html))),
-          sha: iData.sha
-        })
-      });
-      if (!putRes.ok) throw new Error(putRes.status);
-
-      removedItems.clear();
-      renderGallery();
-      toast('Gallery is live on the site ✓', 'success');
-    } catch(err) {
-      handleApiError(err);
-    }
-
-    btn.disabled = false; btn.textContent = 'Publish Gallery →';
-  }
-
-  /* ════════ HELPERS ════════ */
-  function getToken() {
-    const t = localStorage.getItem('vv_gh_token');
-    if (!t) {
-      switchTab('settings');
-      toast('Enter your GitHub token in Settings first', 'error');
-    }
-    return t;
-  }
-
-  function apiHeaders(token) {
-    return {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json'
-    };
-  }
-
-  function apiBase() {
-    return `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`;
-  }
-
-  function handleApiError(err) {
-    const msg = String(err.message || err);
-    if (msg.includes('401'))      toast('Token rejected — check it has write access', 'error');
-    else if (msg.includes('404')) toast('Repo not found — check token repo permissions', 'error');
-    else if (msg.includes('422')) toast('No changes detected — already up to date', 'success');
-    else                          toast('Error: ' + msg, 'error');
-  }
-
-  function toast(msg, type = 'default') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'show' + (type !== 'default' ? ' ' + type : '');
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => el.className = '', 3500);
-  }
-
-  /* ════════ AUTO-LOGIN ════════ */
-  if (sessionStorage.getItem('vv_auth') === '1') showAdmin();
-</script>
-
+      styleEl.textContent = keyframes;
+      document.head.appendChild(styleEl);
+      container.appendChild(svg);
+    })();
+  </script>
 </body>
 </html>
