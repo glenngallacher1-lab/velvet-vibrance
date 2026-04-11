@@ -93,16 +93,6 @@ h1, h2, h3, h4 {
   pointer-events: none;
 }
 
-#shader-bg {
-  position: absolute;
-  inset: 0;
-  opacity: 0.45;
-}
-
-#shader-bg canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
 
 .entry-content {
   position: relative;

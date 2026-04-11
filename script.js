@@ -37,79 +37,6 @@
   document.head.appendChild(script);
 })();
 
-/* ── B. Three.js Shader (Entry Screen) ─────────────────────── */
-(function initShader() {
-  const script = document.createElement('script');
-  script.src = 'https://unpkg.com/three@0.160.0/build/three.min.js';
-  script.onload = function () {
-    const container = document.getElementById('shader-bg');
-    if (!container) return;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(container.offsetWidth, container.offsetHeight);
-    renderer.domElement.style.position = 'absolute';
-    renderer.domElement.style.top = '0';
-    renderer.domElement.style.left = '0';
-    container.appendChild(renderer.domElement);
-
-    const scene  = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-    const vertexShader = `void main() { gl_Position = vec4(position, 1.0); }`;
-    const fragmentShader = `
-      precision highp float;
-      uniform vec2 resolution;
-      uniform float time;
-      void main(void) {
-        vec2 uv = (gl_FragCoord.xy * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
-        float t = time * 0.05;
-        float lw = 0.002;
-        vec3 color = vec3(0.0);
-        for(int j = 0; j < 3; j++){
-          for(int i = 0; i < 5; i++){
-            color[j] += lw * float(i*i) / abs(
-              fract(t - 0.01*float(j) + float(i)*0.01)*5.0
-              - length(uv)
-              + mod(uv.x+uv.y, 0.2)
-            );
-          }
-        }
-        color = vec3(color.r * 2.0 + color.g * 0.35, color.g * 0.3, color.b * 0.06);
-        gl_FragColor = vec4(color, 1.0);
-      }
-    `;
-
-    const material = new THREE.ShaderMaterial({
-      uniforms: {
-        resolution: { value: new THREE.Vector2(container.offsetWidth, container.offsetHeight) },
-        time:       { value: 0.0 }
-      },
-      vertexShader, fragmentShader
-    });
-
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-    scene.add(mesh);
-
-    let animId;
-    const startTime = performance.now();
-    function animate() {
-      animId = requestAnimationFrame(animate);
-      material.uniforms.time.value = (performance.now() - startTime) / 1000;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window._stopShader = function () { cancelAnimationFrame(animId); };
-
-    window.addEventListener('resize', function () {
-      const w = container.offsetWidth, h = container.offsetHeight;
-      renderer.setSize(w, h);
-      material.uniforms.resolution.value.set(w, h);
-    });
-  };
-  document.head.appendChild(script);
-})();
 
 /* ── C. Entry Screen — Auto-Progress Loader ─────────────────── */
 (function initEntry() {
@@ -125,9 +52,6 @@
     if (entry.classList.contains('hidden')) return;
     entry.classList.add('hidden');
     document.body.classList.remove('entry-open');
-    setTimeout(function () {
-      if (typeof window._stopShader === 'function') window._stopShader();
-    }, 1000);
   }
 
   entry.addEventListener('click', dismiss);
