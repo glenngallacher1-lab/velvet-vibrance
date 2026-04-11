@@ -132,7 +132,7 @@
   });
 
   /* ── 3. Auto-dismiss — sweep up when letters finish ─────── */
-  var sweepDelay = (BASE_DELAY + (letterIndex - 1) * STAGGER + 0.7 + 0.6) * 1000;
+  var sweepDelay = 2600;
 
   function dismiss() {
     if (entry.classList.contains('sweep-out')) return;
