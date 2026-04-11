@@ -111,15 +111,18 @@
   document.head.appendChild(script);
 })();
 
-/* ── C. Entry Screen ─────────────────────────────────────────── */
+/* ── C. Entry Screen — Auto-Progress Loader ─────────────────── */
 (function initEntry() {
   const entry    = document.getElementById('entry-screen');
-  const enterBtn = document.getElementById('enter-btn');
-  if (!entry || !enterBtn) return;
+  const fill     = document.getElementById('entry-progress-fill');
+  const counter  = document.getElementById('entry-counter');
+  if (!entry) return;
 
   document.body.classList.add('entry-open');
 
+  // Allow skip on click or keypress
   function dismiss() {
+    if (entry.classList.contains('hidden')) return;
     entry.classList.add('hidden');
     document.body.classList.remove('entry-open');
     setTimeout(function () {
@@ -127,13 +130,46 @@
     }, 1000);
   }
 
-  enterBtn.addEventListener('click', dismiss);
+  entry.addEventListener('click', dismiss);
   document.addEventListener('keydown', function (e) {
-    if ((e.key === ' ' || e.key === 'Enter') && !entry.classList.contains('hidden')) {
-      e.preventDefault();
-      dismiss();
-    }
+    if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') dismiss();
   });
+
+  // Animate 0 → 100 over ~2.8s with ease-out feel, then auto-dismiss
+  var DURATION  = 2800;    // ms for counter to reach 100
+  var HOLD      = 380;     // ms to hold at 100% before dismissing
+  var startTime = null;
+  var lastPct   = 0;
+
+  function easeOut(t) {
+    // Cubic ease-out — quick start, slows near 100%
+    return 1 - Math.pow(1 - t, 2.8);
+  }
+
+  function tick(timestamp) {
+    if (!startTime) startTime = timestamp;
+    var elapsed  = timestamp - startTime;
+    var raw      = Math.min(elapsed / DURATION, 1);
+    var pct      = Math.round(easeOut(raw) * 100);
+
+    if (pct !== lastPct) {
+      lastPct = pct;
+      if (fill)   fill.style.width   = pct + '%';
+      if (counter) counter.textContent = 'LOADING — ' + pct + '%';
+    }
+
+    if (raw < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      // Hold at 100% briefly, then dismiss
+      setTimeout(dismiss, HOLD);
+    }
+  }
+
+  // Start counter after the entry content has faded in (0.8s delay matches CSS)
+  setTimeout(function () {
+    requestAnimationFrame(tick);
+  }, 900);
 })();
 
 /* ── D. Hamburger / Nav Overlay ─────────────────────────────── */

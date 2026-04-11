@@ -15,20 +15,22 @@
   <!-- ══════════════════════════════════════════════════════════
        ENTRY / PRELOADER
   ══════════════════════════════════════════════════════════ -->
-  <div id="entry-screen">
+  <div id="entry-screen" role="status" aria-label="Loading Velvet Vibrance">
     <div id="shader-bg"></div>
+
     <div class="entry-content">
       <div class="entry-logo-wrap">
         <span class="entry-monogram">VV</span>
       </div>
       <h1 class="entry-wordmark">VELVET<br>VIBRANCE</h1>
-      <button id="enter-btn" class="btn-dual btn-elastic" aria-label="Enter site">
-        <span class="btn-text-top">ENTER THE FREQUENCY</span>
-        <span class="btn-text-bot">ENTER THE FREQUENCY</span>
-      </button>
+      <p class="entry-system-url">VV://VELVET-VIBRANCE/FREQUENCY/CHANNEL-01</p>
     </div>
-    <div class="entry-scroll-cue">
-      <span class="scroll-comet"></span>
+
+    <div class="entry-loader">
+      <div class="entry-progress-wrap">
+        <div class="entry-progress-fill" id="entry-progress-fill"></div>
+      </div>
+      <p class="entry-counter" id="entry-counter">LOADING — 0%</p>
     </div>
   </div>
 
