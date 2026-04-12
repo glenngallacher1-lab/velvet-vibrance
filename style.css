@@ -819,13 +819,14 @@ h1, h2, h3, h4 {
   overflow: hidden;
   background: #0a0a0a;
   cursor: pointer;
-  /* clip-path cascade entrance — driven by JS */
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path 1s var(--ease-out);
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
 }
 
 .rg-item.rg-revealed {
-  clip-path: inset(0% 0 0 0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Tall / wide variants for masonry feel */
