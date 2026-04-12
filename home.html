@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Velvet Vibrance — Where Art Bleeds Into Gold. A music, art, fashion and events collective born from frequency." />
+  <title>VELVET VIBRANCE — Where Art Bleeds Into Gold</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ENTRY / PRELOADER
+  ══════════════════════════════════════════════════════════ -->
+  <div id="entry-screen">
+    <!-- SVG path layers injected by JS -->
+    <div class="entry-paths-layer" id="entry-paths-layer"></div>
+    <!-- Letter-by-letter title injected by JS -->
+    <div class="entry-center">
+      <h1 class="entry-title" id="entry-title"></h1>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FULL-SCREEN NAV OVERLAY
+  ══════════════════════════════════════════════════════════ -->
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <nav class="overlay-nav">
+        <a href="#about"   class="overlay-link"><span>About</span></a>
+        <a href="#events"  class="overlay-link"><span>Events</span></a>
+        <a href="#gallery" class="overlay-link"><span>Gallery</span></a>
+        <a href="#join"    class="overlay-link"><span>Contact</span></a>
+      </nav>
+      <div class="overlay-footer">
+        <a href="https://www.instagram.com/v.v.collective?igsh=MWlsNHI1YTZoeDNzaw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">SoundCloud</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════════════════ -->
+  <header id="nav">
+    <a href="#hero" class="nav-logo">VV</a>
+
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#join">Contact</a></li>
+    </ul>
+
+    <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span class="ham-line ham-top"></span>
+      <span class="ham-line ham-bot"></span>
+    </button>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════════════════ -->
+  <section id="hero">
+    <div class="hero-bg" id="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-vignette" id="hero-vignette"></div>
+    <div class="hero-noise"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Music · Art · Fashion · Love</p>
+      <h1 class="hero-headline">
+        <span class="hl-line"><span>WHERE ART</span></span>
+        <span class="hl-line"><span>BLEEDS</span></span>
+        <span class="hl-line"><span>INTO GOLD</span></span>
+      </h1>
+      <a href="#about" class="hero-cta">Discover More</a>
+    </div>
+    <div class="hero-scroll-cue">
+      <span class="scroll-comet"></span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ABOUT / PHILOSOPHY
+  ══════════════════════════════════════════════════════════ -->
+  <section id="about" class="section-dof">
+    <div class="about-grid">
+
+      <div class="about-text">
+        <p class="section-eyebrow reveal-up">The Collective</p>
+        <blockquote class="about-quote reveal-clip">
+          <span>"BLOOD RUNS</span>
+          <span>VELVET GOLD"</span>
+        </blockquote>
+        <div class="about-body reveal-up" style="--delay:0.15s">
+          <p>Creativity is not a gift — it is a birthright.</p>
+          <p>Every event, every artist, every frequency is a prayer made physical.</p>
+          <p>The velvet is our depth. The gold is our light.</p>
+        </div>
+      </div>
+
+      <div class="about-image reveal-right">
+        <div class="about-img-inner">
+          <img src="dj-orange.png" alt="Velvet Vibrance — In Session" />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       UPCOMING EVENTS
+  ══════════════════════════════════════════════════════════ -->
+  <section id="events" class="section-dof">
+    <div class="events-inner">
+      <div class="section-header reveal-up">
+        <p class="section-eyebrow">Schedule</p>
+        <h2 class="section-title">UPCOMING EVENTS</h2>
+      </div>
+      <div class="events-grid" id="events-grid">
+        <p class="events-empty" id="events-empty" style="display:none;">No upcoming events. Check back soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       GALLERY
+  ══════════════════════════════════════════════════════════ -->
+  <section id="gallery">
+    <div class="section-header section-header--padded reveal-up">
+      <p class="section-eyebrow">Archive</p>
+      <h2 class="section-title">THE FREQUENCY</h2>
+    </div>
+    <div class="raw-grid"><!-- GALLERY-ITEMS-START -->
+      <div class="rg-item rg-wide">
+        <img src="crowd-pink.png" alt="The crowd moves as one" />
+        <div class="rg-overlay"><span>The crowd moves as one</span></div>
+      </div>
+      <div class="rg-item rg-tall">
+        <img src="dj-orange.png" alt="In the booth" />
+        <div class="rg-overlay"><span>In the booth</span></div>
+      </div>
+      <div class="rg-item">
+        <img src="laser-show.jpeg" alt="Lasers cut through the dark" />
+        <div class="rg-overlay"><span>Lasers cut through the dark</span></div>
+      </div>
+      <div class="rg-item">
+        <img src="dj-headphones.png" alt="Locked in" />
+        <div class="rg-overlay"><span>Locked in</span></div>
+      </div>
+      <div class="rg-item rg-wide">
+        <img src="dj-crowd.jpeg" alt="DJ raises the room" />
+        <div class="rg-overlay"><span>DJ raises the room</span></div>
+      </div>
+      <div class="rg-item">
+        <img src="crowd-outdoor.jpeg" alt="The frequency moves outside" />
+        <div class="rg-overlay"><span>The frequency moves outside</span></div>
+      </div>
+<!-- GALLERY-ITEMS-END --></div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox" role="dialog" aria-label="Media viewer">
+    <button id="lightbox-close" aria-label="Close">×</button>
+    <img id="lightbox-img" src="" alt="Gallery" />
+    <video id="lightbox-video" controls></video>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       JOIN THE FREQUENCY
+  ══════════════════════════════════════════════════════════ -->
+  <section id="join" class="section-dof">
+    <div class="join-watermark" aria-hidden="true"><span>VV</span></div>
+    <div class="join-inner">
+      <p class="section-eyebrow reveal-up">Stay Connected</p>
+      <p class="join-headline reveal-clip"><span>JOIN THE</span><span>FREQUENCY</span></p>
+      <form class="join-form" id="join-form">
+        <input type="email" class="join-input" placeholder="Your email address" required autocomplete="email" />
+        <button type="submit" class="join-btn">JOIN</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════════════ -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-left reveal-up">
+        <span class="footer-monogram">VV</span>
+        <span class="footer-copy">&copy; VELVET VIBRANCE</span>
+      </div>
+      <div class="footer-social reveal-up" style="--delay:0.1s">
+        <a href="https://www.instagram.com/v.v.collective?igsh=MWlsNHI1YTZoeDNzaw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">SoundCloud</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll progress bar -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <script src="script.js"></script>
+
+  <script>
+    /* ── Load Events ── */
+    fetch('events.json?t=' + Date.now())
+      .then(r => r.json())
+      .then(events => {
+        const grid  = document.getElementById('events-grid');
+        const empty = document.getElementById('events-empty');
+        if (!events || events.length === 0) { empty.style.display = 'block'; return; }
+        events.forEach(ev => {
+          const card = document.createElement('div');
+          card.className = 'event-card';
+          card.innerHTML = `
+            <div class="event-poster-wrap">
+              <img src="${ev.poster}" alt="${ev.name}" class="event-poster" draggable="true"
+                ondragstart="handlePosterDrag(event,'${ev.poster}')"
+                title="Drag to copy poster">
+              <div class="event-poster-overlay">
+                <span class="event-poster-hint">drag to share</span>
+              </div>
+            </div>
+            <div class="event-info">
+              <p class="event-date">${ev.date}</p>
+              <p class="event-name">${ev.name}</p>
+              <p class="event-venue">${ev.venue}</p>
+              ${ev.tickets ? `<a href="${ev.tickets}" target="_blank" class="event-tickets">GET TICKETS →</a>` : ''}
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+        if (typeof window.initCard3D   === 'function') window.initCard3D();
+        if (typeof window.staggerCards === 'function') window.staggerCards();
+      })
+      .catch(() => {
+        document.getElementById('events-empty').style.display = 'block';
+      });
+
+    function handlePosterDrag(e, src) {
+      e.dataTransfer.setData('text/uri-list', src);
+      e.dataTransfer.setData('text/plain', src);
+    }
+  </script>
+</body>
+</html>
