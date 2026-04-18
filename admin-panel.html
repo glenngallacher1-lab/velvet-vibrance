@@ -251,57 +251,40 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ════════ COMMAND CHAT ════════ */
-    #panel-command { display: none; flex-direction: column; gap: 0; height: calc(100vh - 10rem); }
-    #panel-command.active { display: flex; }
-    .chat-window {
-      flex: 1; overflow-y: auto;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius) var(--radius) 0 0;
-      padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
-      scroll-behavior: smooth;
+    /* ════════ HELP / FAQ ════════ */
+    .faq-intro { font-size:0.8rem; color:var(--muted); margin-bottom:1.6rem; line-height:1.7; }
+    .faq-item {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      margin-bottom: 0.75rem; overflow: hidden; transition: border-color 0.2s;
     }
-    .chat-msg { display: flex; gap: 0.6rem; max-width: 88%; animation: msgIn 0.18s ease; }
-    @keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-    .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
-    .chat-msg.bot  { align-self: flex-start; }
-    .chat-avatar {
-      width:28px; height:28px; border-radius:50%; flex-shrink:0;
-      display:flex; align-items:center; justify-content:center;
-      font-size:0.7rem; font-weight:700; margin-top:2px;
+    .faq-item:hover { border-color: var(--border-hover); }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.3rem; cursor: pointer; gap: 1rem;
+      font-size: 0.82rem; font-weight: 600; color: var(--text);
+      user-select: none;
     }
-    .chat-msg.user .chat-avatar { background: var(--gold); color:#000; }
-    .chat-msg.bot  .chat-avatar { background: var(--velvet); color:#fff; }
-    .chat-bubble {
-      padding: 0.6rem 0.9rem; border-radius:14px;
-      font-size:0.84rem; line-height:1.55; max-width:100%;
+    .faq-q .faq-icon {
+      width: 20px; height: 20px; flex-shrink: 0;
+      border: 1px solid var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; color: var(--gold); transition: transform 0.3s;
     }
-    .chat-msg.user .chat-bubble { background:var(--gold); color:#000; border-bottom-right-radius:4px; }
-    .chat-msg.bot  .chat-bubble { background:var(--dark-mid); color:var(--text); border:1px solid var(--border); border-bottom-left-radius:4px; }
-    .chat-bubble code { background:rgba(212,175,55,0.12); padding:1px 5px; border-radius:4px; font-size:0.82em; }
-    .chat-bubble .ok  { color:#4ade80; font-weight:600; }
-    .chat-bubble .err { color:var(--red); font-weight:600; }
-    .chat-bubble .muted { color:var(--muted); font-size:0.78rem; }
-    .chat-typing { display:none; gap:0.6rem; align-items:center; }
-    .chat-typing.show { display:flex; }
-    .chat-typing-dots { display:flex; gap:3px; padding:0.5rem 0.9rem; background:var(--dark-mid); border:1px solid var(--border); border-radius:14px; border-bottom-left-radius:4px; }
-    .chat-typing-dots span { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:dot 1.2s ease-in-out infinite; }
-    .chat-typing-dots span:nth-child(2) { animation-delay:0.2s; }
-    .chat-typing-dots span:nth-child(3) { animation-delay:0.4s; }
-    @keyframes dot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
-    .chat-input-row { display:flex; border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; }
-    .chat-input { flex:1; background:var(--card); color:var(--text); border:none; outline:none; padding:0.85rem 1rem; font-size:0.84rem; font-family:var(--font-b); }
-    .chat-input:focus { border-color:var(--gold); }
-    .chat-send { background:var(--velvet); color:#fff; border:none; padding:0 1.4rem; cursor:pointer; font-size:0.75rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; transition:background 0.2s; }
-    .chat-send:hover { background:var(--gold); color:#000; }
-    .chat-chips { display:flex; flex-wrap:wrap; gap:0.4rem; padding:0.6rem 0 0; }
-    .chip { background:rgba(212,175,55,0.1); border:1px solid var(--border); color:var(--muted); border-radius:99px; padding:0.3rem 0.8rem; font-size:0.65rem; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
-    .chip:hover { background:rgba(212,175,55,0.2); color:var(--text); border-color:var(--gold); }
-    .chat-ai-config { margin-top:1rem; padding:1rem; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); }
-    .chat-ai-config p { font-size:0.72rem; color:var(--muted); margin-bottom:0.6rem; }
-    .chat-ai-row { display:flex; gap:0.5rem; margin-bottom:0.5rem; }
-    .chat-ai-input { flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:0.45rem 0.7rem; font-size:0.75rem; }
-    .chat-ai-input:focus { outline:none; border-color:var(--gold); }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16,1,0.3,1), padding 0.3s;
+      padding: 0 1.3rem;
+    }
+    .faq-item.open .faq-a { max-height: 600px; padding: 0 1.3rem 1.2rem; }
+    .faq-a ol, .faq-a ul { padding-left: 1.2rem; }
+    .faq-a li { font-size: 0.8rem; color: var(--muted); line-height: 1.85; }
+    .faq-a li strong { color: var(--text); }
+    .faq-a .faq-tip {
+      margin-top: 0.75rem; padding: 0.65rem 0.9rem;
+      background: rgba(212,175,55,0.07); border-left: 2px solid var(--gold);
+      font-size: 0.75rem; color: rgba(245,237,224,0.6); line-height: 1.6;
+    }
 
     /* ════════════ CARDS ════════════ */
     .card {
@@ -886,7 +869,7 @@
     <div class="tab active"   onclick="switchTab('gallery')">Gallery</div>
     <div class="tab"          onclick="switchTab('events')">Events</div>
     <div class="tab"          onclick="switchTab('settings')">Settings</div>
-    <div class="tab"          onclick="switchTab('command')">Command</div>
+    <div class="tab"          onclick="switchTab('command')">Help</div>
   </div>
 
   <main>
@@ -1004,54 +987,130 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-label">AI Assistant <span style="font-size:0.65rem;color:var(--muted);font-weight:400;">(optional)</span></div>
-        <div class="help-text">Connect a Cloudflare Worker to enable AI answers in the Command tab. Ask Glenn for the worker URL and secret.</div>
-        <div class="chat-ai-row">
-          <input class="chat-ai-input" id="ai-worker-url" placeholder="https://your-worker.workers.dev" type="url">
-        </div>
-        <div class="chat-ai-row">
-          <input class="chat-ai-input" id="ai-worker-secret" placeholder="worker secret" type="password">
-          <button class="btn-secondary" onclick="saveAI()">Save</button>
-          <button class="btn-secondary" onclick="verifyAI()">Test</button>
-        </div>
-        <div id="ai-status" style="font-size:0.7rem;color:var(--muted);margin-top:0.4rem;"></div>
-      </div>
 
       <div class="card">
         <div class="card-label">About This Panel</div>
         <div class="help-text" style="margin:0; border:none; padding:0;">
           <strong>Gallery:</strong> Upload photos and videos. Drag to reorder. Publish to go live.<br>
           <strong>Events:</strong> Add upcoming shows with poster images and ticket links.<br>
-          <strong>Command:</strong> Check status and chat with the AI assistant.<br>
+          <strong>Help:</strong> Step-by-step tutorials for common tasks.<br>
           <strong>Publish:</strong> Saves directly to GitHub and updates the site within seconds.
         </div>
       </div>
 
     </div>
 
-    <!-- ════════ COMMAND TAB ════════ -->
+    <!-- ════════ HELP TAB ════════ -->
     <div class="tab-panel" id="panel-command">
 
-      <div class="chat-window" id="chat-window">
-        <div class="chat-typing" id="chat-typing">
-          <div class="chat-avatar" style="background:var(--velvet);color:#fff;">VV</div>
-          <div class="chat-typing-dots"><span></span><span></span><span></span></div>
+      <p class="faq-intro">Step-by-step answers for the most common tasks. Tap a question to expand it.</p>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          How do I upload a new gallery image?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <ol>
+            <li>Go to the <strong>Gallery</strong> tab.</li>
+            <li>Click <strong>Add Media</strong> and choose your photo or video.</li>
+            <li>It appears in the preview grid — drag it to reorder if needed.</li>
+            <li>Click <strong>Publish Gallery</strong> to push it live. The site updates in about 30 seconds.</li>
+          </ol>
+          <div class="faq-tip">Best image sizes: landscape photos work great at 1200×800px or wider. Portrait photos at 800×1100px. The panel auto-detects the shape and picks the right layout.</div>
         </div>
       </div>
 
-      <div class="chat-input-row">
-        <input class="chat-input" id="chat-input" type="text"
-          placeholder="status  ·  help  ·  or ask anything about the site"
-          autocomplete="off" onkeydown="if(event.key==='Enter')chatSend()">
-        <button class="chat-send" onclick="chatSend()">Send</button>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          How do I remove an image from the gallery?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <ol>
+            <li>Go to the <strong>Gallery</strong> tab.</li>
+            <li>Hover over the image you want to remove — a <strong>×</strong> button appears in the top-right corner.</li>
+            <li>Click it. The item is marked for removal.</li>
+            <li>Click <strong>Publish Gallery</strong> to save the change live.</li>
+          </ol>
+          <div class="faq-tip">Nothing is permanently deleted until you publish. If you accidentally remove something, refresh the page before publishing to undo it.</div>
+        </div>
       </div>
 
-      <div class="chat-chips">
-        <button class="chip" onclick="chatFill('status')">status</button>
-        <button class="chip" onclick="chatFill('help')">help</button>
-        <button class="chip" onclick="chatFill('how do I update an event poster?')">how do I update a poster?</button>
-        <button class="chip" onclick="chatFill('what images are in the gallery?')">gallery images</button>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          How do I reorder gallery images?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <ol>
+            <li>Go to the <strong>Gallery</strong> tab.</li>
+            <li>Click and drag any image to a new position in the grid.</li>
+            <li>Drop it where you want it — the others shuffle automatically.</li>
+            <li>Click <strong>Publish Gallery</strong> when you're happy with the order.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          How do I add a new event?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <ol>
+            <li>Go to the <strong>Events</strong> tab.</li>
+            <li>Fill in the event name, date, venue, and optionally a ticket link.</li>
+            <li>Upload a poster image for the event card.</li>
+            <li>Click <strong>Add Event</strong> — it appears in the list below.</li>
+            <li>Click <strong>Publish Events</strong> to make it live on the site.</li>
+          </ol>
+          <div class="faq-tip">Events show up in order on the site. The most recently added event appears first — reorder them by dragging if needed.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          How do I remove a past event?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <ol>
+            <li>Go to the <strong>Events</strong> tab.</li>
+            <li>Find the event in the list and click the <strong>×</strong> next to it.</li>
+            <li>Click <strong>Publish Events</strong> to remove it from the live site.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          I published but the site hasn't changed — what's going on?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <ol>
+            <li>The site auto-deploys via GitHub Actions — it normally takes <strong>20–40 seconds</strong> after you publish.</li>
+            <li>If it's been longer than a minute, do a <strong>hard refresh</strong>: hold <kbd>Shift</kbd> and click the reload button (or press <kbd>Cmd+Shift+R</kbd> on Mac, <kbd>Ctrl+Shift+R</kbd> on Windows).</li>
+            <li>If it's still not updated after 2 minutes, message Glenn — the deployment may need a check.</li>
+          </ol>
+          <div class="faq-tip">Your browser caches the old site. Hard refresh forces it to fetch the latest version.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          What image formats and sizes work best?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <ul>
+            <li><strong>Formats:</strong> JPG and PNG for photos. MP4 for video clips.</li>
+            <li><strong>Gallery images:</strong> 1200×800px (landscape) or 800×1100px (portrait) is ideal. Keep files under 3MB for fast loading.</li>
+            <li><strong>Event posters:</strong> Square (1:1) or portrait (2:3) works best. Around 800×800px or 800×1200px.</li>
+            <li>The panel auto-detects landscape vs portrait and picks the right masonry layout for you.</li>
+          </ul>
+        </div>
       </div>
 
     </div>
@@ -1130,7 +1189,6 @@
     );
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.getElementById(`panel-${tab}`).classList.add('active');
-    if (tab === 'command' && !document.querySelector('#chat-window .chat-msg')) initChat();
   }
 
   /* ════════ TOKEN ════════ */
@@ -1609,175 +1667,6 @@
   }
 
   /* ════════ COMMAND CHAT ════════ */
-  var _chatHistory = [];
-
-  function chatFill(text) {
-    var inp = document.getElementById('chat-input');
-    inp.value = text; inp.focus();
-  }
-
-  function chatSend() {
-    var inp = document.getElementById('chat-input');
-    var raw = inp.value.trim();
-    if (!raw) return;
-    inp.value = '';
-    addMsg(escHtml(raw), 'user');
-    setTimeout(function() { runVVCommand(raw); }, 280);
-  }
-
-  function addMsg(html, who) {
-    var win    = document.getElementById('chat-window');
-    var typing = document.getElementById('chat-typing');
-    var div    = document.createElement('div');
-    div.className = 'chat-msg ' + who;
-    div.innerHTML = '<div class="chat-avatar">' + (who === 'user' ? 'You' : 'VV') + '</div><div class="chat-bubble">' + html + '</div>';
-    win.insertBefore(div, typing);
-    win.scrollTop = win.scrollHeight;
-  }
-
-  function showTyping() {
-    var el = document.getElementById('chat-typing');
-    el.classList.add('show');
-    document.getElementById('chat-window').scrollTop = 99999;
-  }
-  function hideTyping() { document.getElementById('chat-typing').classList.remove('show'); }
-
-  function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  function initChat() {
-    var hasAI = !!localStorage.getItem('vv_ai_url');
-    addMsg(
-      'Hey Trystan! I can give you a status update, answer questions about the site, and help you manage it.' +
-      (hasAI ? '' : ' <span class="muted">(Add your AI worker in Settings → AI Assistant to unlock question-answering.)</span>') +
-      '<br><br>Try <code>status</code>, <code>help</code>, or just ask a question.',
-      'bot'
-    );
-  }
-
-  async function runVVCommand(raw) {
-    showTyping();
-    var parts = raw.toLowerCase().replace(/^\//,'').trim().split(/\s+/);
-    var cmd = parts[0];
-    try {
-      if (cmd === 'status') {
-        var total   = GALLERY_ITEMS.filter(p => !removedItems.has(p.file)).length + pendingMedia.length;
-        var pending = pendingMedia.length;
-        var evCount = events.length;
-        hideTyping();
-        addMsg(
-          '<b>VV Site Status</b><br>' +
-          'Gallery: <code>' + total + ' items</code>' + (pending ? ' (<b>'+pending+' unpublished</b>)' : '') + '<br>' +
-          'Events: <code>' + evCount + ' upcoming</code><br>' +
-          'Site: <a href="https://glenngallacher1-lab.github.io/velvet-vibrance/" target="_blank" style="color:var(--gold)">Open live site ↗</a>',
-          'bot'
-        );
-        return;
-      }
-      if (cmd === 'help' || cmd === '?') {
-        hideTyping();
-        addMsg(
-          '<b>Commands</b><br><br>' +
-          '<code>status</code> — gallery & event counts<br>' +
-          '<code>help</code> — this list<br><br>' +
-          '<span class="muted">Use the Gallery and Events tabs to make changes, then Publish.</span>' +
-          (localStorage.getItem('vv_ai_url') ? '<br><br>You can also ask me any question about the site.' : ''),
-          'bot'
-        );
-        return;
-      }
-      // Not a command — send to AI
-      hideTyping();
-      await callVVAI(raw);
-    } catch(err) {
-      hideTyping();
-      addMsg('<span class="err">' + escHtml(err.message || String(err)) + '</span>', 'bot');
-    }
-  }
-
-  async function callVVAI(question) {
-    var url    = localStorage.getItem('vv_ai_url');
-    var secret = localStorage.getItem('vv_ai_secret');
-    if (!url || !secret) {
-      addMsg('AI not configured. Add a worker URL and secret in <b>Settings → AI Assistant</b>.', 'bot');
-      return;
-    }
-    showTyping();
-    var sysPrompt = [
-      'You are the VV assistant — an AI built into the Velvet Vibrance admin panel.',
-      'Velvet Vibrance is a music, art, fashion and events collective. Tagline: "Where Art Bleeds Into Gold."',
-      'The site has a gallery (photos/videos), upcoming events, and an about section.',
-      'Trystan is the DJ and main user of this panel. He uploads gallery images and manages events.',
-      'Answer questions concisely. If asked to do something that requires the gallery or events tabs, guide him there.',
-      'Keep answers short and to the point.'
-    ].join('\n');
-
-    _chatHistory.push({ role: 'user', content: question });
-    if (_chatHistory.length > 10) _chatHistory = _chatHistory.slice(-10);
-
-    try {
-      var res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Secret': secret },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 400,
-          system: sysPrompt,
-          messages: _chatHistory
-        })
-      });
-      var data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Worker error ' + res.status);
-      var reply = data.content?.[0]?.text || data.choices?.[0]?.message?.content || '';
-      if (!reply) throw new Error('Empty response');
-      _chatHistory.push({ role: 'assistant', content: reply });
-      hideTyping();
-      addMsg(escHtml(reply).replace(/\n/g, '<br>'), 'bot');
-    } catch(e) {
-      hideTyping();
-      addMsg('<span class="err">' + escHtml(e.message) + '</span>', 'bot');
-    }
-  }
-
-  /* ════════ AI SETTINGS ════════ */
-  function saveAI() {
-    var url    = document.getElementById('ai-worker-url').value.trim();
-    var secret = document.getElementById('ai-worker-secret').value.trim();
-    if (!url || !secret) { toast('Enter both the worker URL and secret', 'error'); return; }
-    localStorage.setItem('vv_ai_url',    url);
-    localStorage.setItem('vv_ai_secret', secret);
-    document.getElementById('ai-worker-secret').value = '•'.repeat(16);
-    verifyAI();
-  }
-
-  async function verifyAI() {
-    var url    = localStorage.getItem('vv_ai_url');
-    var secret = localStorage.getItem('vv_ai_secret');
-    var statusEl = document.getElementById('ai-status');
-    if (!url || !secret) { if (statusEl) statusEl.textContent = ''; return; }
-    if (statusEl) statusEl.textContent = 'Testing…';
-    try {
-      var res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Secret': secret },
-        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 5, messages: [{ role: 'user', content: 'ping' }] })
-      });
-      var data = await res.json();
-      if (!res.ok) { if (statusEl) statusEl.textContent = '✗ ' + (data.error || 'Worker error ' + res.status); return; }
-      if (statusEl) statusEl.textContent = '✓ AI connected — Claude is ready';
-    } catch(e) {
-      if (statusEl) statusEl.textContent = '✗ Could not reach worker';
-    }
-  }
-
-  // Restore AI config on load
-  if (localStorage.getItem('vv_ai_url')) {
-    document.getElementById('ai-worker-url').value    = localStorage.getItem('vv_ai_url');
-    document.getElementById('ai-worker-secret').value = '•'.repeat(16);
-    verifyAI();
-  }
-
   /* ════════ AUTO-LOGIN ════════ */
   if (sessionStorage.getItem('vv_auth') === '1') showAdmin();
 </script>
