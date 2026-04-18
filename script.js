@@ -148,6 +148,98 @@
   });
 })();
 
+
+/* ── Entry Dots — Three.js wave behind paths + title ─────── */
+(function initEntryDots() {
+  if (typeof THREE === 'undefined') return;
+  var container = document.getElementById('entry-screen');
+  if (!container) return;
+
+  var SEPARATION = 150, AMOUNTX = 40, AMOUNTY = 60;
+
+  var scene  = new THREE.Scene();
+  var W = window.innerWidth, H = window.innerHeight;
+
+  var camera = new THREE.PerspectiveCamera(60, W / H, 1, 10000);
+  camera.position.set(0, 355, 1220);
+
+  var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0);
+
+  /* Insert canvas as FIRST child so it sits below SVG paths and title */
+  var canvas = renderer.domElement;
+  canvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
+  container.insertBefore(canvas, container.firstChild);
+
+  /* Build particle grid */
+  var positions = [], colors = [];
+  for (var ix = 0; ix < AMOUNTX; ix++) {
+    for (var iy = 0; iy < AMOUNTY; iy++) {
+      positions.push(
+        ix * SEPARATION - (AMOUNTX * SEPARATION) / 2,
+        0,
+        iy * SEPARATION - (AMOUNTY * SEPARATION) / 2
+      );
+      /* Gold: 212/255, 175/255, 55/255 */
+      colors.push(0.831, 0.686, 0.216);
+    }
+  }
+
+  var geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
+
+  var material = new THREE.PointsMaterial({
+    size: 6,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.42,
+    sizeAttenuation: true,
+  });
+
+  scene.add(new THREE.Points(geometry, material));
+
+  var count = 0, animId;
+
+  function animateDots() {
+    animId = requestAnimationFrame(animateDots);
+    var pos = geometry.attributes.position.array;
+    var i = 0;
+    for (var xi = 0; xi < AMOUNTX; xi++) {
+      for (var yi = 0; yi < AMOUNTY; yi++) {
+        pos[i * 3 + 1] =
+          Math.sin((xi + count) * 0.3) * 50 +
+          Math.sin((yi + count) * 0.5) * 50;
+        i++;
+      }
+    }
+    geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+    count += 0.1;
+  }
+
+  function onResizeDots() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  window.addEventListener('resize', onResizeDots);
+  animateDots();
+
+  /* Clean up after entry screen completes (sweep 2600ms + slide 1200ms + buffer) */
+  setTimeout(function () {
+    cancelAnimationFrame(animId);
+    window.removeEventListener('resize', onResizeDots);
+    geometry.dispose();
+    material.dispose();
+    renderer.dispose();
+  }, 4100);
+})();
+
+
 /* ── D. Hamburger / Nav Overlay ─────────────────────────────── */
 function closeNav() {
   const overlay   = document.getElementById('nav-overlay');
