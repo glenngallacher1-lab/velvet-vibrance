@@ -251,6 +251,58 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
+    /* ════════ COMMAND CHAT ════════ */
+    #panel-command { display: none; flex-direction: column; gap: 0; height: calc(100vh - 10rem); }
+    #panel-command.active { display: flex; }
+    .chat-window {
+      flex: 1; overflow-y: auto;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
+      scroll-behavior: smooth;
+    }
+    .chat-msg { display: flex; gap: 0.6rem; max-width: 88%; animation: msgIn 0.18s ease; }
+    @keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .chat-msg.bot  { align-self: flex-start; }
+    .chat-avatar {
+      width:28px; height:28px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.7rem; font-weight:700; margin-top:2px;
+    }
+    .chat-msg.user .chat-avatar { background: var(--gold); color:#000; }
+    .chat-msg.bot  .chat-avatar { background: var(--velvet); color:#fff; }
+    .chat-bubble {
+      padding: 0.6rem 0.9rem; border-radius:14px;
+      font-size:0.84rem; line-height:1.55; max-width:100%;
+    }
+    .chat-msg.user .chat-bubble { background:var(--gold); color:#000; border-bottom-right-radius:4px; }
+    .chat-msg.bot  .chat-bubble { background:var(--dark-mid); color:var(--text); border:1px solid var(--border); border-bottom-left-radius:4px; }
+    .chat-bubble code { background:rgba(212,175,55,0.12); padding:1px 5px; border-radius:4px; font-size:0.82em; }
+    .chat-bubble .ok  { color:#4ade80; font-weight:600; }
+    .chat-bubble .err { color:var(--red); font-weight:600; }
+    .chat-bubble .muted { color:var(--muted); font-size:0.78rem; }
+    .chat-typing { display:none; gap:0.6rem; align-items:center; }
+    .chat-typing.show { display:flex; }
+    .chat-typing-dots { display:flex; gap:3px; padding:0.5rem 0.9rem; background:var(--dark-mid); border:1px solid var(--border); border-radius:14px; border-bottom-left-radius:4px; }
+    .chat-typing-dots span { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:dot 1.2s ease-in-out infinite; }
+    .chat-typing-dots span:nth-child(2) { animation-delay:0.2s; }
+    .chat-typing-dots span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes dot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+    .chat-input-row { display:flex; border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; }
+    .chat-input { flex:1; background:var(--card); color:var(--text); border:none; outline:none; padding:0.85rem 1rem; font-size:0.84rem; font-family:var(--font-b); }
+    .chat-input:focus { border-color:var(--gold); }
+    .chat-send { background:var(--velvet); color:#fff; border:none; padding:0 1.4rem; cursor:pointer; font-size:0.75rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; transition:background 0.2s; }
+    .chat-send:hover { background:var(--gold); color:#000; }
+    .chat-chips { display:flex; flex-wrap:wrap; gap:0.4rem; padding:0.6rem 0 0; }
+    .chip { background:rgba(212,175,55,0.1); border:1px solid var(--border); color:var(--muted); border-radius:99px; padding:0.3rem 0.8rem; font-size:0.65rem; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
+    .chip:hover { background:rgba(212,175,55,0.2); color:var(--text); border-color:var(--gold); }
+    .chat-ai-config { margin-top:1rem; padding:1rem; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); }
+    .chat-ai-config p { font-size:0.72rem; color:var(--muted); margin-bottom:0.6rem; }
+    .chat-ai-row { display:flex; gap:0.5rem; margin-bottom:0.5rem; }
+    .chat-ai-input { flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:0.45rem 0.7rem; font-size:0.75rem; }
+    .chat-ai-input:focus { outline:none; border-color:var(--gold); }
+
     /* ════════════ CARDS ════════════ */
     .card {
       background: var(--card);
@@ -834,6 +886,7 @@
     <div class="tab active"   onclick="switchTab('gallery')">Gallery</div>
     <div class="tab"          onclick="switchTab('events')">Events</div>
     <div class="tab"          onclick="switchTab('settings')">Settings</div>
+    <div class="tab"          onclick="switchTab('command')">Command</div>
   </div>
 
   <main>
@@ -952,13 +1005,53 @@
       </div>
 
       <div class="card">
+        <div class="card-label">AI Assistant <span style="font-size:0.65rem;color:var(--muted);font-weight:400;">(optional)</span></div>
+        <div class="help-text">Connect a Cloudflare Worker to enable AI answers in the Command tab. Ask Glenn for the worker URL and secret.</div>
+        <div class="chat-ai-row">
+          <input class="chat-ai-input" id="ai-worker-url" placeholder="https://your-worker.workers.dev" type="url">
+        </div>
+        <div class="chat-ai-row">
+          <input class="chat-ai-input" id="ai-worker-secret" placeholder="worker secret" type="password">
+          <button class="btn-secondary" onclick="saveAI()">Save</button>
+          <button class="btn-secondary" onclick="verifyAI()">Test</button>
+        </div>
+        <div id="ai-status" style="font-size:0.7rem;color:var(--muted);margin-top:0.4rem;"></div>
+      </div>
+
+      <div class="card">
         <div class="card-label">About This Panel</div>
         <div class="help-text" style="margin:0; border:none; padding:0;">
           <strong>Gallery:</strong> Upload photos and videos. Drag to reorder. Publish to go live.<br>
           <strong>Events:</strong> Add upcoming shows with poster images and ticket links.<br>
-          <strong>Publish:</strong> Saves directly to GitHub and updates the site within seconds.<br><br>
-          Questions? Ask Glenn.
+          <strong>Command:</strong> Check status and chat with the AI assistant.<br>
+          <strong>Publish:</strong> Saves directly to GitHub and updates the site within seconds.
         </div>
+      </div>
+
+    </div>
+
+    <!-- ════════ COMMAND TAB ════════ -->
+    <div class="tab-panel" id="panel-command">
+
+      <div class="chat-window" id="chat-window">
+        <div class="chat-typing" id="chat-typing">
+          <div class="chat-avatar" style="background:var(--velvet);color:#fff;">VV</div>
+          <div class="chat-typing-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" type="text"
+          placeholder="status  ·  help  ·  or ask anything about the site"
+          autocomplete="off" onkeydown="if(event.key==='Enter')chatSend()">
+        <button class="chat-send" onclick="chatSend()">Send</button>
+      </div>
+
+      <div class="chat-chips">
+        <button class="chip" onclick="chatFill('status')">status</button>
+        <button class="chip" onclick="chatFill('help')">help</button>
+        <button class="chip" onclick="chatFill('how do I update an event poster?')">how do I update a poster?</button>
+        <button class="chip" onclick="chatFill('what images are in the gallery?')">gallery images</button>
       </div>
 
     </div>
@@ -976,14 +1069,14 @@
   const RAW_BASE   = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
 
   /* ════════ STATE ════════ */
-  // Gallery items: { file, alt, type: 'image'|'video' }
+  // Gallery items: { file, alt, type: 'image'|'video', span: 'rg-wide'|'rg-tall'|'' }
   const GALLERY_ITEMS = [
-    { file: 'crowd-pink.png',     alt: 'The crowd moves as one',        type: 'image' },
-    { file: 'dj-orange.png',      alt: 'In the booth',                  type: 'image' },
-    { file: 'laser-show.jpeg',    alt: 'Lasers cut through the dark',   type: 'image' },
-    { file: 'dj-headphones.png',  alt: 'Locked in',                     type: 'image' },
-    { file: 'dj-crowd.jpeg',      alt: 'DJ raises the room',            type: 'image' },
-    { file: 'crowd-outdoor.jpeg', alt: 'The frequency moves outside',   type: 'image' }
+    { file: 'crowd-pink.png',     alt: 'The crowd moves as one',        type: 'image', span: 'rg-wide' },
+    { file: 'dj-orange.png',      alt: 'In the booth',                  type: 'image', span: 'rg-tall' },
+    { file: 'laser-show.jpeg',    alt: 'Lasers cut through the dark',   type: 'image', span: '' },
+    { file: 'dj-headphones.png',  alt: 'Locked in',                     type: 'image', span: '' },
+    { file: 'dj-crowd.jpeg',      alt: 'DJ raises the room',            type: 'image', span: 'rg-wide' },
+    { file: 'crowd-outdoor.jpeg', alt: 'The frequency moves outside',   type: 'image', span: '' }
   ];
 
   let events        = [];
@@ -1033,10 +1126,11 @@
   /* ════════ TABS ════════ */
   function switchTab(tab) {
     document.querySelectorAll('.tab').forEach((t, i) =>
-      t.classList.toggle('active', ['gallery','events','settings'][i] === tab)
+      t.classList.toggle('active', ['gallery','events','settings','command'][i] === tab)
     );
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.getElementById(`panel-${tab}`).classList.add('active');
+    if (tab === 'command' && !document.querySelector('#chat-window .chat-msg')) initChat();
   }
 
   /* ════════ TOKEN ════════ */
@@ -1367,9 +1461,23 @@
       }
       const reader = new FileReader();
       reader.onload = e => {
-        const base64 = e.target.result.split(',')[1];
-        pendingMedia.push({ file, base64, name: file.name, type: isVideo ? 'video' : 'image', alt: file.name.split('.')[0].replace(/[-_]/g,' ') });
-        renderGallery();
+        const dataUrl = e.target.result;
+        const base64  = dataUrl.split(',')[1];
+        const item    = { file, base64, name: file.name, type: isVideo ? 'video' : 'image', alt: file.name.split('.')[0].replace(/[-_]/g,' '), span: '' };
+        if (!isVideo) {
+          // Auto-detect aspect ratio to assign masonry span class
+          const img = new Image();
+          img.onload = () => {
+            const r = img.naturalWidth / img.naturalHeight;
+            item.span = r >= 1.6 ? 'rg-wide' : (r <= 0.7 ? 'rg-tall' : '');
+            pendingMedia.push(item);
+            renderGallery();
+          };
+          img.src = dataUrl;
+        } else {
+          pendingMedia.push(item);
+          renderGallery();
+        }
       };
       reader.readAsDataURL(file);
     });
@@ -1414,16 +1522,17 @@
       // Build new gallery HTML items
       const activeItems = GALLERY_ITEMS.filter(p => !removedItems.has(p.file));
       const newItemsHTML = activeItems.map(p => {
+        const cls = ['rg-item', p.type === 'video' ? 'rg-video' : '', p.span || ''].filter(Boolean).join(' ');
         if (p.type === 'video') {
           return `
-      <div class="rg-item rg-video">
+      <div class="${cls}">
         <video src="${p.file}" loop muted playsinline></video>
         <div class="rg-overlay"><span>${p.alt}</span></div>
       </div>`;
         } else {
           return `
-      <div class="rg-item">
-        <img src="${p.file}" alt="${p.alt}" loading="lazy" />
+      <div class="${cls}">
+        <img src="${p.file}" alt="${p.alt}" />
         <div class="rg-overlay"><span>${p.alt}</span></div>
       </div>`;
         }
@@ -1497,6 +1606,176 @@
     el.className = 'show' + (type !== 'default' ? ' ' + type : '');
     clearTimeout(el._timer);
     el._timer = setTimeout(() => el.className = '', 3500);
+  }
+
+  /* ════════ COMMAND CHAT ════════ */
+  var _chatHistory = [];
+
+  function chatFill(text) {
+    var inp = document.getElementById('chat-input');
+    inp.value = text; inp.focus();
+  }
+
+  function chatSend() {
+    var inp = document.getElementById('chat-input');
+    var raw = inp.value.trim();
+    if (!raw) return;
+    inp.value = '';
+    addMsg(escHtml(raw), 'user');
+    setTimeout(function() { runVVCommand(raw); }, 280);
+  }
+
+  function addMsg(html, who) {
+    var win    = document.getElementById('chat-window');
+    var typing = document.getElementById('chat-typing');
+    var div    = document.createElement('div');
+    div.className = 'chat-msg ' + who;
+    div.innerHTML = '<div class="chat-avatar">' + (who === 'user' ? 'You' : 'VV') + '</div><div class="chat-bubble">' + html + '</div>';
+    win.insertBefore(div, typing);
+    win.scrollTop = win.scrollHeight;
+  }
+
+  function showTyping() {
+    var el = document.getElementById('chat-typing');
+    el.classList.add('show');
+    document.getElementById('chat-window').scrollTop = 99999;
+  }
+  function hideTyping() { document.getElementById('chat-typing').classList.remove('show'); }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function initChat() {
+    var hasAI = !!localStorage.getItem('vv_ai_url');
+    addMsg(
+      'Hey Trystan! I can give you a status update, answer questions about the site, and help you manage it.' +
+      (hasAI ? '' : ' <span class="muted">(Add your AI worker in Settings → AI Assistant to unlock question-answering.)</span>') +
+      '<br><br>Try <code>status</code>, <code>help</code>, or just ask a question.',
+      'bot'
+    );
+  }
+
+  async function runVVCommand(raw) {
+    showTyping();
+    var parts = raw.toLowerCase().replace(/^\//,'').trim().split(/\s+/);
+    var cmd = parts[0];
+    try {
+      if (cmd === 'status') {
+        var total   = GALLERY_ITEMS.filter(p => !removedItems.has(p.file)).length + pendingMedia.length;
+        var pending = pendingMedia.length;
+        var evCount = events.length;
+        hideTyping();
+        addMsg(
+          '<b>VV Site Status</b><br>' +
+          'Gallery: <code>' + total + ' items</code>' + (pending ? ' (<b>'+pending+' unpublished</b>)' : '') + '<br>' +
+          'Events: <code>' + evCount + ' upcoming</code><br>' +
+          'Site: <a href="https://glenngallacher1-lab.github.io/velvet-vibrance/" target="_blank" style="color:var(--gold)">Open live site ↗</a>',
+          'bot'
+        );
+        return;
+      }
+      if (cmd === 'help' || cmd === '?') {
+        hideTyping();
+        addMsg(
+          '<b>Commands</b><br><br>' +
+          '<code>status</code> — gallery & event counts<br>' +
+          '<code>help</code> — this list<br><br>' +
+          '<span class="muted">Use the Gallery and Events tabs to make changes, then Publish.</span>' +
+          (localStorage.getItem('vv_ai_url') ? '<br><br>You can also ask me any question about the site.' : ''),
+          'bot'
+        );
+        return;
+      }
+      // Not a command — send to AI
+      hideTyping();
+      await callVVAI(raw);
+    } catch(err) {
+      hideTyping();
+      addMsg('<span class="err">' + escHtml(err.message || String(err)) + '</span>', 'bot');
+    }
+  }
+
+  async function callVVAI(question) {
+    var url    = localStorage.getItem('vv_ai_url');
+    var secret = localStorage.getItem('vv_ai_secret');
+    if (!url || !secret) {
+      addMsg('AI not configured. Add a worker URL and secret in <b>Settings → AI Assistant</b>.', 'bot');
+      return;
+    }
+    showTyping();
+    var sysPrompt = [
+      'You are the VV assistant — an AI built into the Velvet Vibrance admin panel.',
+      'Velvet Vibrance is a music, art, fashion and events collective. Tagline: "Where Art Bleeds Into Gold."',
+      'The site has a gallery (photos/videos), upcoming events, and an about section.',
+      'Trystan is the DJ and main user of this panel. He uploads gallery images and manages events.',
+      'Answer questions concisely. If asked to do something that requires the gallery or events tabs, guide him there.',
+      'Keep answers short and to the point.'
+    ].join('\n');
+
+    _chatHistory.push({ role: 'user', content: question });
+    if (_chatHistory.length > 10) _chatHistory = _chatHistory.slice(-10);
+
+    try {
+      var res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Secret': secret },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 400,
+          system: sysPrompt,
+          messages: _chatHistory
+        })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Worker error ' + res.status);
+      var reply = data.content?.[0]?.text || data.choices?.[0]?.message?.content || '';
+      if (!reply) throw new Error('Empty response');
+      _chatHistory.push({ role: 'assistant', content: reply });
+      hideTyping();
+      addMsg(escHtml(reply).replace(/\n/g, '<br>'), 'bot');
+    } catch(e) {
+      hideTyping();
+      addMsg('<span class="err">' + escHtml(e.message) + '</span>', 'bot');
+    }
+  }
+
+  /* ════════ AI SETTINGS ════════ */
+  function saveAI() {
+    var url    = document.getElementById('ai-worker-url').value.trim();
+    var secret = document.getElementById('ai-worker-secret').value.trim();
+    if (!url || !secret) { toast('Enter both the worker URL and secret', 'error'); return; }
+    localStorage.setItem('vv_ai_url',    url);
+    localStorage.setItem('vv_ai_secret', secret);
+    document.getElementById('ai-worker-secret').value = '•'.repeat(16);
+    verifyAI();
+  }
+
+  async function verifyAI() {
+    var url    = localStorage.getItem('vv_ai_url');
+    var secret = localStorage.getItem('vv_ai_secret');
+    var statusEl = document.getElementById('ai-status');
+    if (!url || !secret) { if (statusEl) statusEl.textContent = ''; return; }
+    if (statusEl) statusEl.textContent = 'Testing…';
+    try {
+      var res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Secret': secret },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 5, messages: [{ role: 'user', content: 'ping' }] })
+      });
+      var data = await res.json();
+      if (!res.ok) { if (statusEl) statusEl.textContent = '✗ ' + (data.error || 'Worker error ' + res.status); return; }
+      if (statusEl) statusEl.textContent = '✓ AI connected — Claude is ready';
+    } catch(e) {
+      if (statusEl) statusEl.textContent = '✗ Could not reach worker';
+    }
+  }
+
+  // Restore AI config on load
+  if (localStorage.getItem('vv_ai_url')) {
+    document.getElementById('ai-worker-url').value    = localStorage.getItem('vv_ai_url');
+    document.getElementById('ai-worker-secret').value = '•'.repeat(16);
+    verifyAI();
   }
 
   /* ════════ AUTO-LOGIN ════════ */
