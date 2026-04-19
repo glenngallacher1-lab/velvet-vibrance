@@ -67,12 +67,12 @@
     }
   });
 
-  /* Dismiss — triggered by initEntryDots when zoom fires */
+  /* Dismiss — fades the entry screen out, home page appears beneath */
   window._vvDismissEntry = function () {
     if (entry.classList.contains('sweep-out')) return;
     entry.classList.add('sweep-out');
     document.body.classList.remove('entry-open');
-    setTimeout(function () { entry.style.display = 'none'; }, 1200);
+    setTimeout(function () { entry.style.display = 'none'; }, 600);
   };
 
   /* Fallback: if Three.js never loaded, auto-dismiss after 3s */
@@ -95,8 +95,8 @@
   var YOFF   = 285;   /* distance above/below center — text sits in the gap */
   var AMPL   = 45;    /* wave amplitude */
   var Z0     = 1450;  /* camera start Z */
-  var Z1     = 680;   /* camera end Z (zoom destination) */
-  var ZOOM_D = 1050;  /* zoom duration ms */
+  var Z1     = 480;   /* camera end Z (zoom destination — closer for impact) */
+  var ZOOM_D = 2400;  /* zoom duration ms — slow build */
   var AUTO_D = 1200;  /* ms after load before zoom kicks off */
 
   var scene  = new THREE.Scene();
@@ -132,7 +132,7 @@
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
     var mat = new THREE.PointsMaterial({
-      size: 5, vertexColors: true, transparent: true, opacity: 0.62, sizeAttenuation: true,
+      size: 14, vertexColors: true, transparent: true, opacity: 0.72, sizeAttenuation: true,
     });
     scene.add(new THREE.Points(geo, mat));
     return { geo: geo, mat: mat, yBase: yBase, sign: sign };
@@ -186,18 +186,18 @@
     zooming = true;
     zoomT0  = Date.now();
 
-    /* Entry screen sweeps 350ms into the zoom — dots already rushing forward */
+    /* Dismiss fires when zoom completes — home page appears, no slide */
     setTimeout(function () {
       if (window._vvDismissEntry) window._vvDismissEntry();
-    }, 350);
+    }, ZOOM_D);
 
-    /* Three.js teardown after sweep fully clears */
+    /* Three.js teardown after fade finishes */
     setTimeout(function () {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', onResize);
       grids.forEach(function (g) { g.geo.dispose(); g.mat.dispose(); });
       renderer.dispose();
-    }, 350 + 1350);
+    }, ZOOM_D + 650);
   }, AUTO_D);
 
   tick();
