@@ -75,166 +75,132 @@
     setTimeout(function () { entry.style.display = 'none'; }, 1200);
   };
 
-  /* Fallback: if Three.js never loaded, wheel/touch still dismisses */
+  /* Fallback: if Three.js never loaded, auto-dismiss after 3s */
   setTimeout(function () {
-    if (typeof THREE !== 'undefined') return; /* Three.js loaded fine */
-    function fbWheel(e) {
-      e.preventDefault();
-      if (e.deltaY > 0) { window._vvDismissEntry(); window.removeEventListener('wheel', fbWheel); }
-    }
-    window.addEventListener('wheel', fbWheel, { passive: false });
-  }, 200);
+    if (typeof THREE !== 'undefined') return;
+    if (window._vvDismissEntry) window._vvDismissEntry();
+  }, 3000);
 })();
 
 
-/* ── Entry Dots — Three.js wave, scroll-to-enter ─────────── */
+/* ── Entry Dots — Two mirrored waves, auto-zoom ─────────────── */
 (function initEntryDots() {
   if (typeof THREE === 'undefined') return;
   var container = document.getElementById('entry-screen');
   if (!container) return;
 
-  var SEPARATION = 150, AMOUNTX = 40, AMOUNTY = 60;
-  var CAM_START_Z = 1220, CAM_START_Y = 355;
-  var CAM_END_Z   = 180,  CAM_END_Y   = 160;
-  var ZOOM_DURATION = 950; /* ms */
+  var SEP    = 115;   /* dot spacing */
+  var NX     = 44;    /* columns (wide enough to bleed off-screen) */
+  var NZ     = 16;    /* rows (depth) */
+  var YOFF   = 285;   /* distance above/below center — text sits in the gap */
+  var AMPL   = 45;    /* wave amplitude */
+  var Z0     = 1450;  /* camera start Z */
+  var Z1     = 680;   /* camera end Z (zoom destination) */
+  var ZOOM_D = 1050;  /* zoom duration ms */
+  var AUTO_D = 1200;  /* ms after load before zoom kicks off */
 
   var scene  = new THREE.Scene();
   var W = window.innerWidth, H = window.innerHeight;
 
+  /* Camera looks straight ahead, Y=0 = screen centre (where text sits) */
   var camera = new THREE.PerspectiveCamera(60, W / H, 1, 10000);
-  camera.position.set(0, CAM_START_Y, CAM_START_Z);
+  camera.position.set(0, 0, Z0);
 
   var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W, H);
   renderer.setClearColor(0x000000, 0);
 
-  /* Append canvas, z-index:0 keeps it definitively behind entry-center (z:2) + hint (z:3) */
   var canvas = renderer.domElement;
   canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
   container.appendChild(canvas);
 
-  /* Build particle grid — red dots */
-  var positions = [], colors = [];
-  for (var ix = 0; ix < AMOUNTX; ix++) {
-    for (var iy = 0; iy < AMOUNTY; iy++) {
-      positions.push(
-        ix * SEPARATION - (AMOUNTX * SEPARATION) / 2,
-        0,
-        iy * SEPARATION - (AMOUNTY * SEPARATION) / 2
-      );
-      /* Red: 220/255, 30/255, 30/255 */
-      colors.push(0.863, 0.118, 0.118);
-    }
-  }
-
-  var geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
-
-  var material = new THREE.PointsMaterial({
-    size: 6,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0.55,
-    sizeAttenuation: true,
-  });
-
-  scene.add(new THREE.Points(geometry, material));
-
-  var count = 0, animId;
-  var zooming = false, zoomStartTime = 0;
-
-  function animateDots() {
-    animId = requestAnimationFrame(animateDots);
-
-    /* Slow wave */
-    var pos = geometry.attributes.position.array;
-    var i = 0;
-    for (var xi = 0; xi < AMOUNTX; xi++) {
-      for (var yi = 0; yi < AMOUNTY; yi++) {
-        pos[i * 3 + 1] =
-          Math.sin((xi + count) * 0.3) * 50 +
-          Math.sin((yi + count) * 0.5) * 50;
-        i++;
+  /* Build one grid — yBase is its vertical centre; sign mirrors the wave */
+  function buildGrid(yBase, sign) {
+    var pos = [], col = [];
+    for (var ix = 0; ix < NX; ix++) {
+      for (var iz = 0; iz < NZ; iz++) {
+        pos.push(
+          ix * SEP - (NX * SEP) / 2,
+          yBase,
+          iz * SEP - (NZ * SEP) / 2
+        );
+        col.push(0.863, 0.118, 0.118); /* red */
       }
     }
-    geometry.attributes.position.needsUpdate = true;
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
+    var mat = new THREE.PointsMaterial({
+      size: 5, vertexColors: true, transparent: true, opacity: 0.62, sizeAttenuation: true,
+    });
+    scene.add(new THREE.Points(geo, mat));
+    return { geo: geo, mat: mat, yBase: yBase, sign: sign };
+  }
 
-    /* Camera zoom on scroll trigger */
+  /* Upper band waves UP away from text; lower mirrors it DOWN */
+  var grids = [
+    buildGrid( YOFF,  1),
+    buildGrid(-YOFF, -1),
+  ];
+
+  var count = 0, animId;
+  var zooming = false, zoomT0 = 0;
+
+  function tick() {
+    animId = requestAnimationFrame(tick);
+
+    grids.forEach(function (g) {
+      var arr = g.geo.attributes.position.array;
+      var i = 0;
+      for (var ix = 0; ix < NX; ix++) {
+        for (var iz = 0; iz < NZ; iz++) {
+          var wave = Math.sin((ix + count) * 0.3) * AMPL
+                   + Math.sin((iz + count) * 0.5) * AMPL;
+          arr[i * 3 + 1] = g.yBase + wave * g.sign;
+          i++;
+        }
+      }
+      g.geo.attributes.position.needsUpdate = true;
+    });
+
     if (zooming) {
-      var t = Math.min((Date.now() - zoomStartTime) / ZOOM_DURATION, 1);
-      /* Ease-in cubic — accelerates into the dots */
-      var e = t * t * t;
-      camera.position.z = CAM_START_Z + (CAM_END_Z - CAM_START_Z) * e;
-      camera.position.y = CAM_START_Y + (CAM_END_Y - CAM_START_Y) * e;
+      var t = Math.min((Date.now() - zoomT0) / ZOOM_D, 1);
+      var e = t * t * t; /* ease-in cubic — builds speed */
+      camera.position.z = Z0 + (Z1 - Z0) * e;
     }
 
     renderer.render(scene, camera);
-    count += 0.028; /* slow roll */
+    count += 0.028;
   }
 
-  function onResizeDots() {
+  function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
-  window.addEventListener('resize', onResizeDots);
+  window.addEventListener('resize', onResize);
 
-  /* ── Scroll-to-enter ─────────────────────────────────────── */
-  var triggered = false;
+  /* Auto-zoom fires after AUTO_D ms — no user input needed */
+  setTimeout(function () {
+    zooming = true;
+    zoomT0  = Date.now();
 
-  function triggerZoom() {
-    if (triggered) return;
-    triggered = true;
-
-    /* Detach all input listeners */
-    window.removeEventListener('wheel',      onWheel,      false);
-    window.removeEventListener('touchstart', onTouchStart, false);
-    window.removeEventListener('touchmove',  onTouchMove,  false);
-
-    /* Fade out scroll hint */
-    var hint = document.getElementById('entry-scroll-hint');
-    if (hint) hint.style.opacity = '0';
-
-    /* Kick off Three.js zoom */
-    zooming       = true;
-    zoomStartTime = Date.now();
-
-    /* Entry screen sweep starts 320ms in — dots are already rushing forward */
+    /* Entry screen sweeps 350ms into the zoom — dots already rushing forward */
     setTimeout(function () {
       if (window._vvDismissEntry) window._vvDismissEntry();
-    }, 320);
+    }, 350);
 
-    /* Three.js teardown after sweep fully off-screen */
+    /* Three.js teardown after sweep fully clears */
     setTimeout(function () {
       cancelAnimationFrame(animId);
-      window.removeEventListener('resize', onResizeDots);
-      geometry.dispose();
-      material.dispose();
+      window.removeEventListener('resize', onResize);
+      grids.forEach(function (g) { g.geo.dispose(); g.mat.dispose(); });
       renderer.dispose();
-    }, 1700);
-  }
+    }, 350 + 1350);
+  }, AUTO_D);
 
-  /* Desktop — wheel down only; block page scroll while entry is open */
-  function onWheel(e) {
-    e.preventDefault();
-    if (e.deltaY > 0) triggerZoom();
-  }
-
-  /* Mobile — swipe up (finger moves upward = scroll down) */
-  var touchStartY = 0;
-  function onTouchStart(e) { touchStartY = e.touches[0].clientY; }
-  function onTouchMove(e) {
-    e.preventDefault();
-    if (e.touches[0].clientY < touchStartY - 20) triggerZoom();
-  }
-
-  window.addEventListener('wheel',      onWheel,      { passive: false });
-  window.addEventListener('touchstart', onTouchStart, { passive: true  });
-  window.addEventListener('touchmove',  onTouchMove,  { passive: false });
-
-  animateDots();
+  tick();
 })();
 
 
