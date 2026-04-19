@@ -16,11 +16,15 @@
        ENTRY / PRELOADER
   ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
   <div id="entry-screen">
-    <!-- SVG path layers injected by JS -->
-    <div class="entry-paths-layer" id="entry-paths-layer"></div>
+    <!-- Three.js canvas injected as first child by JS -->
     <!-- Letter-by-letter title injected by JS -->
     <div class="entry-center">
       <h1 class="entry-title" id="entry-title"></h1>
+    </div>
+    <!-- Scroll cue -->
+    <div class="entry-scroll-hint" id="entry-scroll-hint" aria-hidden="true">
+      <span class="entry-scroll-text">scroll</span>
+      <span class="entry-scroll-line"></span>
     </div>
   </div>
 
