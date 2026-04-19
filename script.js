@@ -95,8 +95,8 @@
   var YOFF   = 285;   /* distance above/below center — text sits in the gap */
   var AMPL   = 45;    /* wave amplitude */
   var Z0     = 1450;  /* camera start Z */
-  var Z1     = 480;   /* camera end Z (zoom destination — closer for impact) */
-  var ZOOM_D = 2400;  /* zoom duration ms — slow build */
+  var Z1     = 80;    /* camera end Z — right inside the dot grid */
+  var ZOOM_D = 2000;  /* zoom duration ms */
   var AUTO_D = 1200;  /* ms after load before zoom kicks off */
 
   var scene  = new THREE.Scene();
@@ -186,18 +186,18 @@
     zooming = true;
     zoomT0  = Date.now();
 
-    /* Dismiss fires when zoom completes — home page appears, no slide */
+    /* CSS scale-zoom kicks in at 75% through the camera zoom — they overlap */
     setTimeout(function () {
       if (window._vvDismissEntry) window._vvDismissEntry();
-    }, ZOOM_D);
+    }, Math.round(ZOOM_D * 0.75));
 
-    /* Three.js teardown after fade finishes */
+    /* Three.js teardown after CSS transition completes */
     setTimeout(function () {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', onResize);
       grids.forEach(function (g) { g.geo.dispose(); g.mat.dispose(); });
       renderer.dispose();
-    }, ZOOM_D + 650);
+    }, ZOOM_D + 800);
   }, AUTO_D);
 
   tick();
