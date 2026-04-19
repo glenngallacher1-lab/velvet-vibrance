@@ -38,82 +38,18 @@
 })();
 
 
-/* ── C. Entry Screen — Background Paths + Letter Spring ─────── */
+/* ── C. Entry Screen — Letter Spring ─────────────────────── */
 (function initEntry() {
-  var entry      = document.getElementById('entry-screen');
-  var pathsLayer = document.getElementById('entry-paths-layer');
-  var titleEl    = document.getElementById('entry-title');
+  var entry   = document.getElementById('entry-screen');
+  var titleEl = document.getElementById('entry-title');
   if (!entry) return;
 
   document.body.classList.add('entry-open');
 
-  /* ── 1. Build SVG paths ───────────────────────────────────── */
-  // These bezier paths span ~2200 SVG units in path length.
-  // We use a fixed dasharray (no getTotalLength) so it works before layout.
-  // Dash = 660 units (30%), gap = 1540 units (70%), total period = 2200.
-  var ESTIMATED_LEN = 2200;
-  var DASH          = Math.round(ESTIMATED_LEN * 0.3);  // 660
-  var GAP           = ESTIMATED_LEN - DASH;             // 1540
-
-  var svgNS = 'http://www.w3.org/2000/svg';
-  var svg   = document.createElementNS(svgNS, 'svg');
-  // Wide viewBox that covers the full path extent so paths fill the screen
-  svg.setAttribute('viewBox', '-600 -420 1900 1420');
-  svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('overflow', 'visible');
-
-  var styleEl    = document.createElement('style');
-  var keyframes  = '';
-  var pathIndex  = 0;
-
-  [1, -1].forEach(function (position) {
-    for (var i = 0; i < 36; i++) {
-      var x = 380 - i * 5 * position;
-      var d = 'M-' + x + ' -' + (189 + i * 6) +
-              'C-' + x + ' -' + (189 + i * 6) +
-              ' -' + (312 - i * 5 * position) + ' ' + (216 - i * 6) +
-              ' '  + (152 - i * 5 * position) + ' ' + (343 - i * 6) +
-              'C'  + (616 - i * 5 * position) + ' ' + (470 - i * 6) +
-              ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6) +
-              ' '  + (684 - i * 5 * position) + ' ' + (875 - i * 6);
-
-      // Vivid red: low-i paths are thin + light, high-i thick + saturated
-      var opacity     = 0.18 + i * 0.024;
-      if (opacity > 1) opacity = 1;
-      var strokeWidth = (0.6 + i * 0.04).toFixed(2);
-      var duration    = (18 + i * 0.28 + Math.random() * 6).toFixed(1);
-      // Stagger start points so not all dashes begin at the same place
-      var startOffset = -Math.round(Math.random() * ESTIMATED_LEN);
-      var name        = 'ep' + pathIndex;
-
-      var path = document.createElementNS(svgNS, 'path');
-      path.setAttribute('d', d);
-      path.setAttribute('stroke', 'rgba(220,30,30,' + opacity.toFixed(3) + ')');
-      path.setAttribute('stroke-width', strokeWidth);
-      path.setAttribute('stroke-dasharray', DASH + ' ' + GAP);
-      path.setAttribute('stroke-dashoffset', startOffset);
-      path.setAttribute('fill', 'none');
-
-      keyframes += '@keyframes ' + name + '{' +
-        '0%{stroke-dashoffset:' + startOffset + '}' +
-        '100%{stroke-dashoffset:' + (startOffset - ESTIMATED_LEN) + '}' +
-        '}';
-
-      path.style.animation = name + ' ' + duration + 's linear infinite';
-      svg.appendChild(path);
-      pathIndex++;
-    }
-  });
-
-  styleEl.textContent = keyframes;
-  document.head.appendChild(styleEl);
-  pathsLayer.appendChild(svg);
-
-  /* ── 2. Letter-by-letter title animation ─────────────────── */
-  var TEXT       = 'VELVET VIBRANCE';
-  var BASE_DELAY = 0.2;
-  var STAGGER    = 0.06;
+  /* Letter-by-letter title animation */
+  var TEXT        = 'VELVET VIBRANCE';
+  var BASE_DELAY  = 0.2;
+  var STAGGER     = 0.06;
   var letterIndex = 0;
 
   TEXT.split('').forEach(function (char) {
@@ -131,49 +67,44 @@
     }
   });
 
-  /* ── 3. Auto-dismiss — sweep up when letters finish ─────── */
-  var sweepDelay = 2600;
-
-  function dismiss() {
+  /* Dismiss — triggered by initEntryDots when zoom fires */
+  window._vvDismissEntry = function () {
     if (entry.classList.contains('sweep-out')) return;
     entry.classList.add('sweep-out');
     document.body.classList.remove('entry-open');
     setTimeout(function () { entry.style.display = 'none'; }, 1200);
-  }
-
-  setTimeout(dismiss, sweepDelay);
-  entry.addEventListener('click', dismiss);
-  document.addEventListener('keydown', function (e) {
-    if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') dismiss();
-  });
+  };
 })();
 
 
-/* ── Entry Dots — Three.js wave behind paths + title ─────── */
+/* ── Entry Dots — Three.js wave, scroll-to-enter ─────────── */
 (function initEntryDots() {
   if (typeof THREE === 'undefined') return;
   var container = document.getElementById('entry-screen');
   if (!container) return;
 
   var SEPARATION = 150, AMOUNTX = 40, AMOUNTY = 60;
+  var CAM_START_Z = 1220, CAM_START_Y = 355;
+  var CAM_END_Z   = 180,  CAM_END_Y   = 160;
+  var ZOOM_DURATION = 950; /* ms */
 
   var scene  = new THREE.Scene();
   var W = window.innerWidth, H = window.innerHeight;
 
   var camera = new THREE.PerspectiveCamera(60, W / H, 1, 10000);
-  camera.position.set(0, 355, 1220);
+  camera.position.set(0, CAM_START_Y, CAM_START_Z);
 
   var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W, H);
   renderer.setClearColor(0x000000, 0);
 
-  /* Insert canvas as FIRST child so it sits below SVG paths and title */
+  /* First child = behind title and any remaining overlay */
   var canvas = renderer.domElement;
   canvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
   container.insertBefore(canvas, container.firstChild);
 
-  /* Build particle grid */
+  /* Build particle grid — red dots */
   var positions = [], colors = [];
   for (var ix = 0; ix < AMOUNTX; ix++) {
     for (var iy = 0; iy < AMOUNTY; iy++) {
@@ -182,8 +113,8 @@
         0,
         iy * SEPARATION - (AMOUNTY * SEPARATION) / 2
       );
-      /* Gold: 212/255, 175/255, 55/255 */
-      colors.push(0.831, 0.686, 0.216);
+      /* Red: 220/255, 30/255, 30/255 */
+      colors.push(0.863, 0.118, 0.118);
     }
   }
 
@@ -195,16 +126,19 @@
     size: 6,
     vertexColors: true,
     transparent: true,
-    opacity: 0.42,
+    opacity: 0.55,
     sizeAttenuation: true,
   });
 
   scene.add(new THREE.Points(geometry, material));
 
   var count = 0, animId;
+  var zooming = false, zoomStartTime = 0;
 
   function animateDots() {
     animId = requestAnimationFrame(animateDots);
+
+    /* Slow wave */
     var pos = geometry.attributes.position.array;
     var i = 0;
     for (var xi = 0; xi < AMOUNTX; xi++) {
@@ -216,8 +150,18 @@
       }
     }
     geometry.attributes.position.needsUpdate = true;
+
+    /* Camera zoom on scroll trigger */
+    if (zooming) {
+      var t = Math.min((Date.now() - zoomStartTime) / ZOOM_DURATION, 1);
+      /* Ease-in cubic — accelerates into the dots */
+      var e = t * t * t;
+      camera.position.z = CAM_START_Z + (CAM_END_Z - CAM_START_Z) * e;
+      camera.position.y = CAM_START_Y + (CAM_END_Y - CAM_START_Y) * e;
+    }
+
     renderer.render(scene, camera);
-    count += 0.1;
+    count += 0.028; /* slow roll */
   }
 
   function onResizeDots() {
@@ -225,18 +169,62 @@
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
-
   window.addEventListener('resize', onResizeDots);
-  animateDots();
 
-  /* Clean up after entry screen completes (sweep 2600ms + slide 1200ms + buffer) */
-  setTimeout(function () {
-    cancelAnimationFrame(animId);
-    window.removeEventListener('resize', onResizeDots);
-    geometry.dispose();
-    material.dispose();
-    renderer.dispose();
-  }, 4100);
+  /* ── Scroll-to-enter ─────────────────────────────────────── */
+  var triggered = false;
+
+  function triggerZoom() {
+    if (triggered) return;
+    triggered = true;
+
+    /* Detach all input listeners */
+    window.removeEventListener('wheel',      onWheel,      false);
+    window.removeEventListener('touchstart', onTouchStart, false);
+    window.removeEventListener('touchmove',  onTouchMove,  false);
+
+    /* Fade out scroll hint */
+    var hint = document.getElementById('entry-scroll-hint');
+    if (hint) hint.style.opacity = '0';
+
+    /* Kick off Three.js zoom */
+    zooming       = true;
+    zoomStartTime = Date.now();
+
+    /* Entry screen sweep starts 320ms in — dots are already rushing forward */
+    setTimeout(function () {
+      if (window._vvDismissEntry) window._vvDismissEntry();
+    }, 320);
+
+    /* Three.js teardown after sweep fully off-screen */
+    setTimeout(function () {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', onResizeDots);
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+    }, 1700);
+  }
+
+  /* Desktop — wheel down only; block page scroll while entry is open */
+  function onWheel(e) {
+    e.preventDefault();
+    if (e.deltaY > 0) triggerZoom();
+  }
+
+  /* Mobile — swipe up (finger moves upward = scroll down) */
+  var touchStartY = 0;
+  function onTouchStart(e) { touchStartY = e.touches[0].clientY; }
+  function onTouchMove(e) {
+    e.preventDefault();
+    if (e.touches[0].clientY < touchStartY - 20) triggerZoom();
+  }
+
+  window.addEventListener('wheel',      onWheel,      { passive: false });
+  window.addEventListener('touchstart', onTouchStart, { passive: true  });
+  window.addEventListener('touchmove',  onTouchMove,  { passive: false });
+
+  animateDots();
 })();
 
 
