@@ -74,6 +74,16 @@
     document.body.classList.remove('entry-open');
     setTimeout(function () { entry.style.display = 'none'; }, 1200);
   };
+
+  /* Fallback: if Three.js never loaded, wheel/touch still dismisses */
+  setTimeout(function () {
+    if (typeof THREE !== 'undefined') return; /* Three.js loaded fine */
+    function fbWheel(e) {
+      e.preventDefault();
+      if (e.deltaY > 0) { window._vvDismissEntry(); window.removeEventListener('wheel', fbWheel); }
+    }
+    window.addEventListener('wheel', fbWheel, { passive: false });
+  }, 200);
 })();
 
 
@@ -99,10 +109,10 @@
   renderer.setSize(W, H);
   renderer.setClearColor(0x000000, 0);
 
-  /* First child = behind title and any remaining overlay */
+  /* Append canvas, z-index:0 keeps it definitively behind entry-center (z:2) + hint (z:3) */
   var canvas = renderer.domElement;
-  canvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
-  container.insertBefore(canvas, container.firstChild);
+  canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+  container.appendChild(canvas);
 
   /* Build particle grid — red dots */
   var positions = [], colors = [];
