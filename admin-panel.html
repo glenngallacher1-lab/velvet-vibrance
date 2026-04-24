@@ -858,6 +858,7 @@
     <div class="header-brand">
       <img src="vv-logo.jpeg" alt="VV">
       <span class="header-title">Velvet Vibrance</span>
+      <span id="logged-user" style="font-size:0.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-left:0.3rem;"></span>
     </div>
     <div class="header-right">
       <a href="index.html" target="_blank" class="site-link">View Site ↗</a>
@@ -976,6 +977,12 @@
 
       <div class="card">
         <div class="card-label">GitHub Token</div>
+        <div id="token-set-indicator" style="display:none;align-items:center;gap:1rem;flex-wrap:wrap;padding:0.6rem 0 1rem;">
+          <span style="color:var(--green);font-size:0.75rem;letter-spacing:1px;">Token saved</span>
+          <button class="btn-secondary" onclick="testToken()">Test Connection</button>
+          <button class="btn-secondary" onclick="document.getElementById('config-warning').style.display='';document.getElementById('token-set-indicator').style.display='none';">Change Token</button>
+          <button class="btn-secondary" style="border-color:rgba(255,95,95,0.3);color:var(--red);" onclick="clearToken()">Remove Token</button>
+        </div>
         <div id="config-warning">
           <strong>One-time setup:</strong> To publish changes to the live site, paste a GitHub Personal Access Token below.<br><br>
           <strong>How to get one:</strong> Go to <strong>github.com → Settings → Developer settings → Fine-grained tokens</strong> and create a token with <code>Contents: Read &amp; Write</code> permission on the <code>velvet-vibrance</code> repo.
@@ -1122,7 +1129,10 @@
 
 <script>
   /* ════════ CONFIG ════════ */
-  const PW_HASH    = 'd8078da636aa1ad05f5addc7fd85f1955bb8a9bb952057fb7bc21e965ca5ed24';
+  const USERS = {
+    Glenn:   'd8078da636aa1ad05f5addc7fd85f1955bb8a9bb952057fb7bc21e965ca5ed24',
+    Trystan: 'd9b91863848e2ecd2091756ab6bc4541ae913aa0e4139701d797ae546afc4c22'
+  };
   const REPO_OWNER = 'glenngallacher1-lab';
   const REPO_NAME  = 'velvet-vibrance';
   const RAW_BASE   = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
@@ -1153,8 +1163,10 @@
 
   async function checkPassword() {
     const h = await hash(document.getElementById('pw-input').value);
-    if (h === PW_HASH) {
+    const user = Object.keys(USERS).find(u => USERS[u] === h);
+    if (user) {
       sessionStorage.setItem('vv_auth', '1');
+      sessionStorage.setItem('vv_user', user);
       showAdmin();
     } else {
       document.getElementById('login-error').style.display = 'block';
@@ -1170,11 +1182,20 @@
   function showAdmin() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-panel').style.display  = 'block';
-    if (localStorage.getItem('vv_gh_token')) {
-      document.getElementById('config-warning').style.display = 'none';
-    }
+    const user = sessionStorage.getItem('vv_user') || 'Admin';
+    const userEl = document.getElementById('logged-user');
+    if (userEl) userEl.textContent = user;
+    updateTokenUI();
     loadEvents();
     renderGallery();
+  }
+
+  function updateTokenUI() {
+    const hasToken = !!localStorage.getItem('vv_gh_token');
+    const warning  = document.getElementById('config-warning');
+    const indicator = document.getElementById('token-set-indicator');
+    if (warning)   warning.style.display   = hasToken ? 'none' : '';
+    if (indicator) indicator.style.display = hasToken ? 'flex' : 'none';
   }
 
   function logout() {
@@ -1196,8 +1217,15 @@
     const v = document.getElementById('gh-token-input').value.trim();
     if (!v) return;
     localStorage.setItem('vv_gh_token', v);
-    document.getElementById('config-warning').style.display = 'none';
+    document.getElementById('gh-token-input').value = '';
+    updateTokenUI();
     toast('Token saved ✓', 'success');
+  }
+
+  function clearToken() {
+    localStorage.removeItem('vv_gh_token');
+    updateTokenUI();
+    toast('Token removed');
   }
 
   async function testToken() {
@@ -1220,6 +1248,11 @@
     }
   }
 
+  /* ════════ HELPERS (early) ════════ */
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   /* ════════ EVENTS ════════ */
   async function loadEvents() {
     try {
@@ -1240,15 +1273,16 @@
       const row = document.createElement('div');
       row.className = 'event-row';
       row.innerHTML = `
-        <img src="${ev.poster}" alt="${ev.name}" class="event-row-poster" draggable="true"
-          ondragstart="dragPoster(event,'${ev.poster}')" title="Drag to share poster">
+        <img src="${escapeHtml(ev.poster)}" alt="${escapeHtml(ev.name)}" class="event-row-poster" draggable="true"
+          title="Drag to share poster">
         <div class="event-row-info">
-          <div class="event-row-name">${ev.name}</div>
-          <div class="event-row-date">${ev.date}</div>
-          <div class="event-row-venue">${ev.venue}</div>
+          <div class="event-row-name">${escapeHtml(ev.name)}</div>
+          <div class="event-row-date">${escapeHtml(ev.date)}</div>
+          <div class="event-row-venue">${escapeHtml(ev.venue)}</div>
         </div>
         <button class="event-row-remove" onclick="removeEvent(${i})">Remove</button>
       `;
+      row.querySelector('.event-row-poster').addEventListener('dragstart', e => dragPoster(e, ev.poster));
       list.appendChild(row);
     });
   }
@@ -1307,10 +1341,11 @@
     const posterPath = `posters/${Date.now()}-${posterFileName}`;
 
     try {
-      await fetch(base + posterPath, {
+      const upRes = await fetch(base + posterPath, {
         method: 'PUT', headers: H,
         body: JSON.stringify({ message: `admin: add poster ${posterFileName}`, content: posterBase64 })
       });
+      if (!upRes.ok) throw new Error('Poster upload failed: ' + upRes.status);
 
       const posterUrl = `${RAW_BASE}${posterPath}`;
       events.push({ name, date, venue, tickets, poster: posterUrl });
@@ -1388,7 +1423,7 @@
 
       const isVideo = item.type === 'video';
       const srcUrl  = item.isPending
-        ? (isVideo ? 'data:video/mp4;base64,' + item.base64 : 'data:image/jpeg;base64,' + item.base64)
+        ? (isVideo ? 'data:video/mp4;base64,' : (item.mimeType ? `data:${item.mimeType};base64,` : 'data:image/jpeg;base64,')) + item.base64
         : item.file;
 
       let mediaEl;
@@ -1521,7 +1556,7 @@
       reader.onload = e => {
         const dataUrl = e.target.result;
         const base64  = dataUrl.split(',')[1];
-        const item    = { file, base64, name: file.name, type: isVideo ? 'video' : 'image', alt: file.name.split('.')[0].replace(/[-_]/g,' '), span: '' };
+        const item    = { file, base64, name: file.name, type: isVideo ? 'video' : 'image', mimeType: file.type, alt: file.name.split('.')[0].replace(/[-_]/g,' '), span: '' };
         if (!isVideo) {
           // Auto-detect aspect ratio to assign masonry span class
           const img = new Image();
