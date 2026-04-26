@@ -618,6 +618,7 @@ h1, h2, h3, h4 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: minmax(85vh, auto);
+  align-items: stretch;
 }
 
 .about-text {
