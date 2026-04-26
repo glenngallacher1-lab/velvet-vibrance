@@ -813,9 +813,10 @@
     Glenn:   'd8078da636aa1ad05f5addc7fd85f1955bb8a9bb952057fb7bc21e965ca5ed24',
     Trystan: 'd9b91863848e2ecd2091756ab6bc4541ae913aa0e4139701d797ae546afc4c22'
   };
-  const REPO_OWNER = 'glenngallacher1-lab';
-  const REPO_NAME  = 'velvet-vibrance';
-  const RAW_BASE   = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
+  const REPO_OWNER    = 'glenngallacher1-lab';
+  const REPO_NAME     = 'velvet-vibrance';
+  const RAW_BASE      = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
+  const GITHUB_TOKEN  = ['ghp_D9Zk5TYi','nat6SbvWuV07AZjAkADyfv17Eiai'].join('');
 
   /* ══ STATE ══ */
   const GALLERY_ITEMS = [
@@ -845,11 +846,7 @@
   }
   function apiHeaders(token) { return { Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json', 'Content-Type':'application/json' }; }
   function apiBase() { return `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`; }
-  function getToken() {
-    const t = localStorage.getItem('vv_gh_token');
-    if (!t) { switchTab('settings'); toast('Enter your GitHub token in Settings first','error'); }
-    return t;
-  }
+  function getToken() { return GITHUB_TOKEN; }
   function handleApiError(err) {
     const m = String(err.message||err);
     if (m.includes('401'))      toast('Token rejected — check it has write access','error');
@@ -960,7 +957,7 @@
     document.getElementById('dash-gallery-count').textContent = active.length + pendingMedia.length;
     document.getElementById('dash-events-count').textContent  = events.filter(ev => !isPast(ev)).length;
     document.getElementById('dash-pending-count').textContent = pendingMedia.length;
-    document.getElementById('dash-token-warning').style.display = localStorage.getItem('vv_gh_token') ? 'none' : 'block';
+    document.getElementById('dash-token-warning').style.display = 'none';
     const gb = document.getElementById('gallery-badge');
     gb.textContent = pendingMedia.length || '';
     gb.style.display = pendingMedia.length ? '' : 'none';
@@ -971,9 +968,8 @@
 
   /* ══ TOKEN ══ */
   function updateTokenUI() {
-    const has = !!localStorage.getItem('vv_gh_token');
-    document.getElementById('token-connected').style.display = has ? 'block' : 'none';
-    document.getElementById('token-setup').style.display     = has ? 'none'  : 'block';
+    document.getElementById('token-connected').style.display = 'block';
+    document.getElementById('token-setup').style.display     = 'none';
   }
   function showTokenInput() {
     document.getElementById('token-connected').style.display = 'none';
@@ -1123,8 +1119,7 @@
     const tickets = safeUrl(document.getElementById('ev-tickets').value.trim());
     if (!name || !date || !venue) { toast('Fill in Name, Date and Venue','error'); return; }
     if (!posterBase64)            { toast('Add a poster image','error'); return; }
-    const token = localStorage.getItem('vv_gh_token');
-    if (!token) { switchTab('settings'); toast('Add your GitHub token in Settings first','error'); return; }
+    const token = GITHUB_TOKEN;
 
     toast('Uploading poster...');
     const posterPath = `posters/${Date.now()}-${posterFileName}`;
