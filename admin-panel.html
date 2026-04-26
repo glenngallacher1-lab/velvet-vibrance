@@ -1197,12 +1197,20 @@
 
   /* ══ GALLERY ══ */
   async function loadGallery() {
+    let loaded = false;
     try {
       const res  = await fetch(`${RAW_BASE}gallery.json?t=${Date.now()}`);
       const data = await res.json();
-      GALLERY_ITEMS.length = 0;
-      if (Array.isArray(data)) data.forEach(item => GALLERY_ITEMS.push(item));
-    } catch { /* keep empty, will start fresh */ }
+      if (Array.isArray(data) && data.length > 0) {
+        GALLERY_ITEMS.length = 0;
+        data.forEach(item => GALLERY_ITEMS.push(item));
+        loaded = true;
+      }
+    } catch { /* network error — keep existing items if any */ }
+    if (!loaded && GALLERY_ITEMS.length === 0) {
+      toast('Could not load gallery from site — publish disabled until loaded', 'error');
+      document.getElementById('publish-gallery-btn').disabled = true;
+    }
     removedItems.clear();
     pendingMedia = [];
     renderGallery();
