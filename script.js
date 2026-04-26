@@ -93,7 +93,7 @@
   var NX     = 44;    /* columns (wide enough to bleed off-screen) */
   var NZ     = 16;    /* rows (depth) */
   var YOFF   = 285;   /* distance above/below center — text sits in the gap */
-  var AMPL   = 45;    /* wave amplitude */
+  var AMPL   = 22;    /* wave amplitude — lower keeps grid organized */
   var Z0     = 1450;  /* camera start Z */
   var Z1     = 80;    /* camera end Z — right inside the dot grid */
   var ZOOM_D = 2200;  /* zoom duration ms */
@@ -171,7 +171,7 @@
     }
 
     renderer.render(scene, camera);
-    count += 0.028;
+    count += 0.016;
   }
 
   function onResize() {
