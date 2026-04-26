@@ -84,7 +84,7 @@ h1, h2, h3, h4 {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: opacity 0.55s ease;
+  transition: opacity 1s ease;
 }
 
 #entry-screen.sweep-out {
