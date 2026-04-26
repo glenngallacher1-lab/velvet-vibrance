@@ -3,1124 +3,764 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data: blob:; media-src 'self' https://raw.githubusercontent.com data: blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com; frame-ancestors 'none';" />
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta name="robots" content="noindex, nofollow" />
-  <title>VV Admin — Velvet Vibrance</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data: blob:; media-src 'self' https://raw.githubusercontent.com data: blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com; frame-ancestors 'none';">
+  <meta name="robots" content="noindex, nofollow">
+  <title>VV Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --velvet: #8B1A1A;
-      --gold: #D4AF37;
-      --gold-light: #F0C842;
-      --dark: #000;
-      --dark-mid: #0a0505;
-      --card: rgba(255,255,255,0.04);
-      --border: rgba(212,175,55,0.18);
-      --border-hover: rgba(212,175,55,0.45);
-      --text: #f5ede0;
-      --muted: rgba(245,237,224,0.45);
-      --red: #ff5f5f;
-      --green: #4ade80;
-      --font-d: 'Playfair Display', Georgia, serif;
-      --font-b: 'Inter', system-ui, sans-serif;
-      --radius: 12px;
-      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --red:        #8B1A1A;
+      --red-mid:    #A52020;
+      --red-light:  #FCF3F3;
+      --red-border: #F0DADA;
+      --bg:         #F6F5F3;
+      --white:      #FFFFFF;
+      --text:       #111827;
+      --muted:      #6B7280;
+      --border:     #E5E7EB;
+      --shadow:     0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+      --shadow-sm:  0 1px 2px rgba(0,0,0,0.06);
+      --radius:     12px;
+      --radius-sm:  8px;
+      --green:      #15803d;
+      --font:       'Inter', system-ui, sans-serif;
+      --ease:       cubic-bezier(0.16,1,0.3,1);
+      --sidebar-w:  248px;
     }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--dark);
-      color: var(--text);
-      font-family: var(--font-b);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ════════════ LOGIN ════════════ */
+    /* ── LOGIN ── */
     #login-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      gap: 1.5rem;
-      padding: 2rem;
-      background: radial-gradient(ellipse at 50% 40%, #1a0505 0%, #000 65%);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem;
+      background: linear-gradient(135deg, #fff 0%, #f6f5f3 60%, #fdf0f0 100%);
     }
-
-    .login-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      border: 2px solid var(--gold);
-      object-fit: cover;
-      box-shadow: 0 0 50px rgba(212,175,55,0.2);
+    .login-monogram {
+      width: 56px; height: 56px; background: var(--red); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px;
+      margin-bottom: 1.2rem; box-shadow: 0 4px 20px rgba(139,26,26,0.3);
     }
-
-    .login-title {
-      font-family: var(--font-d);
-      color: var(--gold);
-      font-size: 1.5rem;
-      letter-spacing: 4px;
-      font-style: italic;
-    }
-
-    .login-sub {
-      color: var(--muted);
-      font-size: 0.65rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-top: -1rem;
-    }
-
-    .login-box {
-      background: rgba(255,255,255,0.03);
+    .login-title { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+    .login-sub   { font-size: 0.8rem; color: var(--muted); margin-bottom: 2rem; }
+    .login-card  {
+      background: var(--white); border-radius: 18px; padding: 2rem;
+      width: 100%; max-width: 360px; box-shadow: var(--shadow);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      animation: fadeUp 0.4s var(--ease);
     }
-
-    .login-box label {
-      color: var(--muted);
-      font-size: 0.65rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-
-    .pw-row {
-      display: flex;
-      gap: 0.6rem;
-    }
-
-    .pw-row input {
-      flex: 1;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      color: var(--text);
-      padding: 0.75rem 1rem;
-      font-family: var(--font-b);
-      font-size: 0.95rem;
-      transition: border-color 0.2s;
-    }
-
-    .pw-row input:focus {
+    .field-label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .field-input {
+      width: 100%; padding: 0.7rem 1rem; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-family: var(--font); font-size: 0.9rem;
+      color: var(--text); background: var(--bg); transition: border-color 0.2s;
       outline: none;
-      border-color: var(--gold);
     }
-
+    .field-input:focus { border-color: var(--red); background: #fff; }
+    .remember-row { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; }
+    .remember-row input[type=checkbox] { accent-color: var(--red); width: 15px; height: 15px; cursor: pointer; }
+    .remember-row label { font-size: 0.8rem; color: var(--muted); cursor: pointer; }
     .login-btn {
-      background: var(--gold);
-      color: #000;
-      border: none;
-      border-radius: 9px;
-      padding: 0.75rem 1.3rem;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s, transform 0.15s;
+      width: 100%; padding: 0.8rem; background: var(--red); color: #fff;
+      border: none; border-radius: var(--radius-sm); font-family: var(--font);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem;
+      transition: background 0.2s, transform 0.15s; letter-spacing: 0.03em;
     }
-
-    .login-btn:hover { background: var(--gold-light); }
-    .login-btn:active { transform: scale(0.96); }
-
+    .login-btn:hover  { background: var(--red-mid); }
+    .login-btn:active { transform: scale(0.98); }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     #login-error {
-      display: none;
-      color: var(--red);
-      font-size: 0.75rem;
-      padding: 0.65rem 1rem;
-      border: 1px solid rgba(255,95,95,0.25);
-      border-radius: 8px;
-      background: rgba(255,95,95,0.07);
-      text-align: center;
+      display: none; margin-top: 0.9rem; padding: 0.6rem 0.9rem;
+      background: var(--red-light); border: 1px solid var(--red-border);
+      border-radius: var(--radius-sm); color: var(--red);
+      font-size: 0.78rem; text-align: center;
     }
 
-    /* ════════════ SHELL ════════════ */
-    #admin-panel { display: none; }
+    /* ── SHELL ── */
+    #admin-shell { display: none; min-height: 100vh; }
 
-    .admin-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,0.8);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(16px);
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: var(--sidebar-w); position: fixed; top: 0; left: 0; bottom: 0;
+      background: var(--white); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; z-index: 100;
+      animation: slideRight 0.35s var(--ease);
+    }
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1.3rem 1.25rem 1rem; border-bottom: 1px solid var(--border);
+    }
+    .brand-mark {
+      width: 34px; height: 34px; background: var(--red); border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+    .brand-text { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .brand-sub  { font-size: 0.65rem; color: var(--muted); }
+
+    .sidebar-user {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.9rem 1.25rem; margin: 0.5rem; border-radius: var(--radius-sm);
+      background: var(--red-light); border: 1px solid var(--red-border);
+    }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--red);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .user-role { font-size: 0.65rem; color: var(--red); }
+
+    .sidebar-nav { flex: 1; padding: 0.5rem; overflow-y: auto; }
+    .nav-section-label {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted); padding: 0.75rem 0.75rem 0.4rem;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.62rem 0.75rem; border-radius: var(--radius-sm);
+      cursor: pointer; font-size: 0.83rem; font-weight: 500; color: var(--muted);
+      transition: all 0.15s; user-select: none; margin-bottom: 2px;
+      position: relative;
+    }
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--red-light); color: var(--red); font-weight: 600; }
+    .nav-item.active .nav-icon { color: var(--red); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .nav-badge {
+      margin-left: auto; background: var(--red); color: #fff;
+      font-size: 0.6rem; font-weight: 700; border-radius: 50px;
+      padding: 0.1rem 0.45rem; min-width: 18px; text-align: center;
     }
 
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
+    .sidebar-bottom {
+      padding: 0.75rem; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 0.4rem;
     }
-
-    .header-brand img {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid rgba(212,175,55,0.4);
-      object-fit: cover;
+    .draft-pill {
+      display: none; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.75rem; background: #fffbeb;
+      border: 1px solid #fde68a; border-radius: 50px;
+      font-size: 0.68rem; color: #92400e; font-weight: 500;
     }
-
-    .header-title {
-      font-family: var(--font-d);
-      color: var(--gold);
-      font-size: 1rem;
-      letter-spacing: 2px;
-      font-style: italic;
+    .draft-pill.visible { display: flex; }
+    .draft-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; }
+    .view-site-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.6rem; border-radius: var(--radius-sm);
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--muted); font-size: 0.78rem; font-weight: 500;
+      text-decoration: none; transition: all 0.15s;
     }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    .view-site-btn:hover { background: var(--border); color: var(--text); }
+    .signout-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.6rem; border-radius: var(--radius-sm);
+      background: transparent; border: 1px solid var(--red-border);
+      color: var(--red); font-size: 0.78rem; font-weight: 500;
+      cursor: pointer; transition: background 0.15s; font-family: var(--font);
     }
+    .signout-btn:hover { background: var(--red-light); }
 
-    .site-link {
-      color: var(--muted);
-      font-size: 0.65rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(212,175,55,0.2);
-      padding-bottom: 1px;
-      transition: color 0.2s;
+    /* ── MAIN CONTENT ── */
+    #main-content {
+      margin-left: var(--sidebar-w); min-height: 100vh;
+      padding: 2rem 2.5rem 4rem;
     }
+    .page-header { margin-bottom: 2rem; }
+    .page-title  { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+    .page-sub    { font-size: 0.83rem; color: var(--muted); margin-top: 0.25rem; }
+    .red-rule    { width: 36px; height: 3px; background: var(--red); border-radius: 2px; margin-top: 0.6rem; }
 
-    .site-link:hover { color: var(--gold); }
-
-    .logout-btn {
-      background: transparent;
-      border: 1px solid rgba(255,95,95,0.3);
-      color: var(--red);
-      border-radius: 8px;
-      padding: 0.38rem 0.9rem;
-      font-family: var(--font-b);
-      font-size: 0.68rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .logout-btn:hover { background: rgba(255,95,95,0.08); }
-
-    /* ════════════ TABS ════════════ */
-    .tabs {
-      display: flex;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,0.5);
-      padding: 0 2rem;
-      overflow-x: auto;
-    }
-
-    .tab {
-      padding: 1rem 1.6rem;
-      font-size: 0.68rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      cursor: pointer;
-      color: var(--muted);
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: color 0.2s, border-color 0.2s;
-      white-space: nowrap;
-    }
-
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-
-    /* ════════════ MAIN CONTENT ════════════ */
-    main {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
-    }
-
-    .tab-panel { display: none; }
+    .tab-panel { display: none; animation: fadeUp 0.3s var(--ease); }
     .tab-panel.active { display: block; }
 
-    /* ════════ HELP / FAQ ════════ */
-    .faq-intro { font-size:0.8rem; color:var(--muted); margin-bottom:1.6rem; line-height:1.7; }
-    .faq-item {
-      border: 1px solid var(--border); border-radius: var(--radius);
-      margin-bottom: 0.75rem; overflow: hidden; transition: border-color 0.2s;
+    /* ── CARDS ── */
+    .card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      box-shadow: var(--shadow-sm); margin-bottom: 1.25rem;
     }
-    .faq-item:hover { border-color: var(--border-hover); }
+    .card-title {
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--muted); margin-bottom: 1.1rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .card-title-accent { color: var(--red); }
+    .card-accent { border-left: 3px solid var(--red); padding-left: 1.25rem; }
+
+    /* ── DASHBOARD ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm); transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card:first-child { border-top: 3px solid var(--red); }
+    .stat-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .stat-value { font-size: 2rem; font-weight: 700; color: var(--text); margin: 0.25rem 0; }
+    .stat-value.red { color: var(--red); }
+    .stat-sub   { font-size: 0.72rem; color: var(--muted); }
+
+    .quick-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.65rem 1.25rem; border-radius: var(--radius-sm);
+      font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap;
+    }
+    .btn-primary   { background: var(--red); color: #fff; }
+    .btn-primary:hover { background: var(--red-mid); }
+    .btn-secondary { background: var(--white); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg); border-color: #d1d5db; }
+    .btn-ghost     { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+    .btn-danger    { background: var(--red-light); color: var(--red); border: 1.5px solid var(--red-border); }
+    .btn-danger:hover { background: #f9e0e0; }
+    .btn:disabled  { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+    .btn-sm        { padding: 0.4rem 0.85rem; font-size: 0.75rem; }
+    .actions-row   { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.25rem; flex-wrap: wrap; }
+
+    /* ── GALLERY ── */
+    .insta-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      margin-bottom: 1rem;
+    }
+    .grid-cell {
+      position: relative; aspect-ratio: 1; overflow: hidden;
+      background: var(--border); border-radius: 6px; cursor: grab;
+    }
+    .grid-cell img, .grid-cell video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.35s ease; pointer-events: none;
+    }
+    .grid-cell:hover img, .grid-cell:hover video { transform: scale(1.05); }
+    .cell-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.4rem; opacity: 0; transition: opacity 0.2s;
+    }
+    .grid-cell:hover .cell-overlay { opacity: 1; }
+    .cell-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      padding: 0.5rem 0.5rem 0.35rem; font-size: 0.6rem;
+      color: rgba(255,255,255,0.85); pointer-events: none;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cell-badge {
+      position: absolute; top: 0.35rem; left: 0.35rem;
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.2rem 0.45rem; border-radius: 4px;
+      background: var(--red); color: #fff; pointer-events: none; z-index: 2;
+    }
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 2.5rem 2rem; text-align: center; cursor: pointer;
+      transition: all 0.2s; margin-bottom: 1rem;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--red); background: var(--red-light);
+    }
+    .upload-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+    .upload-zone p { color: var(--muted); font-size: 0.82rem; }
+    .upload-types { color: var(--red); font-size: 0.7rem; letter-spacing: 0.05em; margin-top: 0.3rem; }
+
+    /* ── GALLERY STATS ── */
+    .gallery-stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .stat-pill {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 50px;
+      padding: 0.28rem 0.85rem; font-size: 0.72rem; color: var(--muted);
+    }
+    .stat-pill b { color: var(--red); }
+
+    /* ── EVENTS ── */
+    .event-form {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-field.full { grid-column: 1 / -1; }
+    .form-field input, .form-field select {
+      padding: 0.65rem 0.9rem; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-family: var(--font); font-size: 0.85rem;
+      color: var(--text); background: var(--bg); transition: border-color 0.2s; outline: none;
+    }
+    .form-field input:focus, .form-field select:focus { border-color: var(--red); background: #fff; }
+    .form-field input::placeholder { color: #9ca3af; }
+
+    .poster-drop {
+      border: 2px dashed var(--border); border-radius: var(--radius-sm);
+      padding: 1.25rem; text-align: center; cursor: pointer;
+      transition: all 0.2s; min-height: 90px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
+    }
+    .poster-drop:hover, .poster-drop.drag-over { border-color: var(--red); background: var(--red-light); }
+    .poster-drop p { color: var(--muted); font-size: 0.78rem; }
+    #poster-preview { width: 100%; max-height: 160px; object-fit: contain; border-radius: 6px; display: none; margin-top: 0.5rem; }
+
+    .event-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .event-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.85rem 1rem; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--white);
+      transition: border-color 0.15s;
+    }
+    .event-row:hover { border-color: var(--red-border); }
+    .event-row-poster { width: 42px; height: 56px; object-fit: cover; border-radius: 5px; flex-shrink: 0; border: 1px solid var(--border); }
+    .event-row-info { flex: 1; min-width: 0; }
+    .event-row-name  { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-row-meta  { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .event-row-meta b { color: var(--red); }
+    .event-row-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+    .past-badge {
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; background: var(--bg); color: var(--muted);
+      border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.4rem;
+      flex-shrink: 0;
+    }
+    .empty-state { text-align: center; padding: 2.5rem 0; color: var(--muted); font-size: 0.82rem; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 999; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); padding: 1rem;
+    }
+    .modal-backdrop.open { display: flex; animation: fadeIn 0.2s ease; }
+    .modal-card {
+      background: var(--white); border-radius: 16px; padding: 1.75rem;
+      width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      animation: fadeUp 0.25s var(--ease);
+    }
+    .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .modal-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .modal-field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .modal-field.full { grid-column: 1 / -1; }
+    .modal-field input, .modal-field textarea {
+      padding: 0.6rem 0.85rem; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-family: var(--font); font-size: 0.83rem;
+      color: var(--text); background: var(--bg); outline: none; transition: border-color 0.2s;
+    }
+    .modal-field input:focus, .modal-field textarea:focus { border-color: var(--red); background: #fff; }
+    .modal-field textarea { resize: vertical; min-height: 70px; }
+
+    /* ── TOKEN / SETTINGS ── */
+    .token-status {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.85rem 1rem; border-radius: var(--radius-sm);
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      margin-bottom: 1rem;
+    }
+    .token-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .token-dot.red { background: var(--red); }
+    .token-status p { font-size: 0.8rem; color: #166534; }
+    .token-status p.red { color: var(--red); }
+    .token-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .token-row .field-input { flex: 1; min-width: 200px; }
+
+    /* ── HELP / FAQ ── */
+    .faq-item { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 0.6rem; overflow: hidden; }
     .faq-q {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 1.3rem; cursor: pointer; gap: 1rem;
-      font-size: 0.82rem; font-weight: 600; color: var(--text);
-      user-select: none;
+      padding: 0.9rem 1.1rem; cursor: pointer; font-size: 0.83rem; font-weight: 600;
+      color: var(--text); user-select: none; gap: 1rem;
     }
-    .faq-q .faq-icon {
-      width: 20px; height: 20px; flex-shrink: 0;
-      border: 1px solid var(--border); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem; color: var(--gold); transition: transform 0.3s;
-    }
+    .faq-icon { width: 20px; height: 20px; border: 1.5px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--red); transition: transform 0.25s; flex-shrink: 0; }
     .faq-item.open .faq-icon { transform: rotate(45deg); }
-    .faq-a {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.35s cubic-bezier(0.16,1,0.3,1), padding 0.3s;
-      padding: 0 1.3rem;
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s var(--ease), padding 0.25s; padding: 0 1.1rem; }
+    .faq-item.open .faq-a { max-height: 500px; padding: 0 1.1rem 1rem; }
+    .faq-a p, .faq-a li { font-size: 0.8rem; color: var(--muted); line-height: 1.85; }
+    .faq-a ol, .faq-a ul { padding-left: 1.1rem; }
+    .faq-a strong { color: var(--text); }
+    .faq-tip { margin-top: 0.65rem; padding: 0.6rem 0.85rem; background: var(--red-light); border-left: 2px solid var(--red); font-size: 0.75rem; color: var(--red); border-radius: 0 6px 6px 0; }
+
+    /* ── MAILING LIST ── */
+    .email-setup-steps { counter-reset: steps; }
+    .setup-step {
+      display: flex; gap: 1rem; align-items: flex-start;
+      padding: 0.85rem 0; border-bottom: 1px solid var(--border);
     }
-    .faq-item.open .faq-a { max-height: 600px; padding: 0 1.3rem 1.2rem; }
-    .faq-a ol, .faq-a ul { padding-left: 1.2rem; }
-    .faq-a li { font-size: 0.8rem; color: var(--muted); line-height: 1.85; }
-    .faq-a li strong { color: var(--text); }
-    .faq-a .faq-tip {
-      margin-top: 0.75rem; padding: 0.65rem 0.9rem;
-      background: rgba(212,175,55,0.07); border-left: 2px solid var(--gold);
-      font-size: 0.75rem; color: rgba(245,237,224,0.6); line-height: 1.6;
+    .setup-step:last-child { border-bottom: none; }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%; background: var(--red);
+      color: #fff; font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-
-    /* ════════════ CARDS ════════════ */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.6rem;
-      margin-bottom: 1.6rem;
-      transition: border-color 0.2s;
-    }
-
-    .card:hover { border-color: var(--border-hover); }
-
-    .card-label {
-      color: var(--gold);
-      font-size: 0.6rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-bottom: 1.3rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .card-label .count-badge {
-      background: rgba(212,175,55,0.15);
-      border: 1px solid rgba(212,175,55,0.3);
-      color: var(--gold);
-      font-size: 0.6rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 50px;
-      letter-spacing: 1px;
-    }
-
-    /* ════════════ GITHUB TOKEN SETUP ════════════ */
-    #config-warning {
-      background: rgba(212,175,55,0.04);
-      border: 1px solid rgba(212,175,55,0.25);
-      border-radius: var(--radius);
-      padding: 1.3rem 1.6rem;
-      font-size: 0.8rem;
-      line-height: 1.85;
-      color: var(--muted);
-      margin-bottom: 1.6rem;
-    }
-
-    #config-warning strong { color: var(--gold); }
-
-    code {
-      background: rgba(255,255,255,0.08);
-      border-radius: 4px;
-      padding: 1px 6px;
-      color: #7dd3fc;
-      font-family: 'Courier New', monospace;
-      font-size: 0.85em;
-    }
-
-    .token-row {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .token-row input {
-      flex: 1;
-      min-width: 200px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: 0.6rem 0.9rem;
-      font-family: var(--font-b);
-      font-size: 0.82rem;
-    }
-
-    .token-row input:focus { outline: none; border-color: var(--gold); }
-
-    .token-save-btn {
-      background: var(--gold);
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 0.6rem 1.2rem;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-
-    .token-save-btn:hover { background: var(--gold-light); }
-
-    .btn-secondary {
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 0.6rem 1.1rem;
-      font-family: var(--font-b);
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-
-    .btn-secondary:hover { background: rgba(255,255,255,0.1); }
-
-    /* ════════════ EVENT FORM ════════════ */
-    .event-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .form-field.full { grid-column: 1 / -1; }
-
-    .form-field label {
-      color: var(--muted);
-      font-size: 0.62rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .form-field input {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      color: var(--text);
-      padding: 0.7rem 0.9rem;
-      font-family: var(--font-b);
-      font-size: 0.88rem;
-      transition: border-color 0.2s;
-    }
-
-    .form-field input:focus { outline: none; border-color: var(--gold); }
-    .form-field input::placeholder { color: rgba(245,237,224,0.25); }
-
-    .poster-upload-area {
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      position: relative;
-      min-height: 100px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .poster-upload-area:hover,
-    .poster-upload-area.drag-over {
-      border-color: var(--gold);
-      background: rgba(212,175,55,0.04);
-    }
-
-    .poster-upload-area p { color: var(--muted); font-size: 0.78rem; letter-spacing: 1px; }
-    .poster-upload-area .upload-icon { font-size: 1.6rem; }
-
-    .poster-preview {
-      width: 100%;
-      max-height: 200px;
-      object-fit: contain;
-      border-radius: 8px;
-      margin-top: 0.5rem;
-      display: none;
-    }
-
-    #poster-file-input { display: none; }
-
-    /* ════════════ EVENT LIST ════════════ */
-    .event-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .event-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.9rem 1rem;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      transition: border-color 0.2s;
-    }
-
-    .event-row:hover { border-color: var(--border-hover); }
-
-    .event-row-poster {
-      width: 44px;
-      height: 58px;
-      object-fit: cover;
-      border-radius: 6px;
-      flex-shrink: 0;
-      cursor: grab;
-      border: 1px solid var(--border);
-    }
-
-    .event-row-info { flex: 1; min-width: 0; }
-
-    .event-row-name {
-      font-family: var(--font-d);
-      font-size: 0.95rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .event-row-date  { color: var(--gold); font-size: 0.68rem; letter-spacing: 2px; margin-top: 2px; }
-    .event-row-venue { color: var(--muted); font-size: 0.72rem; margin-top: 2px; }
-
-    .event-row-remove {
-      background: transparent;
-      border: 1px solid rgba(255,95,95,0.25);
-      color: var(--red);
-      border-radius: 7px;
-      padding: 0.35rem 0.75rem;
-      font-size: 0.68rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: background 0.2s;
-    }
-
-    .event-row-remove:hover { background: rgba(255,95,95,0.1); }
-
-    /* ════════════ INSTAGRAM GRID (Gallery) ════════════ */
-    .insta-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      margin-bottom: 1.5rem;
-    }
-
-    .grid-cell {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      overflow: hidden;
-      background: #111;
-      cursor: grab;
-      border-radius: 2px;
-    }
-
-    .grid-cell.grid-cell--new {
-      outline: 2px solid var(--gold);
-      outline-offset: -2px;
-    }
-
-    .grid-cell.grid-cell--removed {
-      opacity: 0.3;
-      pointer-events: none;
-    }
-
-    .grid-cell.drag-over-cell {
-      outline: 2px solid var(--gold);
-    }
-
-    .grid-cell img,
-    .grid-cell video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      pointer-events: none;
-      transition: transform 0.4s ease, filter 0.4s ease;
-      filter: saturate(0.8);
-    }
-
-    .grid-cell:hover img,
-    .grid-cell:hover video {
-      transform: scale(1.06);
-      filter: saturate(1);
-    }
-
-    /* Cell overlay */
-    .cell-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .grid-cell:hover .cell-overlay { opacity: 1; }
-
-    .cell-remove-btn {
-      background: rgba(255,95,95,0.9);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 0.35rem 0.7rem;
-      font-size: 0.65rem;
-      font-family: var(--font-b);
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .cell-remove-btn:hover { background: var(--red); }
-
-    .cell-drag-handle {
-      color: rgba(245,237,224,0.6);
-      font-size: 0.6rem;
-      letter-spacing: 1px;
-      cursor: grab;
-    }
-
-    /* Badge labels */
-    .cell-badge {
-      position: absolute;
-      top: 0.4rem;
-      left: 0.4rem;
-      font-size: 0.55rem;
-      font-family: var(--font-b);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-weight: 600;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .cell-badge--new {
-      background: var(--gold);
-      color: #000;
-    }
-
-    .cell-badge--video {
-      background: rgba(0,0,0,0.75);
-      color: var(--gold);
-      border: 1px solid rgba(212,175,55,0.4);
-    }
-
-    /* Video play icon */
-    .cell-play-icon {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .cell-play-icon::after {
-      content: '▶';
-      width: 36px;
-      height: 36px;
-      background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(212,175,55,0.5);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      color: var(--gold);
-      line-height: 36px;
-      text-align: center;
-      text-indent: 2px;
-    }
-
-    /* ════════════ UPLOAD AREA ════════════ */
-    .upload-zone {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 2.5rem 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 1.5rem;
-    }
-
-    .upload-zone:hover,
-    .upload-zone.drag-over {
-      border-color: var(--gold);
-      background: rgba(212,175,55,0.04);
-    }
-
-    .upload-zone-icon {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .upload-zone p {
-      color: var(--muted);
-      font-size: 0.82rem;
-      letter-spacing: 0.5px;
-      line-height: 1.7;
-    }
-
-    .upload-zone .upload-types {
-      color: rgba(212,175,55,0.6);
-      font-size: 0.68rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 0.4rem;
-    }
-
-    #media-file-input { display: none; }
-
-    /* ════════════ GALLERY STATS ════════════ */
-    .gallery-stats {
-      display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1.3rem;
-      flex-wrap: wrap;
-    }
-
-    .stat-pill {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.65rem;
-      letter-spacing: 2px;
-      color: var(--muted);
-    }
-
-    .stat-pill span { color: var(--gold); font-weight: 600; }
-
-    /* ════════════ BUTTONS ════════════ */
-    .btn-gold {
-      background: var(--gold);
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      padding: 0.85rem 2rem;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    .btn-gold:hover { background: var(--gold-light); }
-    .btn-gold:active { transform: scale(0.97); }
-    .btn-gold:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--gold);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.85rem 2rem;
-      font-family: var(--font-b);
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .btn-outline:hover {
-      background: rgba(212,175,55,0.07);
-      border-color: var(--border-hover);
-    }
-
-    .actions-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.8rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    /* ════════════ TOAST ════════════ */
+    .step-body p { font-size: 0.8rem; color: var(--muted); line-height: 1.75; }
+    .step-body strong { color: var(--text); }
+    code { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.8em; color: var(--red); }
+
+    /* ── TOAST ── */
     #toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--gold);
-      color: #000;
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 2px;
-      padding: 1rem 1.8rem;
-      border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-      transform: translateY(80px);
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
-      z-index: 9999;
-      pointer-events: none;
-      max-width: 320px;
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      padding: 0.85rem 1.4rem; border-radius: var(--radius-sm);
+      font-family: var(--font); font-size: 0.8rem; font-weight: 600;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15); z-index: 9999;
+      transform: translateY(80px); opacity: 0; pointer-events: none;
+      transition: all 0.35s var(--ease); max-width: 300px;
     }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.default { background: #1f2937; color: #fff; }
+    #toast.success { background: #15803d; color: #fff; }
+    #toast.error   { background: var(--red); color: #fff; }
 
-    #toast.show   { transform: translateY(0); opacity: 1; }
-    #toast.error  { background: var(--red); color: #fff; }
-    #toast.success{ background: #16a34a; color: #fff; }
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideRight { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-    /* ════════════ EMPTY STATE ════════════ */
-    .empty-state {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      padding: 2.5rem 0;
-    }
-
-    /* ════════════ HELP TEXT ════════════ */
-    .help-text {
-      font-size: 0.72rem;
-      color: var(--muted);
-      line-height: 1.7;
-      padding: 1rem 1.2rem;
-      border-left: 2px solid rgba(212,175,55,0.25);
-      margin-bottom: 1.3rem;
-    }
-
-    .help-text strong { color: var(--text); }
-
-    /* ════════════ RESPONSIVE ════════════ */
-    @media (max-width: 600px) {
-      .event-form { grid-template-columns: 1fr; }
-      .form-field.full { grid-column: 1; }
-      .actions-row { justify-content: stretch; }
-      .actions-row .btn-gold,
-      .actions-row .btn-outline { flex: 1; text-align: center; }
-      .admin-header { padding: 1rem; }
-      main { padding: 1.5rem 1rem 3rem; }
-      .header-right .site-link { display: none; }
-      .insta-grid { grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      #sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
+      #main-content { margin-left: 0; padding: 1.25rem 1rem 3rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .event-form, .modal-grid { grid-template-columns: 1fr; }
+      .form-field.full, .modal-field.full { grid-column: 1; }
     }
   </style>
 </head>
 <body>
 
-<!-- ════════ LOGIN ════════ -->
+<!-- ══ LOGIN ══ -->
 <div id="login-screen">
-  <img src="vv-logo.jpeg" alt="Velvet Vibrance" class="login-logo">
+  <div class="login-monogram">VV</div>
   <div class="login-title">Velvet Vibrance</div>
-  <div class="login-sub">Admin Panel</div>
-  <div class="login-box">
-    <label for="pw-input">Password</label>
-    <div class="pw-row">
-      <input type="password" id="pw-input" placeholder="Enter password" autofocus>
-      <button class="login-btn" onclick="checkPassword()">ENTER</button>
+  <div class="login-sub">Admin Portal</div>
+  <div class="login-card">
+    <label class="field-label" for="pw-input">Password</label>
+    <input type="password" class="field-input" id="pw-input" placeholder="Enter your password" autofocus>
+    <div class="remember-row">
+      <input type="checkbox" id="remember-me">
+      <label for="remember-me">Keep me signed in</label>
     </div>
+    <button class="login-btn" id="login-btn" onclick="checkPassword()">Sign In</button>
     <div id="login-error">Incorrect password. Try again.</div>
   </div>
 </div>
 
-<!-- ════════ ADMIN ════════ -->
-<div id="admin-panel">
+<!-- ══ ADMIN SHELL ══ -->
+<div id="admin-shell">
 
-  <div class="admin-header">
-    <div class="header-brand">
-      <img src="vv-logo.jpeg" alt="VV">
-      <span class="header-title">Velvet Vibrance</span>
-      <span id="logged-user" style="font-size:0.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-left:0.3rem;"></span>
-    </div>
-    <div class="header-right">
-      <a href="index.html" target="_blank" rel="noopener noreferrer" class="site-link">View Site ↗</a>
-      <button class="logout-btn" onclick="logout()">Sign Out</button>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active"   onclick="switchTab('gallery')">Gallery</div>
-    <div class="tab"          onclick="switchTab('events')">Events</div>
-    <div class="tab"          onclick="switchTab('settings')">Settings</div>
-    <div class="tab"          onclick="switchTab('command')">Help</div>
-  </div>
-
-  <main>
-
-    <!-- ════════ GALLERY TAB ════════ -->
-    <div class="tab-panel active" id="panel-gallery">
-
-      <div class="help-text">
-        <strong>How to update the gallery:</strong> Upload photos or videos below — they'll appear in the grid.
-        Drag items to reorder. Click a cell to remove it. When you're happy, hit <strong>Publish</strong> to push live.
+  <aside id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">VV</div>
+      <div>
+        <div class="brand-text">Velvet Vibrance</div>
+        <div class="brand-sub">Admin Portal</div>
       </div>
+    </div>
 
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar">G</div>
+      <div>
+        <div class="user-name" id="user-name">Glenn</div>
+        <div class="user-role">Administrator</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu</div>
+      <div class="nav-item active" data-tab="dashboard">
+        <span class="nav-icon">⬛</span> Dashboard
+      </div>
+      <div class="nav-item" data-tab="gallery">
+        <span class="nav-icon">🖼</span> Gallery
+        <span class="nav-badge" id="gallery-badge" style="display:none"></span>
+      </div>
+      <div class="nav-item" data-tab="events">
+        <span class="nav-icon">📅</span> Events
+        <span class="nav-badge" id="events-badge" style="display:none"></span>
+      </div>
+      <div class="nav-item" data-tab="mailing">
+        <span class="nav-icon">✉</span> Mailing List
+      </div>
+      <div class="nav-section-label">System</div>
+      <div class="nav-item" data-tab="settings">
+        <span class="nav-icon">⚙</span> Settings
+      </div>
+      <div class="nav-item" data-tab="help">
+        <span class="nav-icon">❓</span> Help
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="draft-pill" id="draft-pill">
+        <span class="draft-dot"></span> Unpublished changes
+      </div>
+      <a href="index.html" target="_blank" rel="noopener noreferrer" class="view-site-btn">
+        ↗ View Live Site
+      </a>
+      <button class="signout-btn" onclick="logout()">⬚ Sign Out</button>
+    </div>
+  </aside>
+
+  <main id="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="tab-panel active" id="panel-dashboard">
+      <div class="page-header">
+        <div class="page-title" id="dash-greeting">Good morning, Glenn</div>
+        <div class="page-sub">Here's what's happening with Velvet Vibrance.</div>
+        <div class="red-rule"></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Gallery Items</div>
+          <div class="stat-value red" id="dash-gallery-count">—</div>
+          <div class="stat-sub">Photos &amp; videos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Upcoming Events</div>
+          <div class="stat-value" id="dash-events-count">—</div>
+          <div class="stat-sub">Live on site</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Uploads</div>
+          <div class="stat-value" id="dash-pending-count">0</div>
+          <div class="stat-sub">Ready to publish</div>
+        </div>
+      </div>
+      <div class="card card-accent">
+        <div class="card-title"><span class="card-title-accent">◆</span> Quick Actions</div>
+        <div class="quick-actions">
+          <button class="btn btn-primary" onclick="switchTab('gallery')">+ Upload Photo</button>
+          <button class="btn btn-secondary" onclick="switchTab('events')">+ Add Event</button>
+          <button class="btn btn-ghost" onclick="switchTab('mailing')">View Mailing List</button>
+        </div>
+      </div>
+      <div class="card" id="dash-token-warning" style="display:none; border-color: var(--red-border); background: var(--red-light);">
+        <div class="card-title"><span class="card-title-accent">⚠</span> Setup Required</div>
+        <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">A GitHub token is needed before you can publish changes to the live site.</p>
+        <button class="btn btn-primary btn-sm" onclick="switchTab('settings')">Go to Settings →</button>
+      </div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="tab-panel" id="panel-gallery">
+      <div class="page-header">
+        <div class="page-title">Gallery</div>
+        <div class="page-sub">Upload, reorder, and caption your photos and videos.</div>
+        <div class="red-rule"></div>
+      </div>
       <div class="card">
-        <div class="card-label">
-          Gallery
-          <span class="count-badge" id="gallery-count">0 items</span>
+        <div class="card-title">
+          <span class="card-title-accent">◆</span> Media Grid
+          <span class="stat-pill" id="gallery-count-badge">0 items</span>
         </div>
-
-        <div class="gallery-stats" id="gallery-stats">
-          <div class="stat-pill">Photos: <span id="stat-photos">0</span></div>
-          <div class="stat-pill">Videos: <span id="stat-videos">0</span></div>
-          <div class="stat-pill">New: <span id="stat-new">0</span></div>
+        <div class="gallery-stats">
+          <div class="stat-pill">Photos: <b id="stat-photos">0</b></div>
+          <div class="stat-pill">Videos: <b id="stat-videos">0</b></div>
+          <div class="stat-pill">New: <b id="stat-new">0</b></div>
         </div>
-
         <div class="insta-grid" id="insta-grid"></div>
-
-        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('media-file-input').click()">
-          <span class="upload-zone-icon">+</span>
+        <div class="upload-zone" id="upload-zone">
+          <span class="upload-icon">+</span>
           <p>Tap or drag to add photos &amp; videos</p>
           <p class="upload-types">JPG · PNG · WEBP · MP4 · MOV</p>
         </div>
-        <input type="file" id="media-file-input" accept="image/*,video/*" multiple onchange="handleMediaSelect(this)">
+        <input type="file" id="media-file-input" accept="image/*,video/*" multiple style="display:none">
       </div>
-
       <div class="actions-row">
-        <button class="btn-outline" onclick="renderGallery()">Reset Preview</button>
-        <button class="btn-gold" id="publish-gallery-btn" onclick="publishGallery()">Publish Gallery →</button>
+        <button class="btn btn-ghost" onclick="renderGallery()">Reset Preview</button>
+        <button class="btn btn-primary" id="publish-gallery-btn" onclick="publishGallery()">Publish Gallery →</button>
       </div>
-
     </div>
 
-    <!-- ════════ EVENTS TAB ════════ -->
+    <!-- EVENTS -->
     <div class="tab-panel" id="panel-events">
-
-      <div class="help-text">
-        <strong>Adding an event:</strong> Fill in the details, upload a poster image, then click <strong>Add Event</strong>.
-        Once your list looks right, click <strong>Publish</strong> to go live on the site.
+      <div class="page-header">
+        <div class="page-title">Events</div>
+        <div class="page-sub">Add, edit, and publish upcoming events to the live site.</div>
+        <div class="red-rule"></div>
       </div>
-
-      <!-- Add event form -->
       <div class="card">
-        <div class="card-label">Add New Event</div>
+        <div class="card-title"><span class="card-title-accent">◆</span> Add New Event</div>
         <div class="event-form">
           <div class="form-field">
-            <label>Event Name</label>
+            <label class="field-label">Event Name</label>
             <input type="text" id="ev-name" placeholder="e.g. Velvet Night Vol. 5">
           </div>
           <div class="form-field">
-            <label>Date</label>
+            <label class="field-label">Date</label>
             <input type="text" id="ev-date" placeholder="e.g. SAT 14 JUNE 2025">
           </div>
           <div class="form-field">
-            <label>Venue</label>
-            <input type="text" id="ev-venue" placeholder="e.g. The Warehouse, Denver">
+            <label class="field-label">Time</label>
+            <input type="text" id="ev-time" placeholder="e.g. 9:00 PM – 2:00 AM">
           </div>
           <div class="form-field">
-            <label>Ticket Link (optional)</label>
+            <label class="field-label">Venue</label>
+            <input type="text" id="ev-venue" placeholder="e.g. The Warehouse, Denver">
+          </div>
+          <div class="form-field full">
+            <label class="field-label">Ticket Link (optional)</label>
             <input type="url" id="ev-tickets" placeholder="https://...">
           </div>
           <div class="form-field full">
-            <label>Event Poster</label>
-            <div class="poster-upload-area" id="poster-drop"
-              onclick="document.getElementById('poster-file-input').click()">
-              <span class="upload-icon">🖼</span>
+            <label class="field-label">Event Poster</label>
+            <div class="poster-drop" id="poster-drop">
+              <span style="font-size:1.5rem;">🖼</span>
               <p>Click or drag poster here</p>
-              <img id="poster-preview" class="poster-preview" src="" alt="Poster preview">
+              <img id="poster-preview" src="" alt="Poster preview">
             </div>
-            <input type="file" id="poster-file-input" accept="image/*" onchange="handlePosterSelect(this)">
+            <input type="file" id="poster-file-input" accept="image/*" style="display:none">
           </div>
         </div>
         <div class="actions-row">
-          <button class="btn-gold" onclick="addEvent()">Add Event</button>
+          <button class="btn btn-primary" onclick="addEvent()">Add Event</button>
         </div>
       </div>
 
-      <!-- Event list -->
       <div class="card">
-        <div class="card-label">
-          Upcoming Events
-          <span class="count-badge" id="events-count">0 events</span>
+        <div class="card-title">
+          <span class="card-title-accent">◆</span> Upcoming Events
+          <span class="stat-pill" id="events-count-badge">0 events</span>
         </div>
         <div class="event-list" id="event-list">
-          <div class="empty-state" id="events-empty-admin">No events yet. Add one above.</div>
+          <div class="empty-state" id="events-empty">No events yet — add one above.</div>
         </div>
         <div class="actions-row">
-          <button class="btn-gold" id="publish-events-btn" onclick="publishEvents()">Publish Events →</button>
+          <button class="btn btn-primary" id="publish-events-btn" onclick="publishEvents()">Publish Events →</button>
         </div>
       </div>
-
     </div>
 
-    <!-- ════════ SETTINGS TAB ════════ -->
-    <div class="tab-panel" id="panel-settings">
-
-      <div class="card">
-        <div class="card-label">GitHub Token</div>
-        <div id="token-set-indicator" style="display:none;align-items:center;gap:1rem;flex-wrap:wrap;padding:0.6rem 0 1rem;">
-          <span style="color:var(--green);font-size:0.75rem;letter-spacing:1px;">Token saved</span>
-          <button class="btn-secondary" onclick="testToken()">Test Connection</button>
-          <button class="btn-secondary" onclick="document.getElementById('config-warning').style.display='';document.getElementById('token-set-indicator').style.display='none';">Change Token</button>
-          <button class="btn-secondary" style="border-color:rgba(255,95,95,0.3);color:var(--red);" onclick="clearToken()">Remove Token</button>
-        </div>
-        <div id="config-warning">
-          <strong>One-time setup:</strong> To publish changes to the live site, paste a GitHub Personal Access Token below.<br><br>
-          <strong>How to get one:</strong> Go to <strong>github.com → Settings → Developer settings → Fine-grained tokens</strong> and create a token with <code>Contents: Read &amp; Write</code> permission on the <code>velvet-vibrance</code> repo.
-          <div class="token-row">
-            <input type="password" id="gh-token-input" placeholder="github_pat_...">
-            <button class="token-save-btn" onclick="saveToken()">Save Token</button>
-            <button class="btn-secondary" onclick="testToken()">Test</button>
+    <!-- MAILING LIST -->
+    <div class="tab-panel" id="panel-mailing">
+      <div class="page-header">
+        <div class="page-title">Mailing List</div>
+        <div class="page-sub">Collect and manage emails from the Join section on the site.</div>
+        <div class="red-rule"></div>
+      </div>
+      <div class="card card-accent">
+        <div class="card-title"><span class="card-title-accent">◆</span> Setup — Formspree (Free)</div>
+        <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;">Formspree collects every email submitted on the site and stores it for you. Free for up to 50 emails/month. Follow these steps once:</p>
+        <div class="email-setup-steps">
+          <div class="setup-step">
+            <div class="step-num">1</div>
+            <div class="step-body"><p>Go to <strong>formspree.io</strong> and create a free account using your email.</p></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-num">2</div>
+            <div class="step-body"><p>Click <strong>New Form</strong>, name it <strong>VV Mailing List</strong>, and copy the form endpoint — it looks like <code>https://formspree.io/f/xxxxxxxx</code>.</p></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-num">3</div>
+            <div class="step-body"><p>Paste it below and click <strong>Save</strong>. The live site's Join form will automatically send emails there.</p></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-num">4</div>
+            <div class="step-body"><p>To view or export your email list, log into <strong>formspree.io</strong> and click your form — you'll see every submission and can download a CSV.</p></div>
           </div>
         </div>
       </div>
-
-
       <div class="card">
-        <div class="card-label">About This Panel</div>
-        <div class="help-text" style="margin:0; border:none; padding:0;">
-          <strong>Gallery:</strong> Upload photos and videos. Drag to reorder. Publish to go live.<br>
-          <strong>Events:</strong> Add upcoming shows with poster images and ticket links.<br>
-          <strong>Help:</strong> Step-by-step tutorials for common tasks.<br>
-          <strong>Publish:</strong> Saves directly to GitHub and updates the site within seconds.
+        <div class="card-title"><span class="card-title-accent">◆</span> Formspree Endpoint</div>
+        <div class="token-row" style="margin-bottom:0.75rem;">
+          <input type="text" class="field-input" id="formspree-input" placeholder="https://formspree.io/f/xxxxxxxx">
+          <button class="btn btn-primary" onclick="saveFormspree()">Save</button>
+        </div>
+        <div id="formspree-status" style="display:none; font-size:0.78rem; color:var(--green);">✓ Endpoint saved — the join form is connected.</div>
+        <div style="margin-top:1rem;">
+          <a id="formspree-dashboard-link" href="https://formspree.io" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Open Formspree Dashboard ↗</a>
         </div>
       </div>
-
     </div>
 
-    <!-- ════════ HELP TAB ════════ -->
-    <div class="tab-panel" id="panel-command">
-
-      <p class="faq-intro">Step-by-step answers for the most common tasks. Tap a question to expand it.</p>
-
-      <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          How do I upload a new gallery image?
-          <span class="faq-icon">+</span>
+    <!-- SETTINGS -->
+    <div class="tab-panel" id="panel-settings">
+      <div class="page-header">
+        <div class="page-title">Settings</div>
+        <div class="page-sub">Manage your GitHub token and site connection.</div>
+        <div class="red-rule"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="card-title-accent">◆</span> GitHub Connection</div>
+        <div id="token-connected" style="display:none;">
+          <div class="token-status">
+            <div class="token-dot"></div>
+            <p>Token saved — you can publish changes to the live site.</p>
+          </div>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="testToken()">Test Connection</button>
+            <button class="btn btn-ghost btn-sm" onclick="showTokenInput()">Change Token</button>
+            <button class="btn btn-danger btn-sm" onclick="clearToken()">Remove Token</button>
+          </div>
         </div>
-        <div class="faq-a">
-          <ol>
-            <li>Go to the <strong>Gallery</strong> tab.</li>
-            <li>Click <strong>Add Media</strong> and choose your photo or video.</li>
-            <li>It appears in the preview grid — drag it to reorder if needed.</li>
-            <li>Click <strong>Publish Gallery</strong> to push it live. The site updates in about 30 seconds.</li>
-          </ol>
-          <div class="faq-tip">Best image sizes: landscape photos work great at 1200×800px or wider. Portrait photos at 800×1100px. The panel auto-detects the shape and picks the right layout.</div>
+        <div id="token-setup">
+          <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;">To publish changes to the live site, you need a GitHub Personal Access Token. Follow these steps:</p>
+          <div class="email-setup-steps" style="margin-bottom:1.25rem;">
+            <div class="setup-step">
+              <div class="step-num">1</div>
+              <div class="step-body"><p>Go to <strong>github.com</strong> → click your profile picture → <strong>Settings</strong>.</p></div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">2</div>
+              <div class="step-body"><p>Scroll to <strong>Developer settings</strong> (bottom of the left menu) → <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong>.</p></div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">3</div>
+              <div class="step-body"><p>Click <strong>Generate new token (classic)</strong>, tick the <strong>repo</strong> checkbox, and click <strong>Generate token</strong>.</p></div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">4</div>
+              <div class="step-body"><p>Copy the token and paste it below. <strong>Keep it safe — you won't see it again.</strong></p></div>
+            </div>
+          </div>
+          <div class="token-row">
+            <input type="password" class="field-input" id="gh-token-input" placeholder="ghp_...">
+            <button class="btn btn-primary" onclick="saveToken()">Save Token</button>
+            <button class="btn btn-ghost" onclick="testToken()">Test</button>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- HELP -->
+    <div class="tab-panel" id="panel-help">
+      <div class="page-header">
+        <div class="page-title">Help</div>
+        <div class="page-sub">Step-by-step answers for common tasks.</div>
+        <div class="red-rule"></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          How do I remove an image from the gallery?
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          <ol>
-            <li>Go to the <strong>Gallery</strong> tab.</li>
-            <li>Hover over the image you want to remove — a <strong>×</strong> button appears in the top-right corner.</li>
-            <li>Click it. The item is marked for removal.</li>
-            <li>Click <strong>Publish Gallery</strong> to save the change live.</li>
-          </ol>
-          <div class="faq-tip">Nothing is permanently deleted until you publish. If you accidentally remove something, refresh the page before publishing to undo it.</div>
-        </div>
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I upload a new gallery photo or video?<span class="faq-icon">+</span></div>
+        <div class="faq-a"><ol><li>Go to the <strong>Gallery</strong> tab.</li><li>Click the upload zone or drag your file onto it.</li><li>The image appears in the grid. Click <strong>Edit Caption</strong> on hover to add a title and caption.</li><li>Drag items to reorder them.</li><li>Click <strong>Publish Gallery</strong> — the site updates within 30 seconds.</li></ol><div class="faq-tip">Keep image files under 3MB for fast loading. JPG and PNG work best.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          How do I reorder gallery images?
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          <ol>
-            <li>Go to the <strong>Gallery</strong> tab.</li>
-            <li>Click and drag any image to a new position in the grid.</li>
-            <li>Drop it where you want it — the others shuffle automatically.</li>
-            <li>Click <strong>Publish Gallery</strong> when you're happy with the order.</li>
-          </ol>
-        </div>
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I remove a gallery image?<span class="faq-icon">+</span></div>
+        <div class="faq-a"><ol><li>Go to <strong>Gallery</strong>.</li><li>Hover over the image — click <strong>Remove</strong> in the overlay.</li><li>Click <strong>Publish Gallery</strong> to apply the change live.</li></ol><div class="faq-tip">Nothing deletes permanently until you publish. Refresh the page before publishing to undo any removals.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          How do I add a new event?
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          <ol>
-            <li>Go to the <strong>Events</strong> tab.</li>
-            <li>Fill in the event name, date, venue, and optionally a ticket link.</li>
-            <li>Upload a poster image for the event card.</li>
-            <li>Click <strong>Add Event</strong> — it appears in the list below.</li>
-            <li>Click <strong>Publish Events</strong> to make it live on the site.</li>
-          </ol>
-          <div class="faq-tip">Events show up in order on the site. The most recently added event appears first — reorder them by dragging if needed.</div>
-        </div>
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I add or edit an event?<span class="faq-icon">+</span></div>
+        <div class="faq-a"><ol><li>Go to <strong>Events</strong>.</li><li>Fill in Name, Date, Time, Venue, and optionally a Ticket Link.</li><li>Upload a poster image.</li><li>Click <strong>Add Event</strong> — it appears in the list below.</li><li>To edit an existing event, click the <strong>Edit</strong> button on its row.</li><li>Click <strong>Publish Events</strong> to go live.</li></ol></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          How do I remove a past event?
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          <ol>
-            <li>Go to the <strong>Events</strong> tab.</li>
-            <li>Find the event in the list and click the <strong>×</strong> next to it.</li>
-            <li>Click <strong>Publish Events</strong> to remove it from the live site.</li>
-          </ol>
-        </div>
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I set up the mailing list?<span class="faq-icon">+</span></div>
+        <div class="faq-a"><ol><li>Go to the <strong>Mailing List</strong> tab.</li><li>Follow the 4-step Formspree setup guide.</li><li>Paste your Formspree endpoint and click <strong>Save</strong>.</li><li>All future email signups from the site will appear in your Formspree dashboard.</li></ol><div class="faq-tip">Formspree is free for up to 50 emails per month. You can export your list as a CSV anytime from their dashboard.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          I published but the site hasn't changed — what's going on?
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          <ol>
-            <li>The site auto-deploys via GitHub Actions — it normally takes <strong>20–40 seconds</strong> after you publish.</li>
-            <li>If it's been longer than a minute, do a <strong>hard refresh</strong>: hold <kbd>Shift</kbd> and click the reload button (or press <kbd>Cmd+Shift+R</kbd> on Mac, <kbd>Ctrl+Shift+R</kbd> on Windows).</li>
-            <li>If it's still not updated after 2 minutes, message Glenn — the deployment may need a check.</li>
-          </ol>
-          <div class="faq-tip">Your browser caches the old site. Hard refresh forces it to fetch the latest version.</div>
-        </div>
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">The site hasn't updated after I published — what's wrong?<span class="faq-icon">+</span></div>
+        <div class="faq-a"><ol><li>The site deploys automatically — it normally takes <strong>20–40 seconds</strong>.</li><li>Do a <strong>hard refresh</strong>: hold <kbd>Shift</kbd> and click reload (or <kbd>Cmd+Shift+R</kbd> on Mac, <kbd>Ctrl+Shift+R</kbd> on Windows).</li><li>If still not updated after 2 minutes, check that your GitHub token is valid in <strong>Settings</strong>.</li></ol></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-          What image formats and sizes work best?
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          <ul>
-            <li><strong>Formats:</strong> JPG and PNG for photos. MP4 for video clips.</li>
-            <li><strong>Gallery images:</strong> 1200×800px (landscape) or 800×1100px (portrait) is ideal. Keep files under 3MB for fast loading.</li>
-            <li><strong>Event posters:</strong> Square (1:1) or portrait (2:3) works best. Around 800×800px or 800×1200px.</li>
-            <li>The panel auto-detects landscape vs portrait and picks the right masonry layout for you.</li>
-          </ul>
-        </div>
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I change a password?<span class="faq-icon">+</span></div>
+        <div class="faq-a"><p>Password changes require a code update. Contact Glenn — he can generate a new password hash and update the admin panel file on GitHub.</p><div class="faq-tip">Current passwords: <strong>Glenn</strong> uses the original VV password. <strong>Trystan</strong> uses <strong>trystan2025</strong>.</div></div>
       </div>
 
     </div>
@@ -1128,10 +768,47 @@
   </main>
 </div>
 
+<!-- ══ EDIT EVENT MODAL ══ -->
+<div class="modal-backdrop" id="event-modal">
+  <div class="modal-card">
+    <div class="modal-title">Edit Event</div>
+    <div class="modal-grid">
+      <div class="modal-field full"><label class="field-label">Event Name</label><input type="text" id="edit-ev-name"></div>
+      <div class="modal-field"><label class="field-label">Date</label><input type="text" id="edit-ev-date"></div>
+      <div class="modal-field"><label class="field-label">Time</label><input type="text" id="edit-ev-time"></div>
+      <div class="modal-field full"><label class="field-label">Venue</label><input type="text" id="edit-ev-venue"></div>
+      <div class="modal-field full"><label class="field-label">Ticket Link (optional)</label><input type="url" id="edit-ev-tickets"></div>
+    </div>
+    <div class="actions-row">
+      <button class="btn btn-ghost" onclick="closeModal('event-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEventEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CAPTION MODAL ══ -->
+<div class="modal-backdrop" id="caption-modal">
+  <div class="modal-card">
+    <div class="modal-title">Edit Caption</div>
+    <div class="modal-field" style="margin-bottom:0.85rem;">
+      <label class="field-label">Title</label>
+      <input type="text" id="cap-title" placeholder="Short title for this image">
+    </div>
+    <div class="modal-field">
+      <label class="field-label">Caption</label>
+      <textarea id="cap-caption" placeholder="Optional caption or description"></textarea>
+    </div>
+    <div class="actions-row">
+      <button class="btn btn-ghost" onclick="closeModal('caption-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCaptionEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-  /* ════════ CONFIG ════════ */
+  /* ══ CONFIG ══ */
   const USERS = {
     Glenn:   'd8078da636aa1ad05f5addc7fd85f1955bb8a9bb952057fb7bc21e965ca5ed24',
     Trystan: 'd9b91863848e2ecd2091756ab6bc4541ae913aa0e4139701d797ae546afc4c22'
@@ -1140,603 +817,519 @@
   const REPO_NAME  = 'velvet-vibrance';
   const RAW_BASE   = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
 
-  /* ════════ STATE ════════ */
-  // Gallery items: { file, alt, type: 'image'|'video', span: 'rg-wide'|'rg-tall'|'' }
+  /* ══ STATE ══ */
   const GALLERY_ITEMS = [
-    { file: 'crowd-pink.png',     alt: 'The crowd moves as one',        type: 'image', span: 'rg-wide' },
-    { file: 'dj-orange.png',      alt: 'In the booth',                  type: 'image', span: 'rg-tall' },
-    { file: 'laser-show.jpeg',    alt: 'Lasers cut through the dark',   type: 'image', span: '' },
-    { file: 'dj-headphones.png',  alt: 'Locked in',                     type: 'image', span: '' },
-    { file: 'dj-crowd.jpeg',      alt: 'DJ raises the room',            type: 'image', span: 'rg-wide' },
-    { file: 'crowd-outdoor.jpeg', alt: 'The frequency moves outside',   type: 'image', span: '' }
+    { file:'crowd-pink.png',     alt:'The crowd moves as one',       type:'image', title:'The Crowd',    caption:'', span:'rg-wide' },
+    { file:'dj-orange.png',      alt:'In the booth',                 type:'image', title:'In the Booth', caption:'', span:'rg-tall' },
+    { file:'laser-show.jpeg',    alt:'Lasers cut through the dark',  type:'image', title:'Laser Show',   caption:'', span:'' },
+    { file:'dj-headphones.png',  alt:'Locked in',                    type:'image', title:'Locked In',    caption:'', span:'' },
+    { file:'dj-crowd.jpeg',      alt:'DJ raises the room',           type:'image', title:'DJ Set',       caption:'', span:'rg-wide' },
+    { file:'crowd-outdoor.jpeg', alt:'The frequency moves outside',  type:'image', title:'Outside',      caption:'', span:'' }
   ];
+  let events       = [];
+  let pendingMedia = [];
+  let removedItems = new Set();
+  let posterBase64 = null, posterFileName = null;
+  let dragSrcIndex = null;
+  let editingEventIndex = null;
+  let editingCaptionIndex = null;
+  let hasDraft = false;
 
-  let events        = [];
-  let pendingMedia  = [];          // { file, base64, name, type: 'image'|'video' }
-  let removedItems  = new Set();   // filenames
-  let posterBase64  = null;
-  let posterFileName = null;
-  let dragSrcIndex  = null;
+  /* ══ HELPERS ══ */
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+  }
+  function safeUrl(u) {
+    if (!u) return '';
+    try { const p = new URL(String(u)); return (p.protocol==='https:'||p.protocol==='http:') ? p.href : ''; } catch { return ''; }
+  }
+  function apiHeaders(token) { return { Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json', 'Content-Type':'application/json' }; }
+  function apiBase() { return `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`; }
+  function getToken() {
+    const t = localStorage.getItem('vv_gh_token');
+    if (!t) { switchTab('settings'); toast('Enter your GitHub token in Settings first','error'); }
+    return t;
+  }
+  function handleApiError(err) {
+    const m = String(err.message||err);
+    if (m.includes('401'))      toast('Token rejected — check it has write access','error');
+    else if (m.includes('404')) toast('File not found — check token permissions','error');
+    else if (m.includes('422')) toast('Already up to date','success');
+    else                        toast('Error: '+m,'error');
+  }
+  function markDraft() {
+    hasDraft = true;
+    document.getElementById('draft-pill').classList.add('visible');
+  }
+  function clearDraft() {
+    hasDraft = false;
+    document.getElementById('draft-pill').classList.remove('visible');
+  }
 
-  /* ════════ AUTH ════════ */
-  let _loginAttempts = 0;
-  let _loginLocked   = false;
+  /* ══ TOAST ══ */
+  function toast(msg, type='default') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = `show ${type}`;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.className = '', 3500);
+  }
 
-  async function hash(s) {
+  /* ══ MODALS ══ */
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('modal-backdrop')) e.target.classList.remove('open');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+  });
+
+  /* ══ AUTH ══ */
+  let _attempts = 0, _locked = false;
+
+  async function sha256(s) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
 
   async function checkPassword() {
-    if (_loginLocked) { toast('Too many attempts — wait 30 seconds', 'error'); return; }
-
-    const h    = await hash(document.getElementById('pw-input').value);
+    if (_locked) { toast('Too many attempts — wait 30s','error'); return; }
+    const h    = await sha256(document.getElementById('pw-input').value);
     const user = Object.keys(USERS).find(u => USERS[u] === h);
-
     if (user) {
-      _loginAttempts = 0;
-      sessionStorage.setItem('vv_auth', '1');
-      sessionStorage.setItem('vv_user', user);
-      showAdmin();
+      _attempts = 0;
+      const remember = document.getElementById('remember-me').checked;
+      const store    = remember ? localStorage : sessionStorage;
+      store.setItem('vv_auth', '1');
+      store.setItem('vv_user', user);
+      showAdmin(user);
     } else {
-      _loginAttempts++;
-      document.getElementById('login-error').style.display = 'block';
+      _attempts++;
+      const err = document.getElementById('login-error');
+      err.style.display = 'block';
       document.getElementById('pw-input').value = '';
-      document.getElementById('pw-input').focus();
-      if (_loginAttempts >= 5) {
-        _loginLocked = true;
-        document.getElementById('login-error').textContent = 'Too many attempts. Wait 30 seconds.';
-        document.querySelector('.login-btn').disabled = true;
+      if (_attempts >= 5) {
+        _locked = true;
+        err.textContent = 'Too many attempts. Wait 30 seconds.';
+        document.getElementById('login-btn').disabled = true;
         setTimeout(() => {
-          _loginLocked   = false;
-          _loginAttempts = 0;
-          document.querySelector('.login-btn').disabled = false;
-          document.getElementById('login-error').textContent = 'Incorrect password. Try again.';
-          document.getElementById('login-error').style.display = 'none';
+          _locked = false; _attempts = 0;
+          document.getElementById('login-btn').disabled = false;
+          err.textContent = 'Incorrect password. Try again.';
+          err.style.display = 'none';
         }, 30000);
       }
     }
   }
+  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key==='Enter') checkPassword(); });
 
-  document.getElementById('pw-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkPassword();
-  });
-
-  function showAdmin() {
+  function showAdmin(user) {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-panel').style.display  = 'block';
-    const user = sessionStorage.getItem('vv_user') || 'Admin';
-    const userEl = document.getElementById('logged-user');
-    if (userEl) userEl.textContent = user;
+    document.getElementById('admin-shell').style.display  = 'flex';
+    document.getElementById('user-name').textContent   = user;
+    document.getElementById('user-avatar').textContent = user[0].toUpperCase();
+    const hr = new Date().getHours();
+    const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('dash-greeting').textContent = `${greet}, ${user}`;
     updateTokenUI();
+    loadFormspreeUI();
     loadEvents();
     renderGallery();
-  }
-
-  function updateTokenUI() {
-    const hasToken = !!localStorage.getItem('vv_gh_token');
-    const warning  = document.getElementById('config-warning');
-    const indicator = document.getElementById('token-set-indicator');
-    if (warning)   warning.style.display   = hasToken ? 'none' : '';
-    if (indicator) indicator.style.display = hasToken ? 'flex' : 'none';
+    updateDashboard();
   }
 
   function logout() {
-    sessionStorage.removeItem('vv_auth');
+    localStorage.removeItem('vv_auth'); localStorage.removeItem('vv_user');
+    sessionStorage.removeItem('vv_auth'); sessionStorage.removeItem('vv_user');
     location.reload();
   }
 
-  /* ════════ TABS ════════ */
+  /* ══ TABS ══ */
   function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach((t, i) =>
-      t.classList.toggle('active', ['gallery','events','settings','command'][i] === tab)
-    );
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === tab));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.getElementById(`panel-${tab}`).classList.add('active');
+    if (tab === 'dashboard') updateDashboard();
+  }
+  document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => switchTab(n.dataset.tab)));
+
+  /* ══ DASHBOARD ══ */
+  function updateDashboard() {
+    const active = GALLERY_ITEMS.filter(p => !removedItems.has(p.file));
+    document.getElementById('dash-gallery-count').textContent = active.length + pendingMedia.length;
+    document.getElementById('dash-events-count').textContent  = events.filter(ev => !isPast(ev)).length;
+    document.getElementById('dash-pending-count').textContent = pendingMedia.length;
+    document.getElementById('dash-token-warning').style.display = localStorage.getItem('vv_gh_token') ? 'none' : 'block';
+    const gb = document.getElementById('gallery-badge');
+    gb.textContent = pendingMedia.length || '';
+    gb.style.display = pendingMedia.length ? '' : 'none';
+  }
+  function isPast(ev) {
+    try { return new Date(ev.date) < new Date(); } catch { return false; }
   }
 
-  /* ════════ TOKEN ════════ */
+  /* ══ TOKEN ══ */
+  function updateTokenUI() {
+    const has = !!localStorage.getItem('vv_gh_token');
+    document.getElementById('token-connected').style.display = has ? 'block' : 'none';
+    document.getElementById('token-setup').style.display     = has ? 'none'  : 'block';
+  }
+  function showTokenInput() {
+    document.getElementById('token-connected').style.display = 'none';
+    document.getElementById('token-setup').style.display     = 'block';
+  }
   function saveToken() {
     const v = document.getElementById('gh-token-input').value.trim();
-    if (!v) return;
+    if (!v) { toast('Paste your token first','error'); return; }
     localStorage.setItem('vv_gh_token', v);
     document.getElementById('gh-token-input').value = '';
     updateTokenUI();
-    toast('Token saved ✓', 'success');
+    toast('Token saved ✓','success');
   }
-
   function clearToken() {
+    if (!confirm('Remove the GitHub token? You will not be able to publish until you add a new one.')) return;
     localStorage.removeItem('vv_gh_token');
     updateTokenUI();
     toast('Token removed');
   }
-
   async function testToken() {
-    const token = localStorage.getItem('vv_gh_token') || document.getElementById('gh-token-input').value.trim();
-    if (!token) { toast('Enter a token first', 'error'); return; }
-    toast('Testing token...');
-    const res  = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`, {
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }
-    });
+    const token = localStorage.getItem('vv_gh_token') || document.getElementById('gh-token-input')?.value.trim();
+    if (!token) { toast('No token saved yet','error'); return; }
+    toast('Testing...');
+    const res  = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`, { headers:{ Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json' } });
     const data = await res.json();
     if (res.ok) {
-      if (data.permissions && data.permissions.push) toast('Token OK — has write access ✓', 'success');
-      else toast('Token valid but NO write access', 'error');
-    } else if (res.status === 401) {
-      toast('Token invalid or expired', 'error');
-    } else if (res.status === 404) {
-      toast('Repo not found — check token permissions', 'error');
-    } else {
-      toast('Error ' + res.status, 'error');
+      if (data.permissions?.push) toast('Token OK — write access confirmed ✓','success');
+      else toast('Token valid but no write access','error');
+    } else if (res.status===401) toast('Token invalid or expired','error');
+    else toast('Error '+res.status,'error');
+  }
+
+  /* ══ FORMSPREE ══ */
+  function saveFormspree() {
+    const v = document.getElementById('formspree-input').value.trim();
+    if (!v || !v.startsWith('http')) { toast('Paste a valid Formspree URL','error'); return; }
+    localStorage.setItem('vv_formspree', v);
+    document.getElementById('formspree-status').style.display = 'block';
+    document.getElementById('formspree-dashboard-link').href = 'https://formspree.io/forms';
+    toast('Formspree endpoint saved ✓','success');
+  }
+  function loadFormspreeUI() {
+    const v = localStorage.getItem('vv_formspree');
+    if (v) {
+      document.getElementById('formspree-input').value = v;
+      document.getElementById('formspree-status').style.display = 'block';
+      document.getElementById('formspree-dashboard-link').href = 'https://formspree.io/forms';
     }
   }
 
-  /* ════════ HELPERS (early) ════════ */
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
-  }
-
-  function safeUrl(u) {
-    if (!u) return '';
-    try {
-      const p = new URL(String(u));
-      return (p.protocol === 'https:' || p.protocol === 'http:') ? p.href : '';
-    } catch { return ''; }
-  }
-
-  /* ════════ EVENTS ════════ */
+  /* ══ EVENTS ══ */
   async function loadEvents() {
     try {
       const res = await fetch(`${RAW_BASE}events.json?t=${Date.now()}`);
-      events = await res.json();
+      const data = await res.json();
+      events = Array.isArray(data) ? data : [];
     } catch { events = []; }
     renderEvents();
   }
 
   function renderEvents() {
     const list  = document.getElementById('event-list');
-    const empty = document.getElementById('events-empty-admin');
-    const badge = document.getElementById('events-count');
+    const empty = document.getElementById('events-empty');
+    const badge = document.getElementById('events-count-badge');
     list.innerHTML = '';
-    badge.textContent = events.length + (events.length === 1 ? ' event' : ' events');
+    badge.textContent = `${events.length} ${events.length===1?'event':'events'}`;
     if (events.length === 0) { list.appendChild(empty); return; }
     events.forEach((ev, i) => {
-      const row = document.createElement('div');
+      const past = isPast(ev);
+      const row  = document.createElement('div');
       row.className = 'event-row';
-      row.innerHTML = `
-        <img src="${escapeHtml(ev.poster)}" alt="${escapeHtml(ev.name)}" class="event-row-poster" draggable="true"
-          title="Drag to share poster">
-        <div class="event-row-info">
-          <div class="event-row-name">${escapeHtml(ev.name)}</div>
-          <div class="event-row-date">${escapeHtml(ev.date)}</div>
-          <div class="event-row-venue">${escapeHtml(ev.venue)}</div>
-        </div>
-        <button class="event-row-remove" onclick="removeEvent(${i})">Remove</button>
-      `;
-      row.querySelector('.event-row-poster').addEventListener('dragstart', e => dragPoster(e, ev.poster));
+      const img = document.createElement('img');
+      img.src = esc(ev.poster); img.alt = esc(ev.name); img.className = 'event-row-poster';
+      const info = document.createElement('div'); info.className = 'event-row-info';
+      const name = document.createElement('div'); name.className = 'event-row-name'; name.textContent = ev.name;
+      const meta = document.createElement('div'); meta.className = 'event-row-meta';
+      meta.innerHTML = `<b>${esc(ev.date)}</b>${ev.time ? ' · '+esc(ev.time) : ''} ${ev.venue ? '· '+esc(ev.venue) : ''}`;
+      info.append(name, meta);
+      const acts = document.createElement('div'); acts.className = 'event-row-actions';
+      if (past) { const pb = document.createElement('span'); pb.className='past-badge'; pb.textContent='Past'; acts.appendChild(pb); }
+      const editBtn = document.createElement('button'); editBtn.className='btn btn-ghost btn-sm'; editBtn.textContent='Edit';
+      editBtn.addEventListener('click', () => openEditEvent(i));
+      const delBtn  = document.createElement('button'); delBtn.className='btn btn-danger btn-sm'; delBtn.textContent='Remove';
+      delBtn.addEventListener('click', () => removeEvent(i));
+      acts.append(editBtn, delBtn);
+      row.append(img, info, acts);
       list.appendChild(row);
     });
+    updateDashboard();
   }
 
-  function dragPoster(e, src) {
-    e.dataTransfer.setData('text/uri-list', src);
-    e.dataTransfer.setData('text/plain', src);
+  function openEditEvent(i) {
+    editingEventIndex = i;
+    const ev = events[i];
+    document.getElementById('edit-ev-name').value    = ev.name    || '';
+    document.getElementById('edit-ev-date').value    = ev.date    || '';
+    document.getElementById('edit-ev-time').value    = ev.time    || '';
+    document.getElementById('edit-ev-venue').value   = ev.venue   || '';
+    document.getElementById('edit-ev-tickets').value = ev.tickets || '';
+    openModal('event-modal');
+  }
+  function saveEventEdit() {
+    if (editingEventIndex === null) return;
+    events[editingEventIndex] = {
+      ...events[editingEventIndex],
+      name:    document.getElementById('edit-ev-name').value.trim(),
+      date:    document.getElementById('edit-ev-date').value.trim(),
+      time:    document.getElementById('edit-ev-time').value.trim(),
+      venue:   document.getElementById('edit-ev-venue').value.trim(),
+      tickets: safeUrl(document.getElementById('edit-ev-tickets').value.trim())
+    };
+    closeModal('event-modal');
+    renderEvents();
+    markDraft();
+    toast('Event updated — publish to go live');
   }
 
   function handlePosterSelect(input) {
-    const file = input.files[0];
-    if (!file) return;
+    const file = input.files?.[0]; if (!file) return;
     posterFileName = file.name;
-    const reader = new FileReader();
+    const reader  = new FileReader();
     reader.onload = e => {
       posterBase64 = e.target.result.split(',')[1];
       const preview = document.getElementById('poster-preview');
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-      document.querySelector('#poster-drop p').style.display = 'none';
-      document.querySelector('#poster-drop .upload-icon').style.display = 'none';
+      preview.src   = e.target.result; preview.style.display = 'block';
+      document.querySelector('#poster-drop p').style.display    = 'none';
+      document.querySelector('#poster-drop span').style.display = 'none';
     };
     reader.readAsDataURL(file);
   }
 
-  // Poster drag-over
   const posterDrop = document.getElementById('poster-drop');
-  posterDrop.addEventListener('dragover',  e => { e.preventDefault(); posterDrop.classList.add('drag-over'); });
-  posterDrop.addEventListener('dragleave', () => posterDrop.classList.remove('drag-over'));
+  posterDrop.addEventListener('click',    () => document.getElementById('poster-file-input').click());
+  posterDrop.addEventListener('dragover', e => { e.preventDefault(); posterDrop.classList.add('drag-over'); });
+  posterDrop.addEventListener('dragleave',  () => posterDrop.classList.remove('drag-over'));
   posterDrop.addEventListener('drop', e => {
-    e.preventDefault();
-    posterDrop.classList.remove('drag-over');
-    const fakeInput = { files: e.dataTransfer.files };
-    handlePosterSelect(fakeInput);
+    e.preventDefault(); posterDrop.classList.remove('drag-over');
+    handlePosterSelect({ files: e.dataTransfer.files });
   });
+  document.getElementById('poster-file-input').addEventListener('change', function(){ handlePosterSelect(this); });
 
   async function addEvent() {
     const name    = document.getElementById('ev-name').value.trim();
     const date    = document.getElementById('ev-date').value.trim();
+    const time    = document.getElementById('ev-time').value.trim();
     const venue   = document.getElementById('ev-venue').value.trim();
-    const tickets = document.getElementById('ev-tickets').value.trim();
-
-    if (!name || !date || !venue) { toast('Fill in name, date and venue', 'error'); return; }
-    if (!posterBase64)            { toast('Add a poster image', 'error'); return; }
-
+    const tickets = safeUrl(document.getElementById('ev-tickets').value.trim());
+    if (!name || !date || !venue) { toast('Fill in Name, Date and Venue','error'); return; }
+    if (!posterBase64)            { toast('Add a poster image','error'); return; }
     const token = localStorage.getItem('vv_gh_token');
-    if (!token) {
-      switchTab('settings');
-      toast('Enter your GitHub token in Settings first', 'error');
-      return;
-    }
+    if (!token) { switchTab('settings'); toast('Add your GitHub token in Settings first','error'); return; }
 
     toast('Uploading poster...');
-    const H    = apiHeaders(token);
-    const base = apiBase();
     const posterPath = `posters/${Date.now()}-${posterFileName}`;
-
     try {
-      const upRes = await fetch(base + posterPath, {
-        method: 'PUT', headers: H,
-        body: JSON.stringify({ message: `admin: add poster ${posterFileName}`, content: posterBase64 })
+      const upRes = await fetch(apiBase()+posterPath, {
+        method:'PUT', headers:apiHeaders(token),
+        body:JSON.stringify({ message:`admin: add poster ${posterFileName}`, content:posterBase64 })
       });
-      if (!upRes.ok) throw new Error('Poster upload failed: ' + upRes.status);
-
-      const posterUrl = `${RAW_BASE}${posterPath}`;
-      const safeTickets = safeUrl(tickets);
-      events.push({ name, date, venue, tickets: safeTickets, poster: posterUrl });
+      if (!upRes.ok) throw new Error('Poster upload failed: '+upRes.status);
+      events.push({ name, date, time, venue, tickets, poster:`${RAW_BASE}${posterPath}` });
       renderEvents();
       resetEventForm();
-      toast('Event added — hit Publish to go live ✓', 'success');
-    } catch(err) {
-      toast('Upload failed: ' + err.message, 'error');
-    }
+      markDraft();
+      toast('Event added — click Publish Events to go live ✓','success');
+    } catch(err) { toast('Upload failed: '+err.message,'error'); }
   }
 
   function resetEventForm() {
-    document.getElementById('ev-name').value    = '';
-    document.getElementById('ev-date').value    = '';
-    document.getElementById('ev-venue').value   = '';
-    document.getElementById('ev-tickets').value = '';
-    document.getElementById('poster-preview').style.display = 'none';
-    const pEl = document.querySelector('#poster-drop p');
-    const iEl = document.querySelector('#poster-drop .upload-icon');
-    if (pEl) pEl.style.display = '';
-    if (iEl) iEl.style.display = '';
-    document.getElementById('poster-file-input').value = '';
-    posterBase64 = null;
-    posterFileName = null;
+    ['ev-name','ev-date','ev-time','ev-venue','ev-tickets'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('poster-preview').style.display='none';
+    const p=document.querySelector('#poster-drop p'), s=document.querySelector('#poster-drop span');
+    if(p) p.style.display=''; if(s) s.style.display='';
+    document.getElementById('poster-file-input').value='';
+    posterBase64=null; posterFileName=null;
   }
 
   function removeEvent(i) {
-    if (!confirm('Remove "' + events[i].name + '"?')) return;
-    events.splice(i, 1);
-    renderEvents();
-    toast('Event removed — Publish to update site');
+    if (!confirm(`Remove "${events[i].name}"?`)) return;
+    events.splice(i,1); renderEvents(); markDraft(); toast('Event removed — Publish to update site');
   }
 
   async function publishEvents() {
     const token = getToken(); if (!token) return;
     const btn = document.getElementById('publish-events-btn');
-    btn.disabled = true; btn.textContent = 'Publishing...';
-
+    btn.disabled=true; btn.textContent='Publishing...';
     try {
-      const res  = await fetch(apiBase() + 'events.json', { headers: apiHeaders(token) });
+      const res  = await fetch(apiBase()+'events.json', { headers:apiHeaders(token) });
       if (!res.ok) throw new Error(res.status);
       const data = await res.json();
-      const put  = await fetch(apiBase() + 'events.json', {
-        method: 'PUT', headers: apiHeaders(token),
-        body: JSON.stringify({
-          message: 'admin: update events',
-          content: btoa(JSON.stringify(events, null, 2)),
-          sha: data.sha
-        })
+      const put  = await fetch(apiBase()+'events.json', {
+        method:'PUT', headers:apiHeaders(token),
+        body:JSON.stringify({ message:'admin: update events', content:btoa(JSON.stringify(events,null,2)), sha:data.sha })
       });
       if (!put.ok) throw new Error(put.status);
-      toast('Events live on site ✓', 'success');
-    } catch(err) {
-      handleApiError(err);
-    }
-
-    btn.disabled = false; btn.textContent = 'Publish Events →';
+      clearDraft(); toast('Events are live ✓','success');
+    } catch(err) { handleApiError(err); }
+    btn.disabled=false; btn.textContent='Publish Events →';
   }
 
-  /* ════════ GALLERY ════════ */
+  /* ══ GALLERY ══ */
   function renderGallery() {
     const grid = document.getElementById('insta-grid');
     grid.innerHTML = '';
-
     const allItems = [
       ...GALLERY_ITEMS.filter(p => !removedItems.has(p.file)),
-      ...pendingMedia.map(p => ({ ...p, isPending: true }))
+      ...pendingMedia.map(p => ({...p, isPending:true}))
     ];
-
     allItems.forEach((item, i) => {
-      const cell = document.createElement('div');
+      const cell    = document.createElement('div');
       cell.className = 'grid-cell';
-      if (item.isPending)          cell.classList.add('grid-cell--new');
-      if (removedItems.has(item.file)) cell.classList.add('grid-cell--removed');
-
-      const isVideo = item.type === 'video';
+      if (item.isPending) cell.classList.add('grid-cell--new');
+      const isVideo = item.type==='video';
       const srcUrl  = item.isPending
-        ? (isVideo ? 'data:video/mp4;base64,' : (item.mimeType ? `data:${item.mimeType};base64,` : 'data:image/jpeg;base64,')) + item.base64
-        : item.file;
-
-      let mediaEl;
+        ? (isVideo ? 'data:video/mp4;base64,' : `data:${item.mimeType||'image/jpeg'};base64,`) + item.base64
+        : `${RAW_BASE}${item.file}`;
+      let media;
       if (isVideo) {
-        mediaEl = document.createElement('video');
-        mediaEl.src = srcUrl;
-        mediaEl.muted = true;
-        mediaEl.loop  = true;
-        mediaEl.playsInline = true;
-        mediaEl.preload = 'metadata';
-        cell.addEventListener('mouseenter', () => mediaEl.play());
-        cell.addEventListener('mouseleave', () => { mediaEl.pause(); mediaEl.currentTime = 0; });
+        media = document.createElement('video');
+        media.src=srcUrl; media.muted=true; media.loop=true; media.playsInline=true; media.preload='metadata';
+        cell.addEventListener('mouseenter',()=>media.play());
+        cell.addEventListener('mouseleave',()=>{media.pause();media.currentTime=0;});
       } else {
-        mediaEl = document.createElement('img');
-        mediaEl.src     = srcUrl;
-        mediaEl.alt     = item.alt || '';
-        mediaEl.loading = 'lazy';
+        media = document.createElement('img');
+        media.src=srcUrl; media.alt=item.alt||''; media.loading='lazy';
       }
+      cell.appendChild(media);
+      if (item.isPending) { const b=document.createElement('div'); b.className='cell-badge'; b.textContent='NEW'; cell.appendChild(b); }
+      if (item.title) { const c=document.createElement('div'); c.className='cell-caption'; c.textContent=item.title; cell.appendChild(c); }
 
-      cell.appendChild(mediaEl);
-
-      // Badges
-      if (item.isPending) {
-        const badge = document.createElement('div');
-        badge.className = 'cell-badge cell-badge--new';
-        badge.textContent = 'NEW';
-        cell.appendChild(badge);
-      }
-      if (isVideo) {
-        const vBadge = document.createElement('div');
-        vBadge.className = 'cell-badge cell-badge--video';
-        vBadge.style.top = item.isPending ? '1.5rem' : '0.4rem';
-        vBadge.textContent = 'VIDEO';
-        cell.appendChild(vBadge);
-
-        const playIcon = document.createElement('div');
-        playIcon.className = 'cell-play-icon';
-        cell.appendChild(playIcon);
-      }
-
-      // Overlay controls
-      const overlay = document.createElement('div');
-      overlay.className = 'cell-overlay';
-      overlay.innerHTML = `
-        <button class="cell-remove-btn">Remove</button>
-        <span class="cell-drag-handle">⠿ drag to reorder</span>
-      `;
-      overlay.querySelector('.cell-remove-btn').addEventListener('click', e => {
+      const overlay = document.createElement('div'); overlay.className='cell-overlay';
+      const editBtn = document.createElement('button'); editBtn.className='btn btn-secondary btn-sm'; editBtn.textContent='Edit Caption';
+      editBtn.addEventListener('click', e => { e.stopPropagation(); openCaptionEdit(i, allItems); });
+      const remBtn  = document.createElement('button'); remBtn.className='btn btn-danger btn-sm'; remBtn.textContent='Remove';
+      remBtn.addEventListener('click', e => {
         e.stopPropagation();
-        if (item.isPending) {
-          const pi = pendingMedia.findIndex(p => p.name === item.name && p.type === item.type);
-          if (pi !== -1) pendingMedia.splice(pi, 1);
-        } else {
-          removedItems.add(item.file);
-        }
-        renderGallery();
-        toast('Item removed — Publish to update site');
+        if (item.isPending) { const pi=pendingMedia.findIndex(p=>p.name===item.name); if(pi!==-1) pendingMedia.splice(pi,1); }
+        else removedItems.add(item.file);
+        renderGallery(); markDraft(); toast('Removed — Publish to update site');
       });
+      overlay.append(editBtn, remBtn);
       cell.appendChild(overlay);
 
-      // Drag to reorder
-      cell.draggable = true;
-      cell.dataset.index = i;
-      cell.addEventListener('dragstart', e => {
-        dragSrcIndex = i;
-        e.dataTransfer.effectAllowed = 'move';
-        cell.style.opacity = '0.4';
-      });
-      cell.addEventListener('dragend', () => { cell.style.opacity = ''; });
-      cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drag-over-cell'); });
-      cell.addEventListener('dragleave', () => cell.classList.remove('drag-over-cell'));
-      cell.addEventListener('drop', e => {
-        e.preventDefault();
-        cell.classList.remove('drag-over-cell');
-        if (dragSrcIndex === null || dragSrcIndex === i) return;
-        reorderGallery(dragSrcIndex, i);
-      });
-
+      cell.draggable=true; cell.dataset.index=i;
+      cell.addEventListener('dragstart',e=>{dragSrcIndex=i;e.dataTransfer.effectAllowed='move';cell.style.opacity='0.4';});
+      cell.addEventListener('dragend',()=>cell.style.opacity='');
+      cell.addEventListener('dragover',e=>{e.preventDefault();cell.style.outline='2px solid var(--red)';});
+      cell.addEventListener('dragleave',()=>cell.style.outline='');
+      cell.addEventListener('drop',e=>{e.preventDefault();cell.style.outline='';if(dragSrcIndex!==null&&dragSrcIndex!==i){reorderGallery(dragSrcIndex,i);}});
       grid.appendChild(cell);
     });
 
-    // Update stats
-    const photoCount = GALLERY_ITEMS.filter(p => !removedItems.has(p.file) && p.type === 'image').length
-                     + pendingMedia.filter(p => p.type === 'image').length;
-    const videoCount = GALLERY_ITEMS.filter(p => !removedItems.has(p.file) && p.type === 'video').length
-                     + pendingMedia.filter(p => p.type === 'video').length;
-    const total      = photoCount + videoCount;
-
-    document.getElementById('gallery-count').textContent = total + (total === 1 ? ' item' : ' items');
-    document.getElementById('stat-photos').textContent   = photoCount;
-    document.getElementById('stat-videos').textContent   = videoCount;
-    document.getElementById('stat-new').textContent      = pendingMedia.length;
+    const photoCount = GALLERY_ITEMS.filter(p=>!removedItems.has(p.file)&&p.type==='image').length + pendingMedia.filter(p=>p.type==='image').length;
+    const videoCount = GALLERY_ITEMS.filter(p=>!removedItems.has(p.file)&&p.type==='video').length + pendingMedia.filter(p=>p.type==='video').length;
+    const total = photoCount+videoCount;
+    document.getElementById('gallery-count-badge').textContent = `${total} ${total===1?'item':'items'}`;
+    document.getElementById('stat-photos').textContent = photoCount;
+    document.getElementById('stat-videos').textContent = videoCount;
+    document.getElementById('stat-new').textContent    = pendingMedia.length;
+    updateDashboard();
   }
 
-  function reorderGallery(fromIdx, toIdx) {
-    // Build combined ordered list
-    const combined = [
-      ...GALLERY_ITEMS.filter(p => !removedItems.has(p.file)),
-      ...pendingMedia.map(p => ({ ...p, isPending: true }))
+  function openCaptionEdit(i, allItems) {
+    editingCaptionIndex = i;
+    const item = allItems[i];
+    document.getElementById('cap-title').value   = item.title   || '';
+    document.getElementById('cap-caption').value = item.caption || '';
+    openModal('caption-modal');
+  }
+  function saveCaptionEdit() {
+    if (editingCaptionIndex === null) return;
+    const allItems = [
+      ...GALLERY_ITEMS.filter(p=>!removedItems.has(p.file)),
+      ...pendingMedia.map(p=>({...p,isPending:true}))
     ];
-
-    const moved = combined.splice(fromIdx, 1)[0];
-    combined.splice(toIdx, 0, moved);
-
-    // Rebuild GALLERY_ITEMS and pendingMedia from new order
-    GALLERY_ITEMS.length = 0;
-    pendingMedia = [];
-    combined.forEach(item => {
-      if (item.isPending) {
-        const { isPending, ...rest } = item;
-        pendingMedia.push(rest);
-      } else {
-        GALLERY_ITEMS.push(item);
-      }
-    });
-
-    dragSrcIndex = null;
-    renderGallery();
+    const item  = allItems[editingCaptionIndex];
+    const title   = document.getElementById('cap-title').value.trim();
+    const caption = document.getElementById('cap-caption').value.trim();
+    if (item.isPending) {
+      const pi = pendingMedia.findIndex(p=>p.name===item.name); if(pi!==-1){pendingMedia[pi].title=title;pendingMedia[pi].caption=caption;}
+    } else {
+      const gi = GALLERY_ITEMS.findIndex(p=>p.file===item.file); if(gi!==-1){GALLERY_ITEMS[gi].title=title;GALLERY_ITEMS[gi].caption=caption;}
+    }
+    closeModal('caption-modal'); renderGallery(); markDraft(); toast('Caption saved');
   }
 
-  function handleMediaSelect(input) {
-    const files = Array.from(input.files);
-    files.forEach(file => {
+  function reorderGallery(from, to) {
+    const combined = [...GALLERY_ITEMS.filter(p=>!removedItems.has(p.file)), ...pendingMedia.map(p=>({...p,isPending:true}))];
+    const moved = combined.splice(from,1)[0]; combined.splice(to,0,moved);
+    GALLERY_ITEMS.length=0; pendingMedia=[];
+    combined.forEach(item => { const {isPending,...rest}=item; isPending ? pendingMedia.push(rest) : GALLERY_ITEMS.push(item); });
+    dragSrcIndex=null; renderGallery(); markDraft();
+  }
+
+  function handleMediaSelect(files) {
+    Array.from(files).forEach(file => {
       const isVideo = file.type.startsWith('video/');
-      if (isVideo && file.size > 50 * 1024 * 1024) {
-        toast(`${file.name} is over 50MB — too large to upload via API`, 'error');
-        return;
-      }
+      if (isVideo && file.size > 50*1024*1024) { toast(`${file.name} is over 50MB — too large`,'error'); return; }
       const reader = new FileReader();
       reader.onload = e => {
-        const dataUrl = e.target.result;
-        const base64  = dataUrl.split(',')[1];
-        const item    = { file, base64, name: file.name, type: isVideo ? 'video' : 'image', mimeType: file.type, alt: file.name.split('.')[0].replace(/[-_]/g,' '), span: '' };
-        if (!isVideo) {
-          // Auto-detect aspect ratio to assign masonry span class
-          const img = new Image();
-          img.onload = () => {
-            const r = img.naturalWidth / img.naturalHeight;
-            item.span = r >= 1.6 ? 'rg-wide' : (r <= 0.7 ? 'rg-tall' : '');
-            pendingMedia.push(item);
-            renderGallery();
-          };
-          img.src = dataUrl;
-        } else {
-          pendingMedia.push(item);
-          renderGallery();
-        }
+        const dataUrl=e.target.result, base64=dataUrl.split(',')[1];
+        const item={file,base64,name:file.name,type:isVideo?'video':'image',mimeType:file.type,alt:file.name.split('.')[0].replace(/[-_]/g,' '),title:'',caption:'',span:''};
+        if (!isVideo) { const img=new Image(); img.onload=()=>{const r=img.naturalWidth/img.naturalHeight;item.span=r>=1.6?'rg-wide':r<=0.7?'rg-tall':'';pendingMedia.push(item);renderGallery();markDraft();}; img.src=dataUrl; }
+        else { pendingMedia.push(item); renderGallery(); markDraft(); }
       };
       reader.readAsDataURL(file);
     });
-    input.value = '';
   }
 
-  // Drag & drop on upload zone
   const uploadZone = document.getElementById('upload-zone');
-  uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-  uploadZone.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadZone.classList.remove('drag-over');
-    handleMediaSelect({ files: e.dataTransfer.files });
-  });
+  uploadZone.addEventListener('click',    () => document.getElementById('media-file-input').click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+  uploadZone.addEventListener('dragleave',  () => uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); handleMediaSelect(e.dataTransfer.files); });
+  document.getElementById('media-file-input').addEventListener('change', function(){ handleMediaSelect(this.files); this.value=''; });
 
   async function publishGallery() {
-    const token = getToken(); if (!token) return;
-    const btn = document.getElementById('publish-gallery-btn');
-    btn.disabled = true; btn.textContent = 'Publishing...';
-
-    const H    = apiHeaders(token);
-    const base = apiBase();
-
+    const token=getToken(); if(!token) return;
+    const btn=document.getElementById('publish-gallery-btn');
+    btn.disabled=true; btn.textContent='Publishing...';
+    const H=apiHeaders(token), base=apiBase();
     try {
-      // Upload new media files
-      let uploadCount = 0;
-      for (const p of pendingMedia) {
+      let uploadCount=0;
+      for(const p of pendingMedia) {
         toast(`Uploading ${p.name}... (${++uploadCount}/${pendingMedia.length})`);
-        const res = await fetch(base + p.name, {
-          method: 'PUT', headers: H,
-          body: JSON.stringify({
-            message: `admin: add ${p.type} ${p.name}`,
-            content: p.base64
-          })
-        });
-        if (!res.ok) throw new Error(res.status + ' uploading ' + p.name);
-        GALLERY_ITEMS.push({ file: p.name, alt: p.alt || p.name.split('.')[0], type: p.type });
+        const res=await fetch(base+p.name,{method:'PUT',headers:H,body:JSON.stringify({message:`admin: add ${p.type} ${p.name}`,content:p.base64})});
+        if(!res.ok) throw new Error(res.status+' uploading '+p.name);
+        GALLERY_ITEMS.push({file:p.name,alt:p.alt||p.name.split('.')[0],type:p.type,title:p.title||'',caption:p.caption||'',span:p.span||''});
       }
-      pendingMedia = [];
-
-      // Build new gallery HTML items
-      const activeItems = GALLERY_ITEMS.filter(p => !removedItems.has(p.file));
-      const newItemsHTML = activeItems.map(p => {
-        const cls = ['rg-item', p.type === 'video' ? 'rg-video' : '', p.span || ''].filter(Boolean).join(' ');
-        if (p.type === 'video') {
-          return `
-      <div class="${cls}">
-        <video src="${p.file}" loop muted playsinline></video>
-        <div class="rg-overlay"><span>${p.alt}</span></div>
-      </div>`;
-        } else {
-          return `
-      <div class="${cls}">
-        <img src="${p.file}" alt="${p.alt}" />
-        <div class="rg-overlay"><span>${p.alt}</span></div>
-      </div>`;
-        }
+      pendingMedia=[];
+      const activeItems=GALLERY_ITEMS.filter(p=>!removedItems.has(p.file));
+      const newHTML=activeItems.map(p=>{
+        const cls=['rg-item',p.type==='video'?'rg-video':'',p.span||''].filter(Boolean).join(' ');
+        return p.type==='video'
+          ? `\n      <div class="${cls}"><video src="${p.file}" loop muted playsinline></video><div class="rg-overlay"><span>${p.alt}</span></div></div>`
+          : `\n      <div class="${cls}"><img src="${p.file}" alt="${p.alt}" /><div class="rg-overlay"><span>${p.alt}</span></div></div>`;
       }).join('');
-
-      // Fetch and update index.html
       toast('Updating site...');
-      const iRes  = await fetch(base + 'index.html', { headers: H });
-      if (!iRes.ok) throw new Error('Could not fetch index.html');
-      const iData = await iRes.json();
-      let html    = atob(iData.content.replace(/\n/g, ''));
-
-      html = html.replace(
-        /<!-- GALLERY-ITEMS-START -->[\s\S]*?<!-- GALLERY-ITEMS-END -->/,
-        `<!-- GALLERY-ITEMS-START -->${newItemsHTML}\n<!-- GALLERY-ITEMS-END -->`
-      );
-
-      const putRes = await fetch(base + 'index.html', {
-        method: 'PUT', headers: H,
-        body: JSON.stringify({
-          message: 'admin: update gallery',
-          content: btoa(unescape(encodeURIComponent(html))),
-          sha: iData.sha
-        })
-      });
-      if (!putRes.ok) throw new Error(putRes.status);
-
-      removedItems.clear();
-      renderGallery();
-      toast('Gallery is live on the site ✓', 'success');
-    } catch(err) {
-      handleApiError(err);
-    }
-
-    btn.disabled = false; btn.textContent = 'Publish Gallery →';
+      const iRes=await fetch(base+'index.html',{headers:H});
+      if(!iRes.ok) throw new Error('Could not fetch index.html');
+      const iData=await iRes.json();
+      let html=atob(iData.content.replace(/\n/g,''));
+      html=html.replace(/<!-- GALLERY-ITEMS-START -->[\s\S]*?<!-- GALLERY-ITEMS-END -->/,`<!-- GALLERY-ITEMS-START -->${newHTML}\n<!-- GALLERY-ITEMS-END -->`);
+      const putRes=await fetch(base+'index.html',{method:'PUT',headers:H,body:JSON.stringify({message:'admin: update gallery',content:btoa(unescape(encodeURIComponent(html))),sha:iData.sha})});
+      if(!putRes.ok) throw new Error(putRes.status);
+      removedItems.clear(); renderGallery(); clearDraft(); toast('Gallery is live ✓','success');
+    } catch(err) { handleApiError(err); }
+    btn.disabled=false; btn.textContent='Publish Gallery →';
   }
 
-  /* ════════ HELPERS ════════ */
-  function getToken() {
-    const t = localStorage.getItem('vv_gh_token');
-    if (!t) {
-      switchTab('settings');
-      toast('Enter your GitHub token in Settings first', 'error');
-    }
-    return t;
-  }
-
-  function apiHeaders(token) {
-    return {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json'
-    };
-  }
-
-  function apiBase() {
-    return `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`;
-  }
-
-  function handleApiError(err) {
-    const msg = String(err.message || err);
-    if (msg.includes('401'))      toast('Token rejected — check it has write access', 'error');
-    else if (msg.includes('404')) toast('Repo not found — check token repo permissions', 'error');
-    else if (msg.includes('422')) toast('No changes detected — already up to date', 'success');
-    else                          toast('Error: ' + msg, 'error');
-  }
-
-  function toast(msg, type = 'default') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'show' + (type !== 'default' ? ' ' + type : '');
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => el.className = '', 3500);
-  }
-
-  /* ════════ COMMAND CHAT ════════ */
-  /* ════════ AUTO-LOGIN ════════ */
-  if (sessionStorage.getItem('vv_auth') === '1') showAdmin();
+  /* ══ INIT ══ */
+  (function init(){
+    const user = localStorage.getItem('vv_user') || sessionStorage.getItem('vv_user');
+    const auth = localStorage.getItem('vv_auth') || sessionStorage.getItem('vv_auth');
+    if (auth==='1' && user && USERS[user]) showAdmin(user);
+  })();
 </script>
-
 </body>
 </html>
