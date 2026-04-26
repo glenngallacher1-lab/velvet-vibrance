@@ -1346,6 +1346,7 @@
       const gjBody={message:'admin: update gallery',content:btoa(unescape(encodeURIComponent(JSON.stringify(activeItems,null,2))))};
       if(gjSha) gjBody.sha=gjSha;
       await fetch(base+'gallery.json',{method:'PUT',headers:H,body:JSON.stringify(gjBody)});
+      GALLERY_ITEMS.length=0; activeItems.forEach(item=>GALLERY_ITEMS.push(item));
       removedItems.clear(); renderGallery(); clearDraft(); toast('Gallery is live ✓','success');
     } catch(err) { handleApiError(err); }
     btn.disabled=false; btn.textContent='Publish Gallery →';
