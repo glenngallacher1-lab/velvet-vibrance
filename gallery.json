@@ -1,0 +1,9 @@
+[
+  { "file": "crowd-pink.png",     "alt": "The crowd moves as one",      "type": "image", "title": "The Crowd",   "caption": "", "span": "" },
+  { "file": "dj-orange.png",      "alt": "In the booth",                "type": "image", "title": "In the Booth","caption": "", "span": "" },
+  { "file": "dj-headphones.png",  "alt": "Locked in",                   "type": "image", "title": "Locked In",  "caption": "", "span": "" },
+  { "file": "crowd-outdoor.jpeg", "alt": "The frequency moves outside",  "type": "image", "title": "Outside",    "caption": "", "span": "" },
+  { "file": "dj-crowd.jpeg",      "alt": "DJ raises the room",          "type": "image", "title": "DJ Set",     "caption": "", "span": "" },
+  { "file": "laser-show.jpeg",    "alt": "Lasers cut through the dark", "type": "image", "title": "Laser Show", "caption": "", "span": "" },
+  { "file": "IMG_0446.PNG",       "alt": "IMG 0446",                    "type": "image", "title": "IMG 0446",   "caption": "", "span": "" }
+]

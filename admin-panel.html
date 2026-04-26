@@ -840,14 +840,7 @@
   const GITHUB_TOKEN  = ['ghp_1Of1WKjT','Js2KKaXchn53NZnFoAWnxN0TVgum'].join('');
 
   /* ══ STATE ══ */
-  const GALLERY_ITEMS = [
-    { file:'crowd-pink.png',     alt:'The crowd moves as one',       type:'image', title:'The Crowd',    caption:'', span:'rg-wide' },
-    { file:'dj-orange.png',      alt:'In the booth',                 type:'image', title:'In the Booth', caption:'', span:'rg-tall' },
-    { file:'laser-show.jpeg',    alt:'Lasers cut through the dark',  type:'image', title:'Laser Show',   caption:'', span:'' },
-    { file:'dj-headphones.png',  alt:'Locked in',                    type:'image', title:'Locked In',    caption:'', span:'' },
-    { file:'dj-crowd.jpeg',      alt:'DJ raises the room',           type:'image', title:'DJ Set',       caption:'', span:'rg-wide' },
-    { file:'crowd-outdoor.jpeg', alt:'The frequency moves outside',  type:'image', title:'Outside',      caption:'', span:'' }
-  ];
+  const GALLERY_ITEMS = [];
   let events       = [];
   let pendingMedia = [];
   let removedItems = new Set();
@@ -953,7 +946,7 @@
     updateTokenUI();
     loadFormspreeUI();
     loadEvents();
-    renderGallery();
+    loadGallery();
     updateDashboard();
   }
 
@@ -1191,6 +1184,19 @@
   }
 
   /* ══ GALLERY ══ */
+  async function loadGallery() {
+    try {
+      const res  = await fetch(`${RAW_BASE}gallery.json?t=${Date.now()}`);
+      const data = await res.json();
+      GALLERY_ITEMS.length = 0;
+      if (Array.isArray(data)) data.forEach(item => GALLERY_ITEMS.push(item));
+    } catch { /* keep empty, will start fresh */ }
+    removedItems.clear();
+    pendingMedia = [];
+    renderGallery();
+    updateDashboard();
+  }
+
   function renderGallery() {
     const grid = document.getElementById('insta-grid');
     grid.innerHTML = '';
@@ -1335,6 +1341,11 @@
       html=html.replace(/<!-- GALLERY-ITEMS-START -->[\s\S]*?<!-- GALLERY-ITEMS-END -->/,`<!-- GALLERY-ITEMS-START -->${newHTML}\n<!-- GALLERY-ITEMS-END -->`);
       const putRes=await fetch(base+'index.html',{method:'PUT',headers:H,body:JSON.stringify({message:'admin: update gallery',content:btoa(unescape(encodeURIComponent(html))),sha:iData.sha})});
       if(!putRes.ok) throw new Error(putRes.status);
+      const gjRes=await fetch(base+'gallery.json',{headers:H}).catch(()=>null);
+      const gjSha=gjRes&&gjRes.ok?(await gjRes.json()).sha:undefined;
+      const gjBody={message:'admin: update gallery',content:btoa(unescape(encodeURIComponent(JSON.stringify(activeItems,null,2))))};
+      if(gjSha) gjBody.sha=gjSha;
+      await fetch(base+'gallery.json',{method:'PUT',headers:H,body:JSON.stringify(gjBody)});
       removedItems.clear(); renderGallery(); clearDraft(); toast('Gallery is live ✓','success');
     } catch(err) { handleApiError(err); }
     btn.disabled=false; btn.textContent='Publish Gallery →';
