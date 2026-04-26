@@ -146,13 +146,9 @@
 
   var count = 0, animId;
   var zooming = false, zoomT0 = 0;
-  var entryCenter = container.querySelector('.entry-center');
-  var _tmpVec = new THREE.Vector3();
 
   function tick() {
     animId = requestAnimationFrame(tick);
-
-    var minUpperY = Infinity;
 
     grids.forEach(function (g) {
       var arr = g.geo.attributes.position.array;
@@ -161,10 +157,7 @@
         for (var iz = 0; iz < NZ; iz++) {
           var wave = Math.sin((ix + count) * 0.3) * AMPL
                    + Math.sin((iz + count) * 0.5) * AMPL;
-          var y = g.yBase + wave * g.sign;
-          arr[i * 3 + 1] = y;
-          /* track the bottom edge of the upper band (sign=1, lowest y = closest to text) */
-          if (g.sign === 1 && y < minUpperY) minUpperY = y;
+          arr[i * 3 + 1] = g.yBase + wave * g.sign;
           i++;
         }
       }
@@ -175,14 +168,6 @@
       var t = Math.min((Date.now() - zoomT0) / ZOOM_D, 1);
       var e = t * t * t;
       camera.position.z = Z0 + (Z1 - Z0) * e;
-    }
-
-    /* Move title to sit just below the lowest point of the upper dot band */
-    if (entryCenter && isFinite(minUpperY)) {
-      _tmpVec.set(0, minUpperY, 0);
-      _tmpVec.project(camera);
-      var screenY = (-_tmpVec.y + 1) / 2 * H;
-      entryCenter.style.transform = 'translateY(' + (screenY - H / 2 + 28) + 'px)';
     }
 
     renderer.render(scene, camera);
