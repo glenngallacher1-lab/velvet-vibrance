@@ -551,6 +551,27 @@
         <div class="page-sub">Upload, reorder, and caption your photos and videos.</div>
         <div class="red-rule"></div>
       </div>
+
+      <!-- HOME PAGE IMAGE -->
+      <div class="card card-accent">
+        <div class="card-title"><span class="card-title-accent">◆</span> Home Page Image</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">This is the full-screen background image on the home page. Upload a new one to replace it.</p>
+        <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
+          <img id="hero-current-preview" src="" alt="Current hero" style="width:160px;height:90px;object-fit:cover;border-radius:8px;border:1px solid var(--border);flex-shrink:0;" />
+          <div style="flex:1;min-width:160px;">
+            <div class="upload-zone" id="hero-upload-zone" style="padding:1.25rem;margin-bottom:0;">
+              <span class="upload-icon" style="font-size:1.4rem;">+</span>
+              <p>Click or drag new image here</p>
+              <p class="upload-types">JPG · PNG · WEBP</p>
+            </div>
+            <input type="file" id="hero-file-input" accept="image/*" style="display:none">
+          </div>
+        </div>
+        <div class="actions-row" style="margin-top:1rem;">
+          <button class="btn btn-primary btn-sm" id="publish-hero-btn" onclick="publishHero()" disabled>Publish Home Image →</button>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-title">
           <span class="card-title-accent">◆</span> Media Grid
@@ -1317,6 +1338,68 @@
       removedItems.clear(); renderGallery(); clearDraft(); toast('Gallery is live ✓','success');
     } catch(err) { handleApiError(err); }
     btn.disabled=false; btn.textContent='Publish Gallery →';
+  }
+
+  /* ══ HERO IMAGE ══ */
+  let heroPendingBase64 = null, heroPendingFileName = null;
+
+  (function initHeroPreview(){
+    const img = document.getElementById('hero-current-preview');
+    img.src = RAW_BASE + 'crowd-pink.png';
+    img.onerror = () => img.style.display = 'none';
+  })();
+
+  function handleHeroSelect(file) {
+    if (!file) return;
+    heroPendingFileName = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      heroPendingBase64 = e.target.result.split(',')[1];
+      document.getElementById('hero-current-preview').src = e.target.result;
+      document.getElementById('publish-hero-btn').disabled = false;
+      toast('Image ready — click Publish Home Image to go live');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const heroZone = document.getElementById('hero-upload-zone');
+  heroZone.addEventListener('click',    () => document.getElementById('hero-file-input').click());
+  heroZone.addEventListener('dragover', e => { e.preventDefault(); heroZone.classList.add('drag-over'); });
+  heroZone.addEventListener('dragleave',  () => heroZone.classList.remove('drag-over'));
+  heroZone.addEventListener('drop', e => { e.preventDefault(); heroZone.classList.remove('drag-over'); handleHeroSelect(e.dataTransfer.files[0]); });
+  document.getElementById('hero-file-input').addEventListener('change', function(){ handleHeroSelect(this.files[0]); this.value=''; });
+
+  async function publishHero() {
+    if (!heroPendingBase64) return;
+    const btn = document.getElementById('publish-hero-btn');
+    btn.disabled = true; btn.textContent = 'Publishing...';
+    const H = apiHeaders(GITHUB_TOKEN), base = apiBase();
+    try {
+      toast('Uploading image...');
+      const upRes = await fetch(base + heroPendingFileName, {
+        method: 'PUT', headers: H,
+        body: JSON.stringify({ message: 'admin: update home page image', content: heroPendingBase64 })
+      });
+      if (!upRes.ok) throw new Error(upRes.status);
+
+      toast('Updating site...');
+      const iRes  = await fetch(base + 'index.html', { headers: H });
+      if (!iRes.ok) throw new Error('Could not fetch index.html');
+      const iData = await iRes.json();
+      let html = atob(iData.content.replace(/\n/g,''));
+      html = html.replace(
+        /<!-- HERO-BG-START -->.*?<!-- HERO-BG-END -->/,
+        `<!-- HERO-BG-START --><div class="hero-bg" id="hero-bg" style="background-image:url('${heroPendingFileName}')"></div><!-- HERO-BG-END -->`
+      );
+      const putRes = await fetch(base + 'index.html', {
+        method: 'PUT', headers: H,
+        body: JSON.stringify({ message: 'admin: update home page image', content: btoa(unescape(encodeURIComponent(html))), sha: iData.sha })
+      });
+      if (!putRes.ok) throw new Error(putRes.status);
+      heroPendingBase64 = null; heroPendingFileName = null;
+      toast('Home image is live ✓', 'success');
+    } catch(err) { handleApiError(err); }
+    btn.disabled = false; btn.textContent = 'Publish Home Image →';
   }
 
   /* ══ INIT ══ */

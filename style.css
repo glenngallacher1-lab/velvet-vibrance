@@ -494,7 +494,6 @@ h1, h2, h3, h4 {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('crowd-pink.png');
   background-size: cover;
   background-position: center;
   transform: scale(1.05);
