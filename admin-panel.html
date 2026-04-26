@@ -861,6 +861,18 @@
   function apiHeaders(token) { return { Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json', 'Content-Type':'application/json' }; }
   function apiBase() { return `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`; }
   function getToken() { return GITHUB_TOKEN; }
+  function b64decode(b64) {
+    const binary = atob(b64.replace(/\n/g,''));
+    const bytes  = new Uint8Array(binary.length);
+    for (let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  function b64encode(str) {
+    const bytes = new TextEncoder().encode(str);
+    let binary  = '';
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    return btoa(binary);
+  }
   function handleApiError(err) {
     const m = String(err.message||err);
     if (m.includes('401'))      toast('Token rejected — check it has write access','error');
@@ -1175,7 +1187,7 @@
       const data = await res.json();
       const put  = await fetch(apiBase()+'events.json', {
         method:'PUT', headers:apiHeaders(token),
-        body:JSON.stringify({ message:'admin: update events', content:btoa(JSON.stringify(events,null,2)), sha:data.sha })
+        body:JSON.stringify({ message:'admin: update events', content:b64encode(JSON.stringify(events,null,2)), sha:data.sha })
       });
       if (!put.ok) throw new Error(put.status);
       clearDraft(); toast('Events are live ✓','success');
@@ -1337,13 +1349,13 @@
       const iRes=await fetch(base+'index.html',{headers:H});
       if(!iRes.ok) throw new Error('Could not fetch index.html');
       const iData=await iRes.json();
-      let html=atob(iData.content.replace(/\n/g,''));
+      let html=b64decode(iData.content);
       html=html.replace(/<!-- GALLERY-ITEMS-START -->[\s\S]*?<!-- GALLERY-ITEMS-END -->/,`<!-- GALLERY-ITEMS-START -->${newHTML}\n<!-- GALLERY-ITEMS-END -->`);
-      const putRes=await fetch(base+'index.html',{method:'PUT',headers:H,body:JSON.stringify({message:'admin: update gallery',content:btoa(unescape(encodeURIComponent(html))),sha:iData.sha})});
+      const putRes=await fetch(base+'index.html',{method:'PUT',headers:H,body:JSON.stringify({message:'admin: update gallery',content:b64encode(html),sha:iData.sha})});
       if(!putRes.ok) throw new Error(putRes.status);
       const gjRes=await fetch(base+'gallery.json',{headers:H}).catch(()=>null);
       const gjSha=gjRes&&gjRes.ok?(await gjRes.json()).sha:undefined;
-      const gjBody={message:'admin: update gallery',content:btoa(unescape(encodeURIComponent(JSON.stringify(activeItems,null,2))))};
+      const gjBody={message:'admin: update gallery',content:b64encode(JSON.stringify(activeItems,null,2))};
       if(gjSha) gjBody.sha=gjSha;
       await fetch(base+'gallery.json',{method:'PUT',headers:H,body:JSON.stringify(gjBody)});
       GALLERY_ITEMS.length=0; activeItems.forEach(item=>GALLERY_ITEMS.push(item));
@@ -1398,14 +1410,14 @@
       const iRes  = await fetch(base + 'index.html', { headers: H });
       if (!iRes.ok) throw new Error('Could not fetch index.html');
       const iData = await iRes.json();
-      let html = atob(iData.content.replace(/\n/g,''));
+      let html = b64decode(iData.content);
       html = html.replace(
         /<!-- HERO-BG-START -->.*?<!-- HERO-BG-END -->/,
         `<!-- HERO-BG-START --><div class="hero-bg" id="hero-bg" style="background-image:url('${heroPendingFileName}')"></div><!-- HERO-BG-END -->`
       );
       const putRes = await fetch(base + 'index.html', {
         method: 'PUT', headers: H,
-        body: JSON.stringify({ message: 'admin: update home page image', content: btoa(unescape(encodeURIComponent(html))), sha: iData.sha })
+        body: JSON.stringify({ message: 'admin: update home page image', content: b64encode(html), sha: iData.sha })
       });
       if (!putRes.ok) throw new Error(putRes.status);
       heroPendingBase64 = null; heroPendingFileName = null;
