@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data: blob:; media-src 'self' https://raw.githubusercontent.com data: blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com; frame-ancestors 'none';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>VV Admin — Velvet Vibrance</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -861,7 +864,7 @@
       <span id="logged-user" style="font-size:0.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-left:0.3rem;"></span>
     </div>
     <div class="header-right">
-      <a href="index.html" target="_blank" class="site-link">View Site ↗</a>
+      <a href="index.html" target="_blank" rel="noopener noreferrer" class="site-link">View Site ↗</a>
       <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
   </div>
@@ -1156,22 +1159,42 @@
   let dragSrcIndex  = null;
 
   /* ════════ AUTH ════════ */
+  let _loginAttempts = 0;
+  let _loginLocked   = false;
+
   async function hash(s) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
   async function checkPassword() {
-    const h = await hash(document.getElementById('pw-input').value);
+    if (_loginLocked) { toast('Too many attempts — wait 30 seconds', 'error'); return; }
+
+    const h    = await hash(document.getElementById('pw-input').value);
     const user = Object.keys(USERS).find(u => USERS[u] === h);
+
     if (user) {
+      _loginAttempts = 0;
       sessionStorage.setItem('vv_auth', '1');
       sessionStorage.setItem('vv_user', user);
       showAdmin();
     } else {
+      _loginAttempts++;
       document.getElementById('login-error').style.display = 'block';
       document.getElementById('pw-input').value = '';
       document.getElementById('pw-input').focus();
+      if (_loginAttempts >= 5) {
+        _loginLocked = true;
+        document.getElementById('login-error').textContent = 'Too many attempts. Wait 30 seconds.';
+        document.querySelector('.login-btn').disabled = true;
+        setTimeout(() => {
+          _loginLocked   = false;
+          _loginAttempts = 0;
+          document.querySelector('.login-btn').disabled = false;
+          document.getElementById('login-error').textContent = 'Incorrect password. Try again.';
+          document.getElementById('login-error').style.display = 'none';
+        }, 30000);
+      }
     }
   }
 
@@ -1250,7 +1273,15 @@
 
   /* ════════ HELPERS (early) ════════ */
   function escapeHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+  }
+
+  function safeUrl(u) {
+    if (!u) return '';
+    try {
+      const p = new URL(String(u));
+      return (p.protocol === 'https:' || p.protocol === 'http:') ? p.href : '';
+    } catch { return ''; }
   }
 
   /* ════════ EVENTS ════════ */
@@ -1348,7 +1379,8 @@
       if (!upRes.ok) throw new Error('Poster upload failed: ' + upRes.status);
 
       const posterUrl = `${RAW_BASE}${posterPath}`;
-      events.push({ name, date, venue, tickets, poster: posterUrl });
+      const safeTickets = safeUrl(tickets);
+      events.push({ name, date, venue, tickets: safeTickets, poster: posterUrl });
       renderEvents();
       resetEventForm();
       toast('Event added — hit Publish to go live ✓', 'success');
