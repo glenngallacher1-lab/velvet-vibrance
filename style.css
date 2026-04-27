@@ -109,7 +109,10 @@ h1, h2, h3, h4 {
 
 /* Centered title */
 .entry-center {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 2;
   display: flex;
   align-items: center;
@@ -616,12 +619,12 @@ h1, h2, h3, h4 {
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: minmax(85vh, auto);
+  grid-template-rows: minmax(60vh, auto);
   align-items: stretch;
 }
 
 .about-text {
-  padding: 7rem 5rem 7rem 4rem;
+  padding: 4rem 4rem 4rem 4rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -756,7 +759,7 @@ h1, h2, h3, h4 {
 }
 
 .section-header--padded {
-  padding: 5rem 2.5rem 0;
+  padding: 3rem 2.5rem 0;
   max-width: unset;
 }
 
@@ -774,7 +777,7 @@ h1, h2, h3, h4 {
    EVENTS
 ════════════════════════════════════════════════════════════ */
 #events {
-  padding: 6rem 2.5rem;
+  padding: 4rem 2.5rem;
   background: var(--dark-mid);
 }
 
@@ -1087,7 +1090,7 @@ h1, h2, h3, h4 {
    JOIN THE FREQUENCY
 ════════════════════════════════════════════════════════════ */
 #join {
-  padding: 8rem 2rem;
+  padding: 5rem 2rem;
   background: var(--dark-mid);
 }
 
@@ -1317,14 +1320,18 @@ h1, h2, h3, h4 {
   .nav-hamburger { display: flex; }
 
   .about-grid { grid-template-columns: 1fr; }
-  .about-text  { padding: 5rem 2rem; }
-  .about-image { height: 55vh; }
+  .about-text  { padding: 3rem 1.5rem; }
+  .about-image { height: 38vh; }
 
-  .hero-content { padding: 3rem 2rem; }
+  .hero-content { padding: 2rem 1.5rem; }
 
-  #events { padding: 5rem 1.5rem; }
+  #events { padding: 3rem 1.5rem; }
 
-  .section-header--padded { padding: 4rem 1.5rem 0; }
+  #join { padding: 3.5rem 1.5rem; }
+
+  .section-header--padded { padding: 2.5rem 1.5rem 0; }
+
+  .raw-grid { grid-auto-rows: 200px; }
 
   .join-form { flex-direction: column; }
   .join-btn  { padding: 1.2rem 0 0.5rem 0; border-bottom: none; }
