@@ -362,19 +362,69 @@ function splitWords(el) {
   sections.forEach(function (s) { observer.observe(s); });
 })();
 
-/* ── J. Layered Hero Parallax ───────────────────────────────── */
+/* ── J. Layered Hero Parallax (Z-depth) ─────────────────────── */
 (function initHeroParallax() {
   const heroBg       = document.getElementById('hero-bg');
   const heroVignette = document.getElementById('hero-vignette');
+  const heroContent  = document.querySelector('.hero-content');
+  const headline     = document.querySelector('.hero-headline');
   if (!heroBg) return;
 
-  window.addEventListener('scroll', function () {
+  let ticking = false;
+  function update() {
     const y = window.scrollY;
-    heroBg.style.transform       = 'scale(1.05) translateY(' + (y * 0.35) + 'px)';
+    heroBg.style.transform = 'scale(1.05) translate3d(0,' + (y * 0.35) + 'px, -120px)';
     if (heroVignette) {
-      heroVignette.style.transform = 'translateY(' + (y * 0.12) + 'px)';
+      heroVignette.style.transform = 'translate3d(0,' + (y * 0.12) + 'px, -40px)';
+    }
+    if (heroContent) {
+      heroContent.style.transform = 'translate3d(0,' + (y * -0.08) + 'px, 60px)';
+    }
+    if (headline) {
+      headline.style.transform = 'translate3d(0,' + (y * -0.18) + 'px, 100px)';
+    }
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      requestAnimationFrame(update);
+      ticking = true;
     }
   }, { passive: true });
+})();
+
+/* ── J2. Generic 3D Tilt for .tilt-3d ────────────────────────── */
+(function initGenericTilt() {
+  if (window.matchMedia('(hover: none)').matches) return;
+
+  const MAX_ROT = 9;
+  document.querySelectorAll('.tilt-3d').forEach(function (el) {
+    let rect = null;
+    let raf  = 0;
+
+    function onEnter() { rect = el.getBoundingClientRect(); }
+    function onMove(e) {
+      if (!rect) rect = el.getBoundingClientRect();
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        raf = 0;
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top)  / rect.height;
+        const rotX = (y - 0.5) * -MAX_ROT;
+        const rotY = (x - 0.5) *  MAX_ROT;
+        el.style.transform = 'perspective(1100px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) translateZ(14px)';
+      });
+    }
+    function onLeave() {
+      rect = null;
+      el.style.transform = '';
+    }
+
+    el.addEventListener('mouseenter', onEnter);
+    el.addEventListener('mousemove',  onMove);
+    el.addEventListener('mouseleave', onLeave);
+  });
 })();
 
 /* ── K. Magnetic Cursor ─────────────────────────────────────── */
