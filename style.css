@@ -1483,23 +1483,7 @@ h1, h2, h3, h4 {
   transform-style: preserve-3d;
   will-change: transform;
 }
-.hero-headline {
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-.hl-line {
-  transform-style: preserve-3d;
-  animation: hlFloat 7s ease-in-out infinite;
-}
-.hl-line:nth-child(2) { animation-delay: -2.3s; animation-duration: 8s; }
-.hl-line:nth-child(3) { animation-delay: -4.6s; animation-duration: 9s; }
-
-@keyframes hlFloat {
-  0%, 100% { transform: translate3d(0, 0, 0) rotateX(0deg); }
-  50%      { transform: translate3d(0, -6px, 24px) rotateX(2deg); }
-}
-
-/* Generic mouse-tilt target */
+/* Generic mouse-tilt target (gallery only) */
 .tilt-3d {
   transform-style: preserve-3d;
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s ease;
@@ -1509,8 +1493,6 @@ h1, h2, h3, h4 {
   perspective: 1100px;
 }
 
-/* About image + gallery items get raised shadow on hover via tilt */
-.about-image.tilt-3d-wrap .about-img-inner.tilt-3d:hover,
 .rg-item.tilt-3d:hover {
   box-shadow:
     0 30px 60px -20px rgba(0, 0, 0, 0.55),
@@ -1559,7 +1541,6 @@ h1, h2, h3, h4 {
 
 /* Respect reduced-motion */
 @media (prefers-reduced-motion: reduce) {
-  .hl-line,
   .tilt-3d,
   .reveal-up,
   .reveal-right {

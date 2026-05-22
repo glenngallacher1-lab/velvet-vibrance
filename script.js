@@ -366,22 +366,14 @@ function splitWords(el) {
 (function initHeroParallax() {
   const heroBg       = document.getElementById('hero-bg');
   const heroVignette = document.getElementById('hero-vignette');
-  const heroContent  = document.querySelector('.hero-content');
-  const headline     = document.querySelector('.hero-headline');
   if (!heroBg) return;
 
   let ticking = false;
   function update() {
     const y = window.scrollY;
-    heroBg.style.transform = 'scale(1.05) translate3d(0,' + (y * 0.35) + 'px, -120px)';
+    heroBg.style.transform = 'scale(1.05) translateY(' + (y * 0.35) + 'px)';
     if (heroVignette) {
-      heroVignette.style.transform = 'translate3d(0,' + (y * 0.12) + 'px, -40px)';
-    }
-    if (heroContent) {
-      heroContent.style.transform = 'translate3d(0,' + (y * -0.08) + 'px, 60px)';
-    }
-    if (headline) {
-      headline.style.transform = 'translate3d(0,' + (y * -0.18) + 'px, 100px)';
+      heroVignette.style.transform = 'translateY(' + (y * 0.12) + 'px)';
     }
     ticking = false;
   }
