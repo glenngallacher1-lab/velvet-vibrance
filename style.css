@@ -1627,12 +1627,13 @@ h1, h2, h3, h4 {
   display: flex; align-items: flex-end;
   padding: 0 clamp(1.5rem, 6vw, 6rem) clamp(2rem, 5vw, 4rem);
   overflow: hidden;
+  background: #3a0a0a;
 }
 .gallery-hero::before {
   content: "";
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 30% 40%, rgba(139,26,26,0.18) 0%, transparent 60%),
-              linear-gradient(180deg, rgba(8,5,5,0.85) 0%, rgba(8,5,5,0.6) 60%, var(--bg) 100%);
+  background: radial-gradient(ellipse at 30% 40%, rgba(139,26,26,0.55) 0%, transparent 65%),
+              linear-gradient(180deg, #2a0707 0%, #3a0a0a 55%, var(--bg) 100%);
   z-index: 0;
 }
 .gallery-hero-inner { position: relative; z-index: 1; max-width: 1100px; }
