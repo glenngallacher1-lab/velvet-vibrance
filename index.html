@@ -34,7 +34,7 @@
       <nav class="overlay-nav">
         <a href="#about"   class="overlay-link"><span>About</span></a>
         <a href="#events"  class="overlay-link"><span>Events</span></a>
-        <a href="#gallery" class="overlay-link"><span>Gallery</span></a>
+        <a href="gallery.html" class="overlay-link"><span>Gallery</span></a>
         <a href="#join"    class="overlay-link"><span>Contact</span></a>
       </nav>
       <div class="overlay-footer">
@@ -54,7 +54,7 @@
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#events">Events</a></li>
-      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
       <li><a href="#join">Contact</a></li>
     </ul>
 
@@ -111,7 +111,7 @@
 
       <div class="about-image reveal-right">
         <div class="about-img-inner">
-          <img src="dj-orange.png" alt="Velvet Vibrance — In Session" />
+          <img src="IMG_0429.PNG" alt="Velvet Vibrance — In Session" class="about-img-feature" />
         </div>
       </div>
 
@@ -134,26 +134,20 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════
-       GALLERY
+       GALLERY TEASER → /gallery.html
   ══════════════════════════════════════════════════════════ -->
-  <section id="gallery">
-    <div class="section-header section-header--padded reveal-up">
-      <p class="section-eyebrow">Archive</p>
-      <h2 class="section-title">THE FREQUENCY</h2>
-    </div>
-    <div class="raw-grid"><!-- GALLERY-ITEMS-START -->
-      <div class="rg-item tilt-3d"><img src="IMG_0446.PNG" alt="IMG 0446" /><div class="rg-overlay"><span>IMG 0446</span></div></div>
-      <div class="rg-item tilt-3d"><img src="IMG_0527.JPG" alt="IMG 0527" /><div class="rg-overlay"><span>IMG 0527</span></div></div>
-      <div class="rg-item tilt-3d"><img src="IMG_0484.png" alt="IMG 0484" /><div class="rg-overlay"><span>IMG 0484</span></div></div>
-<!-- GALLERY-ITEMS-END --></div>
+  <section id="gallery-teaser" class="section-dof">
+    <a href="gallery.html" class="gt-link" aria-label="Enter the Frequency — Gallery">
+      <div class="gt-bg" style="background-image:url('IMG_0446.PNG')"></div>
+      <div class="gt-veil"></div>
+      <div class="gt-inner">
+        <p class="section-eyebrow reveal-up">Archive</p>
+        <h2 class="section-title reveal-clip"><span>THE FREQUENCY</span></h2>
+        <p class="gt-body reveal-up" style="--delay:0.15s">A living archive of nights, faces, and frequencies. Step into the room.</p>
+        <span class="gt-cta reveal-up" style="--delay:0.25s">Enter the Gallery →</span>
+      </div>
+    </a>
   </section>
-
-  <!-- Lightbox -->
-  <div id="lightbox" role="dialog" aria-label="Media viewer">
-    <button id="lightbox-close" aria-label="Close">×</button>
-    <img id="lightbox-img" src="" alt="Gallery" />
-    <video id="lightbox-video" controls></video>
-  </div>
 
   <!-- ══════════════════════════════════════════════════════════
        JOIN THE FREQUENCY

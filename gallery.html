@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Velvet Vibrance — The Frequency. A living archive of nights, faces, and frequencies." />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data:; media-src 'self' https://raw.githubusercontent.com; connect-src 'self' https://raw.githubusercontent.com; frame-ancestors 'none';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>VELVET VIBRANCE — The Frequency</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="gallery-page">
+
+  <!-- ══════════════════════════════════════════════════════════
+       FULL-SCREEN NAV OVERLAY
+  ══════════════════════════════════════════════════════════ -->
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <nav class="overlay-nav">
+        <a href="index.html#about"   class="overlay-link"><span>About</span></a>
+        <a href="index.html#events"  class="overlay-link"><span>Events</span></a>
+        <a href="gallery.html"       class="overlay-link"><span>Gallery</span></a>
+        <a href="index.html#join"    class="overlay-link"><span>Contact</span></a>
+      </nav>
+      <div class="overlay-footer">
+        <a href="https://www.instagram.com/v.v.collective?igsh=MWlsNHI1YTZoeDNzaw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">SoundCloud</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════════════════ -->
+  <header id="nav">
+    <a href="index.html" class="nav-logo">VV</a>
+
+    <ul class="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#events">Events</a></li>
+      <li><a href="gallery.html" aria-current="page">Gallery</a></li>
+      <li><a href="index.html#join">Contact</a></li>
+    </ul>
+
+    <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span class="ham-line ham-top"></span>
+      <span class="ham-line ham-bot"></span>
+    </button>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       GALLERY HERO
+  ══════════════════════════════════════════════════════════ -->
+  <section class="gallery-hero">
+    <div class="gallery-hero-inner">
+      <p class="section-eyebrow">Archive · Vol. 01</p>
+      <h1>THE <em>FREQUENCY</em></h1>
+      <p>A living archive of nights, faces, and frequencies. Every frame is a residue of the room — the light, the sweat, the velvet, the gold. Hover to bring it back to colour. Click to step inside.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       GALLERY MOSAIC (id="gallery" so existing JS picks it up)
+  ══════════════════════════════════════════════════════════ -->
+  <section id="gallery" class="gallery-stage">
+    <div class="mosaic">
+      <div class="rg-item span-a"><img src="IMG_0446.PNG" alt="IMG 0446" /><div class="rg-overlay"><span>Velvet · 0446</span></div></div>
+      <div class="rg-item span-b"><img src="IMG_0527.JPG" alt="IMG 0527" /><div class="rg-overlay"><span>Velvet · 0527</span></div></div>
+      <div class="rg-item span-b"><img src="IMG_0484.png" alt="IMG 0484" /><div class="rg-overlay"><span>Velvet · 0484</span></div></div>
+      <div class="rg-item span-c"><img src="IMG_0431.PNG" alt="IMG 0431" /><div class="rg-overlay"><span>Velvet · 0431</span></div></div>
+      <div class="rg-item span-d"><img src="IMG_0436.PNG" alt="IMG 0436" /><div class="rg-overlay"><span>Velvet · 0436</span></div></div>
+      <div class="rg-item span-e"><img src="IMG_0447.PNG" alt="IMG 0447" /><div class="rg-overlay"><span>Velvet · 0447</span></div></div>
+      <div class="rg-item span-c"><img src="dj-crowd.jpeg" alt="DJ and crowd" /><div class="rg-overlay"><span>In Session</span></div></div>
+      <div class="rg-item span-c"><img src="laser-show.jpeg" alt="Laser show" /><div class="rg-overlay"><span>Laser · Frequency</span></div></div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox" role="dialog" aria-label="Media viewer">
+    <button id="lightbox-close" aria-label="Close">×</button>
+    <img id="lightbox-img" src="" alt="Gallery" />
+    <video id="lightbox-video" controls></video>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════════════ -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-monogram">VV</span>
+        <span class="footer-copy">&copy; VELVET VIBRANCE</span>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/v.v.collective?igsh=MWlsNHI1YTZoeDNzaw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">SoundCloud</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll progress bar -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
