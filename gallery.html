@@ -65,17 +65,10 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════
-       GALLERY MOSAIC (id="gallery" so existing JS picks it up)
+       GALLERY MOSAIC — items injected from MEDIA[] below
   ══════════════════════════════════════════════════════════ -->
   <section id="gallery" class="gallery-stage">
-    <div class="mosaic">
-      <div class="rg-item span-a"><img src="IMG_0446.PNG" alt="IMG 0446" /><div class="rg-overlay"><span>Velvet · 0446</span></div></div>
-      <div class="rg-item span-b"><img src="IMG_0527.JPG" alt="IMG 0527" /><div class="rg-overlay"><span>Velvet · 0527</span></div></div>
-      <div class="rg-item span-b"><img src="IMG_0484.png" alt="IMG 0484" /><div class="rg-overlay"><span>Velvet · 0484</span></div></div>
-      <div class="rg-item span-c"><img src="IMG_0431.PNG" alt="IMG 0431" /><div class="rg-overlay"><span>Velvet · 0431</span></div></div>
-      <div class="rg-item span-d"><img src="IMG_0436.PNG" alt="IMG 0436" /><div class="rg-overlay"><span>Velvet · 0436</span></div></div>
-      <div class="rg-item span-e"><img src="IMG_0447.PNG" alt="IMG 0447" /><div class="rg-overlay"><span>Velvet · 0447</span></div></div>
-    </div>
+    <div class="mosaic" id="mosaic"></div>
   </section>
 
   <!-- Lightbox -->
@@ -102,8 +95,68 @@
     </div>
   </footer>
 
-  <!-- Scroll progress bar -->
   <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MEDIA SOURCE — add one line per item.
+       type: 'image' (default) | 'video'
+       Optional `poster` for video first-frame thumbnail.
+  ══════════════════════════════════════════════════════════ -->
+  <script>
+    const MEDIA = [
+      { src: 'vv-event.mov',                   type: 'video', label: 'Live · Reel' },
+      { src: 'IMG_0446.PNG',                                  label: 'Velvet · 0446' },
+      { src: 'IMG_0527.JPG',                                  label: 'Velvet · 0527' },
+      { src: 'IMG_0484.png',                                  label: 'Velvet · 0484' },
+      { src: 'IMG_0431.PNG',                                  label: 'Velvet · 0431' },
+      { src: 'IMG_0436.PNG',                                  label: 'Velvet · 0436' },
+      { src: 'IMG_0447.PNG',                                  label: 'Velvet · 0447' },
+      { src: 'IMG_0369.png',                                  label: 'Crowd · Pink' },
+      { src: 'crowd-outdoor.jpeg',                            label: 'Outdoor · Sun' },
+      { src: 'dark-venue.jpeg',                               label: 'Dark · Venue' },
+      { src: 'dj-headphones.png',                             label: 'In Session · 01' },
+      { src: 'dj-orange.png',                                 label: 'In Session · 02' },
+      { src: 'Image 2-15-26 at 9.39 AM.jpeg',                 label: 'Frame · 02·15' }
+    ];
+
+    /* Editorial span pattern — repeats across the list */
+    const SPANS = ['span-a', 'span-b', 'span-b', 'span-c', 'span-d', 'span-e', 'span-b', 'span-c', 'span-c', 'span-b', 'span-d', 'span-e'];
+
+    (function renderMosaic() {
+      const mosaic = document.getElementById('mosaic');
+      MEDIA.forEach(function (m, i) {
+        const isVideo = m.type === 'video';
+        const item = document.createElement('div');
+        item.className = 'rg-item ' + (SPANS[i % SPANS.length]) + (isVideo ? ' rg-video' : '');
+
+        if (isVideo) {
+          const v = document.createElement('video');
+          v.src = m.src;
+          v.muted = true;
+          v.loop = true;
+          v.playsInline = true;
+          v.preload = 'metadata';
+          if (m.poster) v.poster = m.poster;
+          item.appendChild(v);
+        } else {
+          const img = document.createElement('img');
+          img.src = m.src;
+          img.alt = m.label || '';
+          img.loading = 'lazy';
+          item.appendChild(img);
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'rg-overlay';
+        const span = document.createElement('span');
+        span.textContent = m.label || '';
+        overlay.appendChild(span);
+        item.appendChild(overlay);
+
+        mosaic.appendChild(item);
+      });
+    })();
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="script.js"></script>
