@@ -104,30 +104,30 @@
   ══════════════════════════════════════════════════════════ -->
   <script>
     const MEDIA = [
-      { src: 'vv-event.mp4',                   type: 'video', label: 'Live · Reel' },
-      { src: 'IMG_0446.PNG',                                  label: 'Velvet · 0446' },
-      { src: 'IMG_0527.JPG',                                  label: 'Velvet · 0527' },
-      { src: 'IMG_0484.png',                                  label: 'Velvet · 0484' },
-      { src: 'IMG_0431.PNG',                                  label: 'Velvet · 0431' },
-      { src: 'IMG_0436.PNG',                                  label: 'Velvet · 0436' },
-      { src: 'IMG_0447.PNG',                                  label: 'Velvet · 0447' },
-      { src: 'IMG_0369.png',                                  label: 'Crowd · Pink' },
-      { src: 'crowd-outdoor.jpeg',                            label: 'Outdoor · Sun' },
-      { src: 'dark-venue.jpeg',                               label: 'Dark · Venue' },
-      { src: 'dj-headphones.png',                             label: 'In Session · 01' },
-      { src: 'dj-orange.png',                                 label: 'In Session · 02' },
-      { src: 'Image 2-15-26 at 9.39 AM.jpeg',                 label: 'Frame · 02·15' }
+      { src: 'vv-event.mp4',            type: 'video', label: 'Live · Reel' },
+      { src: 'DSC08604.JPEG',                          label: 'Heart · Frequency' },
+      { src: 'IMG_0253.jpg',                           label: 'Crowd · Heater' },
+      { src: 'IMG_9627.jpg',                           label: 'Outdoor · Lights' },
+      { src: 'Image-2-15-26-939AM.jpg',                label: 'Decks · 02·15' },
+      { src: 'IMG_0446.PNG',                           label: 'Velvet · 0446' },
+      { src: 'IMG_0527.JPG',                           label: 'Velvet · 0527' },
+      { src: 'IMG_0484.png',                           label: 'Velvet · 0484' },
+      { src: 'IMG_0431.PNG',                           label: 'Velvet · 0431' },
+      { src: 'IMG_0436.PNG',                           label: 'Velvet · 0436' },
+      { src: 'IMG_0447.PNG',                           label: 'Velvet · 0447' },
+      { src: 'IMG_0369.png',                           label: 'Crowd · Pink' },
+      { src: 'crowd-outdoor.jpeg',                     label: 'Outdoor · Sun' },
+      { src: 'dark-venue.jpeg',                        label: 'Dark · Venue' },
+      { src: 'dj-headphones.png',                      label: 'In Session · 01' },
+      { src: 'dj-orange.png',                          label: 'In Session · 02' }
     ];
-
-    /* Editorial span pattern — repeats across the list */
-    const SPANS = ['span-a', 'span-b', 'span-b', 'span-c', 'span-d', 'span-e', 'span-b', 'span-c', 'span-c', 'span-b', 'span-d', 'span-e'];
 
     (function renderMosaic() {
       const mosaic = document.getElementById('mosaic');
-      MEDIA.forEach(function (m, i) {
+      MEDIA.forEach(function (m) {
         const isVideo = m.type === 'video';
         const item = document.createElement('div');
-        item.className = 'rg-item ' + (SPANS[i % SPANS.length]) + (isVideo ? ' rg-video' : '');
+        item.className = 'rg-item' + (isVideo ? ' rg-video' : '');
 
         if (isVideo) {
           const v = document.createElement('video');
