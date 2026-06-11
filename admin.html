@@ -2416,7 +2416,8 @@ function init() {
   /* Login form */
   $('#login-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const ok = await tryLogin($('#pw').value);
+    const raw = $('#pw').value || '';
+    const ok = await tryLogin(raw.trim());
     if (ok) enterApp();
     else {
       $('#login-err').classList.add('show');
