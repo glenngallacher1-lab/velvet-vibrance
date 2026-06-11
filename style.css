@@ -1664,32 +1664,40 @@ h1, h2, h3, h4 {
 }
 /* Uniform square grid — every tile the same size; uploads crop-fit identically */
 .mosaic {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  grid-auto-rows: 1fr !important;
   gap: 10px;
   max-width: 1600px;
   margin: 0 auto;
   padding: 10px;
   background: #000;
+  column-count: unset !important; /* kill any inherited masonry */
 }
 .mosaic .rg-item {
-  position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 0 !important;            /* belt: padding-bottom trick */
+  padding-bottom: 100% !important; /* suspenders: square cell on every browser */
+  aspect-ratio: 1 / 1;             /* preferred path on modern browsers */
+  margin: 0 !important;
   overflow: hidden;
   cursor: pointer;
   background: #000;
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+  break-inside: avoid;
 }
-.mosaic .rg-item.rg-revealed { opacity: 1; transform: none; }
+.mosaic .rg-item.rg-revealed { opacity: 1; transform: translateY(0); }
 .mosaic .rg-item img,
 .mosaic .rg-item video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
   display: block;
   filter: grayscale(0.75) contrast(1.05) brightness(0.88);
   transition: filter 0.8s var(--ease-out), transform 1.2s var(--ease-out);
