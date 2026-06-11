@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Velvet Vibrance — The Lineup. The next nights tuned to the frequency." />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data:; media-src 'self' https://raw.githubusercontent.com; connect-src 'self' https://raw.githubusercontent.com; frame-ancestors 'none';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>VELVET VIBRANCE — The Lineup</title>
+  <link rel="stylesheet" href="style.css?v=grid2" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="gallery-page">
+
+  <!-- VV maintenance flag — toggled by admin. Do not edit by hand. -->
+  <script>(function(){var VV_MAINT='OFF';/*VV_MAINT*/if(VV_MAINT==='ON'){location.replace('maintenance.html');}})();</script>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FULL-SCREEN NAV OVERLAY
+  ══════════════════════════════════════════════════════════ -->
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <nav class="overlay-nav">
+        <a href="index.html#about"   class="overlay-link"><span>About</span></a>
+        <a href="events.html"        class="overlay-link"><span>Events</span></a>
+        <a href="gallery.html"       class="overlay-link"><span>Gallery</span></a>
+        <a href="index.html#join"    class="overlay-link"><span>Contact</span></a>
+      </nav>
+      <div class="overlay-footer">
+        <a href="https://www.instagram.com/v.v.collective?igsh=MWlsNHI1YTZoeDNzaw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">SoundCloud</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════════════════ -->
+  <header id="nav">
+    <a href="index.html" class="nav-logo">VV</a>
+
+    <ul class="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="events.html" aria-current="page">Events</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="index.html#join">Contact</a></li>
+    </ul>
+
+    <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span class="ham-line ham-top"></span>
+      <span class="ham-line ham-bot"></span>
+    </button>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       LINEUP HERO
+  ══════════════════════════════════════════════════════════ -->
+  <section class="gallery-hero">
+    <div class="gallery-hero-inner">
+      <p class="section-eyebrow">Schedule · Vol. 01</p>
+      <h1>THE <em>LINEUP</em></h1>
+      <p>The next nights tuned to the frequency. Every gathering a prayer made physical — listed below in order of arrival. Pull the poster, save the date, bring whoever needs the room.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       UPCOMING EVENTS
+  ══════════════════════════════════════════════════════════ -->
+  <section id="events" class="section-dof">
+    <div class="events-inner">
+      <div class="events-grid" id="events-grid">
+        <p class="events-empty" id="events-empty" style="display:none;">No nights posted yet. Check back soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════════════ -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-monogram">VV</span>
+        <span class="footer-copy">&copy; VELVET VIBRANCE</span>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/v.v.collective?igsh=MWlsNHI1YTZoeDNzaw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">SoundCloud</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="script.js"></script>
+
+  <script>
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+        .replace(/'/g,'&#x27;');
+    }
+    function safeUrl(u) {
+      try {
+        const p = new URL(String(u ?? ''));
+        return (p.protocol === 'https:' || p.protocol === 'http:') ? p.href : '';
+      } catch { return ''; }
+    }
+
+    fetch('events.json?t=' + Date.now())
+      .then(r => r.json())
+      .then(events => {
+        const grid  = document.getElementById('events-grid');
+        const empty = document.getElementById('events-empty');
+        if (!Array.isArray(events) || events.length === 0) { empty.style.display = 'block'; return; }
+        events.forEach(ev => {
+          const card = document.createElement('div');
+          card.className = 'event-card';
+
+          const posterUrl = safeUrl(ev.poster);
+          const ticketUrl = safeUrl(ev.tickets);
+
+          const posterWrap = document.createElement('div');
+          posterWrap.className = 'event-poster-wrap';
+
+          const img = document.createElement('img');
+          img.src = posterUrl;
+          img.alt = esc(ev.name);
+          img.className = 'event-poster';
+          img.draggable = true;
+          img.title = 'Drag to copy poster';
+          img.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/uri-list', posterUrl);
+            e.dataTransfer.setData('text/plain', posterUrl);
+          });
+
+          const overlay = document.createElement('div');
+          overlay.className = 'event-poster-overlay';
+          const hint = document.createElement('span');
+          hint.className = 'event-poster-hint';
+          hint.textContent = 'drag to share';
+          overlay.appendChild(hint);
+          posterWrap.append(img, overlay);
+
+          const info = document.createElement('div');
+          info.className = 'event-info';
+
+          const dateEl = document.createElement('p');
+          dateEl.className = 'event-date';
+          dateEl.textContent = ev.date ?? '';
+
+          const nameEl = document.createElement('p');
+          nameEl.className = 'event-name';
+          nameEl.textContent = ev.name ?? '';
+
+          const venueEl = document.createElement('p');
+          venueEl.className = 'event-venue';
+          venueEl.textContent = ev.venue ?? '';
+
+          info.append(dateEl, nameEl, venueEl);
+
+          if (ticketUrl) {
+            const a = document.createElement('a');
+            a.href = ticketUrl;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.className = 'event-tickets';
+            a.textContent = 'GET TICKETS →';
+            info.appendChild(a);
+          }
+
+          card.append(posterWrap, info);
+          grid.appendChild(card);
+        });
+      })
+      .catch(() => {
+        document.getElementById('events-empty').style.display = 'block';
+      });
+  </script>
+</body>
+</html>
