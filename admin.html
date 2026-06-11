@@ -1697,8 +1697,8 @@
     <div class="cubes-wrap">
       <div class="cubes-scene" id="cubes-scene"></div>
     </div>
-    <div class="ct-eye">Filing</div>
-    <div class="ct-label">The Ledger</div>
+    <div class="ct-eye">Cooking</div>
+    <div class="ct-label">Secret Sauce</div>
   </div>
 </div>
 
@@ -2992,7 +2992,10 @@ const cubes = {
     if (!this.inited) this.init();
     $('#notes-transition').classList.add('show');
     this.startSim();
+    /* sustained activity across the 3.4s window — three ripples */
     setTimeout(() => this.ripple(this.gridSize / 2 - 0.5, this.gridSize / 2 - 0.5), 120);
+    setTimeout(() => this.ripple(2, 5), 1200);
+    setTimeout(() => this.ripple(6, 2), 2200);
   },
   hide() {
     $('#notes-transition').classList.remove('show');
@@ -3002,8 +3005,8 @@ const cubes = {
 
 function transitionToNotes() {
   cubes.show();
-  setTimeout(() => go('notes'), 800);
-  setTimeout(() => cubes.hide(), 1500);
+  setTimeout(() => go('notes'), 2400);
+  setTimeout(() => cubes.hide(), 3400);
 }
 
 /* ════════════════════════════════════════════════════════════
