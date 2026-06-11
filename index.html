@@ -525,8 +525,8 @@
           uScanGlow:      { value: 0.75 },
           uScanSoftness:  { value: 2.0 },
           uPhaseTaper:    { value: 0.25 },
-          uScanDuration:  { value: 1.1 },
-          uScanDelay:     { value: 0.12 },
+          uScanDuration:  { value: 0.9 },
+          uScanDelay:     { value: 0.0 },
           uScanDirection: { value: 0 },
           uScanStarts:    { value: new Array(8).fill(0) },
           uScanCount:     { value: 0 }
@@ -757,7 +757,7 @@
       e.preventDefault();
       if (kind === 'gallery') {
         gridscan.show();
-        setTimeout(() => { window.location.href = href; }, 1400);
+        setTimeout(() => { window.location.href = href; }, 1000);
       } else if (kind === 'events') {
         circularText.show();
         setTimeout(() => { window.location.href = href; }, 1400);
