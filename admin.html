@@ -628,81 +628,199 @@
     .poster-zone.has-img .pz-content { display: none; }
     .pz-icon { font-size: 1.6rem; color: var(--honey); margin-bottom: 0.4rem; }
 
-    /* ── Photo grid ── */
+    /* ── Photo card grid (mirrors live gallery) ── */
     .photo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 0.6rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
     }
-    .photo-cell {
+    @media (max-width: 1000px) { .photo-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 720px)  { .photo-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 460px)  { .photo-grid { grid-template-columns: 1fr; } }
+
+    .photo-card {
       position: relative;
-      aspect-ratio: 1 / 1;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid var(--line);
-      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, rgba(20,9,11,0.6), rgba(8,4,5,0.85));
+      border: 1px solid var(--line-warm);
+      border-radius: 3px;
       overflow: hidden;
       cursor: grab;
-      transition: border-color 0.2s, transform 0.2s var(--ease);
+      transition: border-color 0.25s, transform 0.25s var(--ease), box-shadow 0.3s;
     }
-    .photo-cell:active { cursor: grabbing; }
-    .photo-cell:hover { border-color: var(--honey); transform: translateY(-2px); }
-    .photo-cell.drag-over { border-color: var(--honey); box-shadow: 0 0 0 2px rgba(232,181,71,0.3); }
-    .photo-cell.new { border-color: var(--honey); box-shadow: 0 0 0 1px rgba(232,181,71,0.3); }
-    .photo-cell.removed { opacity: 0.3; filter: grayscale(1); }
-    .photo-cell img, .photo-cell video {
-      width: 100%; height: 100%; object-fit: cover;
+    .photo-card:active { cursor: grabbing; }
+    .photo-card:hover {
+      border-color: var(--honey);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(232,181,71,0.18);
+    }
+    .photo-card.drag-over {
+      border-color: var(--honey);
+      box-shadow: 0 0 0 2px rgba(232,181,71,0.45);
+    }
+    .photo-card.new {
+      border-color: var(--honey);
+      box-shadow: 0 0 0 1px rgba(232,181,71,0.35), 0 8px 28px rgba(232,181,71,0.12);
+    }
+    .photo-card.removed { opacity: 0.35; filter: grayscale(0.8); }
+
+    .photo-card-media {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: #050303;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line-warm);
+    }
+    .photo-card-media img,
+    .photo-card-media video {
+      width: 100%; height: 100%;
+      object-fit: cover;
       display: block;
+      transition: transform 0.6s var(--ease);
     }
-    .photo-badge {
+    .photo-card:hover .photo-card-media img,
+    .photo-card:hover .photo-card-media video { transform: scale(1.03); }
+
+    .photo-card-badge {
       position: absolute;
-      top: 0.45rem; left: 0.45rem;
+      top: 0.5rem; left: 0.5rem;
       font-size: 0.55rem;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
-      padding: 0.18rem 0.42rem;
-      background: rgba(0,0,0,0.7);
+      padding: 0.22rem 0.5rem;
+      background: rgba(0,0,0,0.78);
       border: 1px solid var(--line-warm);
-      border-radius: 1px;
+      border-radius: 999px;
       color: var(--honey);
+      backdrop-filter: blur(6px);
     }
-    .photo-badge.video {
-      top: 0.45rem; left: auto; right: 0.45rem;
+    .photo-card-badge.video {
+      left: auto; right: 0.5rem;
+      background: rgba(139,26,26,0.88);
+      color: var(--paper);
+      border-color: rgba(232,181,71,0.5);
+    }
+
+    .photo-card-caption {
+      width: 100%;
+      padding: 0.7rem 0.85rem;
+      background: rgba(0,0,0,0.45);
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--paper);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.92rem;
+      letter-spacing: 0.01em;
+      transition: background 0.25s, box-shadow 0.25s;
+    }
+    .photo-card-caption::placeholder {
+      color: var(--paper-mute);
+      font-style: italic;
+    }
+    .photo-card-caption:focus {
+      outline: none;
+      background: rgba(232,181,71,0.06);
+      box-shadow: inset 0 -2px 0 var(--honey);
+    }
+
+    .photo-card-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.45rem 0.6rem 0.5rem 0.85rem;
+      gap: 0.6rem;
+    }
+    .photo-card-handle {
+      font-size: 0.58rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--paper-mute);
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      user-select: none;
+    }
+    .photo-card-handle::before {
+      content: '⠿';
+      font-size: 0.85rem;
+      letter-spacing: 0;
+      color: var(--honey);
+      opacity: 0.7;
+    }
+    .photo-card-remove {
+      padding: 0.32rem 0.7rem;
+      background: transparent;
+      color: var(--paper-mute);
+      font-size: 0.58rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      border: 1px solid var(--line);
+      border-radius: 1px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .photo-card-remove:hover {
       background: rgba(139,26,26,0.85);
       color: var(--paper);
       border-color: rgba(232,181,71,0.45);
     }
-    .photo-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85));
+
+    /* ════════════════════════════════════════════════════════════
+       GRIDSCAN TRANSITION
+       ════════════════════════════════════════════════════════════ */
+    #gridscan {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
       opacity: 0;
-      transition: opacity 0.25s;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 0.5rem;
-      gap: 0.3rem;
+      pointer-events: none;
+      background: #050303;
+      transition: opacity 0.35s var(--ease);
     }
-    .photo-cell:hover .photo-overlay { opacity: 1; }
-    .photo-label-input {
-      width: 100%;
-      padding: 0.32rem 0.42rem;
-      background: rgba(0,0,0,0.7);
-      border: 1px solid var(--line-warm);
-      border-radius: 1px;
-      color: var(--paper);
-      font-size: 0.68rem;
+    #gridscan.show { opacity: 1; pointer-events: auto; }
+    #gridscan-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      display: block;
     }
-    .photo-remove {
-      align-self: stretch;
-      padding: 0.28rem 0.4rem;
-      background: rgba(139,26,26,0.85);
-      color: var(--paper);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
+    .gridscan-veil {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.5) 80%, rgba(5,3,3,0.9) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.4) 100%);
+    }
+    .gridscan-label {
+      position: absolute;
+      bottom: 8vh;
+      left: 0; right: 0;
+      text-align: center;
+      pointer-events: none;
+      display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: gs-rise 0.6s var(--ease) 0.15s forwards;
+    }
+    .gs-eyebrow {
+      font-size: 0.62rem;
+      letter-spacing: 0.5em;
       text-transform: uppercase;
-      border: 1px solid rgba(232,181,71,0.35);
-      border-radius: 1px;
-      cursor: pointer;
+      color: var(--honey);
+      opacity: 0.85;
     }
-    .photo-remove:hover { background: var(--velvet); }
+    .gs-name {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: -0.01em;
+      color: var(--paper);
+      text-shadow: 0 0 30px rgba(232,181,71,0.35);
+    }
+    @keyframes gs-rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     /* ── Event rows ── */
     .events-list { display: flex; flex-direction: column; gap: 0.7rem; }
@@ -1315,6 +1433,16 @@
   </div>
 </aside>
 
+<!-- GRIDSCAN TRANSITION OVERLAY -->
+<div id="gridscan" aria-hidden="true">
+  <canvas id="gridscan-canvas"></canvas>
+  <div class="gridscan-veil"></div>
+  <div class="gridscan-label">
+    <span class="gs-eyebrow">Scanning</span>
+    <span class="gs-name">The Archive</span>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -1911,6 +2039,344 @@ const terminal = {
 };
 
 /* ════════════════════════════════════════════════════════════
+   GRIDSCAN · port of React Bits component (shader only, no face-api)
+   ════════════════════════════════════════════════════════════ */
+const gridscan = {
+  inited: false,
+  active: false,
+  raf: 0,
+  hideTimer: 0,
+  uniforms: null,
+  renderer: null,
+  scene: null,
+  camera: null,
+  startTime: 0,
+  init() {
+    if (this.inited) return;
+    const canvas = $('#gridscan-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const scene  = new THREE.Scene();
+
+    const u = {
+      iResolution:          { value: new THREE.Vector3(1, 1, 1) },
+      iTime:                { value: 0 },
+      uSkew:                { value: new THREE.Vector2(0, 0) },
+      uTilt:                { value: 0 },
+      uYaw:                 { value: 0 },
+      uLineThickness:       { value: 1.0 },
+      uLinesColor:          { value: new THREE.Color(0x6e1818) }, // deep velvet grid
+      uScanColor:           { value: new THREE.Color(0xe8b547) }, // honey scan beam
+      uGridScale:           { value: 0.08 },
+      uLineStyle:           { value: 0 },   // solid
+      uLineJitter:          { value: 0.08 },
+      uScanOpacity:         { value: 0.9 },
+      uNoise:               { value: 0.025 },
+      uBloomOpacity:        { value: 0.55 }, // line halo
+      uScanGlow:            { value: 0.75 },
+      uScanSoftness:        { value: 2.0 },
+      uPhaseTaper:          { value: 0.25 },
+      uScanDuration:        { value: 1.1 },
+      uScanDelay:           { value: 0.12 },
+      uScanDirection:       { value: 0 },    // forward
+      uScanStarts:          { value: new Array(8).fill(0) },
+      uScanCount:           { value: 0 }
+    };
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: u,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      extensions: { derivatives: true },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){
+          vUv = uv;
+          gl_Position = vec4(position.xy, 0.0, 1.0);
+        }
+      `,
+      fragmentShader: `
+        precision highp float;
+        uniform vec3  iResolution;
+        uniform float iTime;
+        uniform vec2  uSkew;
+        uniform float uTilt;
+        uniform float uYaw;
+        uniform float uLineThickness;
+        uniform vec3  uLinesColor;
+        uniform vec3  uScanColor;
+        uniform float uGridScale;
+        uniform float uLineStyle;
+        uniform float uLineJitter;
+        uniform float uScanOpacity;
+        uniform float uScanDirection;
+        uniform float uNoise;
+        uniform float uBloomOpacity;
+        uniform float uScanGlow;
+        uniform float uScanSoftness;
+        uniform float uPhaseTaper;
+        uniform float uScanDuration;
+        uniform float uScanDelay;
+        uniform float uScanStarts[8];
+        uniform float uScanCount;
+        varying vec2 vUv;
+
+        const int MAX_SCANS = 8;
+
+        float smoother01(float a, float b, float x){
+          float t = clamp((x - a) / max(1e-5, (b - a)), 0.0, 1.0);
+          return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+        }
+
+        void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+          vec2 p = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+
+          vec3 ro = vec3(0.0);
+          vec3 rd = normalize(vec3(p, 2.0));
+
+          float cR = cos(uTilt), sR = sin(uTilt);
+          rd.xy = mat2(cR, -sR, sR, cR) * rd.xy;
+          float cY = cos(uYaw), sY = sin(uYaw);
+          rd.xz = mat2(cY, -sY, sY, cY) * rd.xz;
+
+          vec2 skew = clamp(uSkew, vec2(-0.7), vec2(0.7));
+          rd.xy += skew * rd.z;
+
+          vec3 color = vec3(0.0);
+          float minT = 1e20;
+          float gridScale = max(1e-5, uGridScale);
+          float fadeStrength = 2.0;
+          vec2 gridUV = vec2(0.0);
+          float hitIsY = 1.0;
+
+          for (int i = 0; i < 4; i++) {
+            float isY = float(i < 2);
+            float pos = mix(-0.2, 0.2, float(i)) * isY + mix(-0.5, 0.5, float(i - 2)) * (1.0 - isY);
+            float num = pos - (isY * ro.y + (1.0 - isY) * ro.x);
+            float den = isY * rd.y + (1.0 - isY) * rd.x;
+            float t = num / den;
+            vec3 h = ro + rd * t;
+            float depthBoost = smoothstep(0.0, 3.0, h.z);
+            h.xy += skew * 0.15 * depthBoost;
+
+            bool use = t > 0.0 && t < minT;
+            gridUV = use ? mix(h.zy, h.xz, isY) / gridScale : gridUV;
+            minT   = use ? t : minT;
+            hitIsY = use ? isY : hitIsY;
+          }
+
+          vec3 hit = ro + rd * minT;
+          float dist = length(hit - ro);
+
+          float jitterAmt = clamp(uLineJitter, 0.0, 1.0);
+          if (jitterAmt > 0.0) {
+            vec2 j = vec2(
+              sin(gridUV.y * 2.7 + iTime * 1.8),
+              cos(gridUV.x * 2.3 - iTime * 1.6)
+            ) * (0.15 * jitterAmt);
+            gridUV += j;
+          }
+          float fx = fract(gridUV.x);
+          float fy = fract(gridUV.y);
+          float ax = min(fx, 1.0 - fx);
+          float ay = min(fy, 1.0 - fy);
+          float wx = fwidth(gridUV.x);
+          float wy = fwidth(gridUV.y);
+          float halfPx = max(0.0, uLineThickness) * 0.5;
+          float tx = halfPx * wx;
+          float ty = halfPx * wy;
+          float aax = wx;
+          float aay = wy;
+          float lineX = 1.0 - smoothstep(tx, tx + aax, ax);
+          float lineY = 1.0 - smoothstep(ty, ty + aay, ay);
+          if (uLineStyle > 0.5) {
+            float dashRepeat = 4.0;
+            float dashDuty = 0.5;
+            float vyD = fract(gridUV.y * dashRepeat);
+            float vxD = fract(gridUV.x * dashRepeat);
+            float dashMaskY = step(vyD, dashDuty);
+            float dashMaskX = step(vxD, dashDuty);
+            if (uLineStyle < 1.5) {
+              lineX *= dashMaskY;
+              lineY *= dashMaskX;
+            } else {
+              float dotRepeat = 6.0;
+              float dotWidth = 0.18;
+              float cy = abs(fract(gridUV.y * dotRepeat) - 0.5);
+              float cx = abs(fract(gridUV.x * dotRepeat) - 0.5);
+              float dotMaskY = 1.0 - smoothstep(dotWidth, dotWidth + fwidth(gridUV.y * dotRepeat), cy);
+              float dotMaskX = 1.0 - smoothstep(dotWidth, dotWidth + fwidth(gridUV.x * dotRepeat), cx);
+              lineX *= dotMaskY;
+              lineY *= dotMaskX;
+            }
+          }
+          float primaryMask = max(lineX, lineY);
+
+          vec2 gridUV2 = (hitIsY > 0.5 ? hit.xz : hit.zy) / gridScale;
+          if (jitterAmt > 0.0) {
+            vec2 j2 = vec2(
+              cos(gridUV2.y * 2.1 - iTime * 1.4),
+              sin(gridUV2.x * 2.5 + iTime * 1.7)
+            ) * (0.15 * jitterAmt);
+            gridUV2 += j2;
+          }
+          float fx2 = fract(gridUV2.x);
+          float fy2 = fract(gridUV2.y);
+          float ax2 = min(fx2, 1.0 - fx2);
+          float ay2 = min(fy2, 1.0 - fy2);
+          float wx2 = fwidth(gridUV2.x);
+          float wy2 = fwidth(gridUV2.y);
+          float tx2 = halfPx * wx2;
+          float ty2 = halfPx * wy2;
+          float aax2 = wx2;
+          float aay2 = wy2;
+          float lineX2 = 1.0 - smoothstep(tx2, tx2 + aax2, ax2);
+          float lineY2 = 1.0 - smoothstep(ty2, ty2 + aay2, ay2);
+          float altMask = max(lineX2, lineY2);
+
+          float edgeDistX = min(abs(hit.x - (-0.5)), abs(hit.x - 0.5));
+          float edgeDistY = min(abs(hit.y - (-0.2)), abs(hit.y - 0.2));
+          float edgeDist = mix(edgeDistY, edgeDistX, hitIsY);
+          float edgeGate = 1.0 - smoothstep(gridScale * 0.5, gridScale * 2.0, edgeDist);
+          altMask *= edgeGate;
+
+          float lineMask = max(primaryMask, altMask);
+          float fade = exp(-dist * fadeStrength);
+
+          float dur = max(0.05, uScanDuration);
+          float del = max(0.0, uScanDelay);
+          float scanZMax = 2.0;
+          float widthScale = max(0.1, uScanGlow);
+          float sigma = max(0.001, 0.18 * widthScale * uScanSoftness);
+          float sigmaA = sigma * 2.0;
+
+          float combinedPulse = 0.0;
+          float combinedAura  = 0.0;
+
+          float cycle = dur + del;
+          float tCycle = mod(iTime, cycle);
+          float scanPhase = clamp((tCycle - del) / dur, 0.0, 1.0);
+          float phase = scanPhase;
+          if (uScanDirection > 0.5 && uScanDirection < 1.5) {
+            phase = 1.0 - phase;
+          } else if (uScanDirection > 1.5) {
+            float t2 = mod(max(0.0, iTime - del), 2.0 * dur);
+            phase = (t2 < dur) ? (t2 / dur) : (1.0 - (t2 - dur) / dur);
+          }
+          float scanZ = phase * scanZMax;
+          float dz = abs(hit.z - scanZ);
+          float lineBand = exp(-0.5 * (dz * dz) / (sigma * sigma));
+          float taper = clamp(uPhaseTaper, 0.0, 0.49);
+          float headFade = smoother01(0.0, taper, phase);
+          float tailFade = 1.0 - smoother01(1.0 - taper, 1.0, phase);
+          float phaseWindow = headFade * tailFade;
+          float pulseBase = lineBand * phaseWindow;
+          combinedPulse += pulseBase * clamp(uScanOpacity, 0.0, 1.0);
+          float auraBand = exp(-0.5 * (dz * dz) / (sigmaA * sigmaA));
+          combinedAura += (auraBand * 0.25) * phaseWindow * clamp(uScanOpacity, 0.0, 1.0);
+
+          for (int i = 0; i < MAX_SCANS; i++) {
+            if (float(i) >= uScanCount) break;
+            float tActiveI = iTime - uScanStarts[i];
+            float phaseI = clamp(tActiveI / dur, 0.0, 1.0);
+            if (uScanDirection > 0.5 && uScanDirection < 1.5) {
+              phaseI = 1.0 - phaseI;
+            } else if (uScanDirection > 1.5) {
+              phaseI = (phaseI < 0.5) ? (phaseI * 2.0) : (1.0 - (phaseI - 0.5) * 2.0);
+            }
+            float scanZI = phaseI * scanZMax;
+            float dzI = abs(hit.z - scanZI);
+            float lineBandI = exp(-0.5 * (dzI * dzI) / (sigma * sigma));
+            float headFadeI = smoother01(0.0, taper, phaseI);
+            float tailFadeI = 1.0 - smoother01(1.0 - taper, 1.0, phaseI);
+            float phaseWindowI = headFadeI * tailFadeI;
+            combinedPulse += lineBandI * phaseWindowI * clamp(uScanOpacity, 0.0, 1.0);
+            float auraBandI = exp(-0.5 * (dzI * dzI) / (sigmaA * sigmaA));
+            combinedAura += (auraBandI * 0.25) * phaseWindowI * clamp(uScanOpacity, 0.0, 1.0);
+          }
+
+          float lineVis = lineMask;
+          vec3 gridCol = uLinesColor * lineVis * fade;
+          vec3 scanCol = uScanColor * combinedPulse;
+          vec3 scanAura = uScanColor * combinedAura;
+
+          color = gridCol + scanCol + scanAura;
+
+          float n = fract(sin(dot(gl_FragCoord.xy + vec2(iTime * 123.4), vec2(12.9898, 78.233))) * 43758.5453123);
+          color += (n - 0.5) * uNoise;
+          color = clamp(color, 0.0, 1.0);
+
+          float alpha = clamp(max(lineVis, combinedPulse), 0.0, 1.0);
+          float gx = 1.0 - smoothstep(tx * 2.0, tx * 2.0 + aax * 2.0, ax);
+          float gy = 1.0 - smoothstep(ty * 2.0, ty * 2.0 + aay * 2.0, ay);
+          float halo = max(gx, gy) * fade;
+          alpha = max(alpha, halo * clamp(uBloomOpacity, 0.0, 1.0));
+          fragColor = vec4(color, alpha);
+        }
+
+        void main() {
+          vec4 c;
+          mainImage(c, vUv * iResolution.xy);
+          gl_FragColor = c;
+        }
+      `
+    });
+
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+
+    const resize = () => {
+      const w = Math.floor(canvas.clientWidth);
+      const h = Math.floor(canvas.clientHeight);
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      u.iResolution.value.set(w, h, w / h);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    this.uniforms = u;
+    this.renderer = renderer;
+    this.scene = scene;
+    this.camera = camera;
+    this.inited = true;
+  },
+  show() {
+    if (!this.inited) this.init();
+    if (this.hideTimer) { clearTimeout(this.hideTimer); this.hideTimer = 0; }
+    this.startTime = performance.now();
+    this.active = true;
+    $('#gridscan').classList.add('show');
+    if (!this.raf) this.tick();
+  },
+  hide() {
+    this.active = false;
+    $('#gridscan').classList.remove('show');
+    if (this.hideTimer) clearTimeout(this.hideTimer);
+    this.hideTimer = setTimeout(() => {
+      if (this.active) return;
+      if (this.raf) cancelAnimationFrame(this.raf);
+      this.raf = 0;
+    }, 450);
+  },
+  tick() {
+    this.raf = requestAnimationFrame(() => this.tick());
+    if (!this.uniforms) return;
+    this.uniforms.iTime.value = (performance.now() - this.startTime) / 1000;
+    this.renderer.render(this.scene, this.camera);
+  }
+};
+
+function transitionToPhotos() {
+  gridscan.show();
+  setTimeout(() => go('photos'), 700);
+  setTimeout(() => gridscan.hide(), 1400);
+}
+
+/* ════════════════════════════════════════════════════════════
    AUTH
    ════════════════════════════════════════════════════════════ */
 async function sha256(s) {
@@ -2039,50 +2505,56 @@ function renderPhotos() {
   ];
 
   items.forEach((it, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'photo-cell';
-    if (it._origin === 'pending') cell.classList.add('new');
-    if (removedSrcs.has(it.src))  cell.classList.add('removed');
+    const card = document.createElement('div');
+    card.className = 'photo-card';
+    if (it._origin === 'pending') card.classList.add('new');
+    if (removedSrcs.has(it.src))  card.classList.add('removed');
 
     const isVideo = it.type === 'video';
     const url = it._origin === 'pending' ? it._dataUrl : RAW_BASE + it.src;
+
+    /* ── media block ── */
+    const mediaWrap = document.createElement('div');
+    mediaWrap.className = 'photo-card-media';
 
     let media;
     if (isVideo) {
       media = document.createElement('video');
       media.src = url;
       media.muted = true; media.loop = true; media.playsInline = true; media.preload = 'metadata';
-      cell.addEventListener('mouseenter', () => media.play().catch(() => {}));
-      cell.addEventListener('mouseleave', () => { media.pause(); media.currentTime = 0; });
+      card.addEventListener('mouseenter', () => media.play().catch(() => {}));
+      card.addEventListener('mouseleave', () => { media.pause(); media.currentTime = 0; });
     } else {
       media = document.createElement('img');
       media.src = url;
       media.alt = it.label || '';
       media.loading = 'lazy';
     }
-    cell.appendChild(media);
+    mediaWrap.appendChild(media);
 
     if (it._origin === 'pending') {
-      const b = document.createElement('div');
-      b.className = 'photo-badge';
+      const b = document.createElement('span');
+      b.className = 'photo-card-badge';
       b.textContent = 'NEW';
-      cell.appendChild(b);
+      mediaWrap.appendChild(b);
     }
     if (isVideo) {
-      const b = document.createElement('div');
-      b.className = 'photo-badge video';
+      const b = document.createElement('span');
+      b.className = 'photo-card-badge video';
       b.textContent = 'VIDEO';
-      cell.appendChild(b);
+      mediaWrap.appendChild(b);
     }
 
-    const ov = document.createElement('div');
-    ov.className = 'photo-overlay';
-    const labelInput = document.createElement('input');
-    labelInput.className = 'photo-label-input';
-    labelInput.value = it.label || '';
-    labelInput.placeholder = 'Label';
-    labelInput.addEventListener('click', e => e.stopPropagation());
-    labelInput.addEventListener('change', e => {
+    /* ── caption (always visible) ── */
+    const cap = document.createElement('input');
+    cap.type = 'text';
+    cap.className = 'photo-card-caption';
+    cap.value = it.label || '';
+    cap.placeholder = 'Caption…';
+    cap.addEventListener('click', e => e.stopPropagation());
+    cap.addEventListener('mousedown', e => e.stopPropagation());
+    cap.addEventListener('dragstart', e => e.preventDefault());
+    cap.addEventListener('change', e => {
       e.stopPropagation();
       const newLabel = e.target.value;
       if (it._origin === 'pending') {
@@ -2093,10 +2565,19 @@ function renderPhotos() {
         if (target) target.label = newLabel;
       }
     });
-    const rmBtn = document.createElement('button');
-    rmBtn.className = 'photo-remove';
-    rmBtn.textContent = 'Remove';
-    rmBtn.addEventListener('click', e => {
+
+    /* ── bottom bar ── */
+    const bottom = document.createElement('div');
+    bottom.className = 'photo-card-bottom';
+
+    const handle = document.createElement('span');
+    handle.className = 'photo-card-handle';
+    handle.textContent = 'drag to reorder';
+
+    const rm = document.createElement('button');
+    rm.className = 'photo-card-remove';
+    rm.textContent = 'Remove';
+    rm.addEventListener('click', e => {
       e.stopPropagation();
       if (it._origin === 'pending') {
         const idx = pendingMedia.findIndex(p => p.name === it.src);
@@ -2107,27 +2588,31 @@ function renderPhotos() {
       renderPhotos();
       toast('Removed — Publish to update site');
     });
-    ov.append(labelInput, rmBtn);
-    cell.appendChild(ov);
+    rm.addEventListener('mousedown', e => e.stopPropagation());
 
-    cell.draggable = true;
-    cell.dataset.idx = i;
-    cell.addEventListener('dragstart', e => {
+    bottom.append(handle, rm);
+
+    card.append(mediaWrap, cap, bottom);
+
+    /* ── drag-to-reorder ── */
+    card.draggable = true;
+    card.dataset.idx = i;
+    card.addEventListener('dragstart', e => {
       dragSrcIndex = i;
       e.dataTransfer.effectAllowed = 'move';
-      cell.style.opacity = '0.45';
+      card.style.opacity = '0.45';
     });
-    cell.addEventListener('dragend', () => { cell.style.opacity = ''; });
-    cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drag-over'); });
-    cell.addEventListener('dragleave', () => cell.classList.remove('drag-over'));
-    cell.addEventListener('drop', e => {
+    card.addEventListener('dragend', () => { card.style.opacity = ''; });
+    card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag-over'); });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', e => {
       e.preventDefault();
-      cell.classList.remove('drag-over');
+      card.classList.remove('drag-over');
       if (dragSrcIndex === null || dragSrcIndex === i) return;
       reorder(dragSrcIndex, i);
     });
 
-    grid.appendChild(cell);
+    grid.appendChild(card);
   });
 
   const liveCount    = MEDIA.filter(m => !removedSrcs.has(m.src)).length;
@@ -2686,7 +3171,12 @@ function init() {
     const t = e.target.closest('[data-go]');
     if (!t) return;
     e.preventDefault();
-    go(t.dataset.go);
+    const view = t.dataset.go;
+    if (view === 'photos' && t.classList.contains('tile')) {
+      transitionToPhotos();
+    } else {
+      go(view);
+    }
   });
 
   /* Topbar */
