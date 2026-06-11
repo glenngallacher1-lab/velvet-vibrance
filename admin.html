@@ -1605,7 +1605,7 @@
           </div>
         </div>
         <div class="actions-row">
-          <button class="btn" id="add-event">+ Add to lineup</button>
+          <button class="btn btn-primary" id="add-event">+ Post event</button>
         </div>
       </div>
 
@@ -3821,11 +3821,26 @@ function renderEvents() {
     const rm = document.createElement('button');
     rm.className = 'btn btn-ghost';
     rm.textContent = 'Remove';
-    rm.addEventListener('click', () => {
+    rm.addEventListener('click', async () => {
       if (!confirm(`Remove "${ev.name}"?`)) return;
+      const token = getToken();
+      if (!token) return;
+      const snapshot = events.slice();
       events.splice(i, 1);
       renderEvents();
-      toast('Removed — Publish to update site');
+      rm.disabled = true; rm.textContent = 'Removing…';
+      toast('Removing event…');
+      setStatus('Removing');
+      try {
+        await pushEventsJSON(token);
+        toast('Event removed from the site ✓', 'success');
+        setStatus('Live');
+      } catch (err) {
+        events.splice(0, events.length, ...snapshot);
+        renderEvents();
+        toast(apiErrMsg(err), 'error');
+        setStatus('Error');
+      }
     });
 
     row.append(img, info, rm);
@@ -3858,6 +3873,18 @@ function handlePoster(file) {
   };
   reader.readAsDataURL(file);
 }
+/* Re-fetch latest events.json + push the current `events` array. Shared by Add/Remove/manual Publish. */
+async function pushEventsJSON(token) {
+  const fresh = await ghGet('events.json', token);
+  await ghPut(
+    'events.json',
+    b64encodeUtf8(JSON.stringify(events, null, 2) + '\n'),
+    'admin: update events',
+    fresh.sha,
+    token
+  );
+}
+
 async function addEvent() {
   const name    = $('#ev-name').value.trim();
   const date    = $('#ev-date').value.trim();
@@ -3871,23 +3898,35 @@ async function addEvent() {
   const token = getToken();
   if (!token) return;
 
+  const btn = $('#add-event');
+  btn.disabled = true; btn.textContent = 'Posting…';
   toast('Uploading poster…');
   setStatus('Uploading poster');
+
   const posterPath = `posters/${Date.now()}-${posterName.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
   try {
     await ghPut(posterPath, posterBase64, `admin: add poster ${posterName}`, null, token);
     const posterUrl = RAW_BASE + posterPath;
     events.push({ name, date, time, venue, tickets, poster: posterUrl });
     renderEvents();
+
+    toast('Publishing event…');
+    setStatus('Publishing');
+    await pushEventsJSON(token);
+
     $('#ev-name').value = $('#ev-date').value = $('#ev-time').value = $('#ev-venue').value = $('#ev-tickets').value = '';
     resetPoster();
-    toast('Event drafted — hit Publish to go live ✓', 'success');
-    setStatus('Ready to publish');
+    toast('Event live on the site ✓', 'success');
+    setStatus('Live');
   } catch (err) {
     toast(apiErrMsg(err), 'error');
     setStatus('Error');
+  } finally {
+    btn.disabled = false; btn.textContent = '+ Post event';
   }
 }
+
+/* Manual Publish button — still here for syncing after caption tweaks etc. */
 async function publishEvents() {
   const token = getToken();
   if (!token) return;
@@ -3895,15 +3934,8 @@ async function publishEvents() {
   btn.disabled = true; btn.textContent = 'Publishing…';
   setStatus('Publishing events');
   try {
-    const file = await ghGet('events.json', token);
-    await ghPut(
-      'events.json',
-      b64encodeUtf8(JSON.stringify(events, null, 2) + '\n'),
-      'admin: update events',
-      file.sha,
-      token
-    );
-    toast('Events published ✓', 'success');
+    await pushEventsJSON(token);
+    toast('Events synced ✓', 'success');
     setStatus('Live');
   } catch (err) {
     toast(apiErrMsg(err), 'error');
