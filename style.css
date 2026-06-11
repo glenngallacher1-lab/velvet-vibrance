@@ -1662,10 +1662,11 @@ h1, h2, h3, h4 {
   padding: clamp(2rem, 5vw, 5rem) clamp(0.5rem, 2vw, 2rem) 8rem;
   background: #000;
 }
-/* Column-masonry — preserves aspect ratios; gaps form the black borders */
+/* Uniform square grid — every tile the same size; uploads crop-fit identically */
 .mosaic {
-  column-count: 3;
-  column-gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
   max-width: 1600px;
   margin: 0 auto;
   padding: 10px;
@@ -1675,8 +1676,7 @@ h1, h2, h3, h4 {
   position: relative;
   display: block;
   width: 100%;
-  margin: 0 0 10px;
-  break-inside: avoid;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   cursor: pointer;
   background: #000;
@@ -1688,7 +1688,8 @@ h1, h2, h3, h4 {
 .mosaic .rg-item img,
 .mosaic .rg-item video {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
   filter: grayscale(0.75) contrast(1.05) brightness(0.88);
   transition: filter 0.8s var(--ease-out), transform 1.2s var(--ease-out);
@@ -1710,5 +1711,5 @@ h1, h2, h3, h4 {
   transition: opacity 0.4s var(--ease-out), transform 0.5s var(--ease-out);
 }
 .mosaic .rg-item:hover .rg-overlay { opacity: 1; transform: none; }
-@media (max-width: 1100px) { .mosaic { column-count: 2; } }
-@media (max-width: 600px)  { .mosaic { column-count: 1; column-gap: 8px; padding: 8px; } .mosaic .rg-item { margin-bottom: 8px; } }
+@media (max-width: 1100px) { .mosaic { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .mosaic { grid-template-columns: 1fr; gap: 8px; padding: 8px; } }
