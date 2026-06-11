@@ -259,6 +259,94 @@
     #app[data-view="photos"] #linewaves-canvas,
     #app[data-view="photos"] #linewaves-overlay { opacity: 1; }
 
+    /* ── ASCII text layers (events view only) ── */
+    #events-ascii {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s var(--ease);
+      background: #060303;
+      overflow: hidden;
+      font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    #events-ascii pre {
+      margin: 0;
+      padding: 0;
+      line-height: 1em;
+      text-align: left;
+      position: absolute;
+      left: 0; top: 0;
+      z-index: 9;
+      mix-blend-mode: difference;
+      user-select: none;
+      background-image: linear-gradient(125deg, #E8B547 0%, #B83838 50%, #8B1A1A 100%);
+      background-attachment: fixed;
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+              background-clip: text;
+    }
+    #events-ascii canvas {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      image-rendering: pixelated;
+    }
+    #events-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s var(--ease);
+      background:
+        radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.92) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.5) 100%);
+    }
+    #app[data-view="events"] #events-ascii,
+    #app[data-view="events"] #events-overlay { opacity: 1; }
+
+    /* ── Perlin waves layers (notes view only) ── */
+    #notes-waves-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      display: block;
+      z-index: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s var(--ease);
+      background: #060303;
+    }
+    #notes-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s var(--ease);
+      background:
+        radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.88) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.45) 100%);
+    }
+    #app[data-view="notes"] #notes-waves-canvas,
+    #app[data-view="notes"] #notes-overlay { opacity: 1; }
+
+    /* ── FuzzyText title (replaces h2 on Notes view) ── */
+    .fuzzy-wrap {
+      position: relative;
+      display: block;
+      margin: 0;
+      min-height: 56px;
+    }
+    .fuzzy-wrap canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
     /* Make sure content sits above the terminal layers */
     .topbar { z-index: 30; }
     .view { position: relative; z-index: 2; }
@@ -847,6 +935,73 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* ════════════════════════════════════════════════════════════
+       EVENTS TRANSITION (CircularText)
+       ════════════════════════════════════════════════════════════ */
+    #events-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
+      opacity: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, rgba(20,9,11,0.92) 0%, rgba(5,3,3,0.97) 100%);
+      backdrop-filter: blur(12px);
+      transition: opacity 0.35s var(--ease);
+      display: grid; place-items: center;
+    }
+    #events-transition.show { opacity: 1; pointer-events: auto; }
+
+    .ct-stage {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 1.4rem;
+      animation: ct-fade 0.5s var(--ease) both;
+    }
+    @keyframes ct-fade {
+      from { opacity: 0; transform: scale(0.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .circular-text {
+      position: relative;
+      width: 280px; height: 280px;
+      margin: 0 auto;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--honey);
+      text-align: center;
+      transform-origin: 50% 50%;
+      animation: ct-spin 5s linear infinite;
+    }
+    .circular-text span {
+      position: absolute;
+      display: inline-block;
+      left: 0; right: 0; top: 0; bottom: 0;
+      text-shadow: 0 0 18px rgba(232,181,71,0.35);
+    }
+    @keyframes ct-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .ct-eye {
+      font-size: 0.62rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--paper-mute);
+      margin-top: 1rem;
+    }
+    .ct-label {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+      letter-spacing: -0.01em;
+      color: var(--paper);
+      text-shadow: 0 0 30px rgba(184,56,56,0.35);
+    }
+
     /* ── Event rows ── */
     .events-list { display: flex; flex-direction: column; gap: 0.7rem; }
     .event-row {
@@ -1197,6 +1352,14 @@
   <canvas id="linewaves-canvas"></canvas>
   <div id="linewaves-overlay"></div>
 
+  <!-- ASCII text background (events view only) -->
+  <div id="events-ascii"></div>
+  <div id="events-overlay"></div>
+
+  <!-- Perlin waves background (notes view only) -->
+  <canvas id="notes-waves-canvas"></canvas>
+  <div id="notes-overlay"></div>
+
   <!-- Topbar -->
   <header class="topbar">
     <div class="top-left">
@@ -1307,7 +1470,9 @@
       <div class="ws-head">
         <div>
           <p class="ws-eyebrow">03 · Ledger</p>
-          <h2><em>Notes</em> & Reminders</h2>
+          <div class="fuzzy-wrap">
+            <canvas id="notes-fuzzy" aria-label="notes for Glenn"></canvas>
+          </div>
         </div>
         <div class="ws-actions">
           <button class="btn btn-ghost" data-go="home">← Console</button>
@@ -1469,6 +1634,15 @@
   <div class="gridscan-label">
     <span class="gs-eyebrow">Scanning</span>
     <span class="gs-name">The Archive</span>
+  </div>
+</div>
+
+<!-- EVENTS TRANSITION OVERLAY (CircularText) -->
+<div id="events-transition" aria-hidden="true">
+  <div class="ct-stage">
+    <div class="circular-text" id="circular-text"></div>
+    <div class="ct-eye">Opening</div>
+    <div class="ct-label">Event Posters</div>
   </div>
 </div>
 
@@ -2621,6 +2795,556 @@ function transitionToPhotos() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   CIRCULAR TEXT · pure CSS + JS port (no Framer Motion)
+   ════════════════════════════════════════════════════════════ */
+const circularText = {
+  inited: false,
+  init(text) {
+    const el = $('#circular-text');
+    if (this.inited) return;
+    const letters = Array.from(text);
+    el.innerHTML = '';
+    letters.forEach((letter, i) => {
+      const rot = (360 / letters.length) * i;
+      const factor = Math.PI / letters.length;
+      const x = factor * i;
+      const y = factor * i;
+      const span = document.createElement('span');
+      span.textContent = letter === ' ' ? ' ' : letter;
+      const t = `rotateZ(${rot}deg) translate3d(${x}px, ${y}px, 0)`;
+      span.style.transform = t;
+      span.style.webkitTransform = t;
+      el.appendChild(span);
+    });
+    this.inited = true;
+  },
+  show() {
+    this.init('event posters · velvet vibrance · ');
+    $('#events-transition').classList.add('show');
+  },
+  hide() {
+    $('#events-transition').classList.remove('show');
+  }
+};
+
+function transitionToEvents() {
+  circularText.show();
+  setTimeout(() => go('events'), 800);
+  setTimeout(() => circularText.hide(), 1500);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ASCII TEXT · port of React Bits component (vanilla three.js)
+   ════════════════════════════════════════════════════════════ */
+const asciiText = {
+  inited: false,
+  active: false,
+  raf: 0,
+  init() {
+    if (this.inited) return;
+
+    const container = $('#events-ascii');
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
+
+    /* ── Scene + camera ── */
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+    camera.position.z = 30;
+
+    /* ── Text drawn to a canvas → CanvasTexture ── */
+    const textCanvas = document.createElement('canvas');
+    const tctx = textCanvas.getContext('2d');
+    const TXT = 'post';
+    const FS  = 220;
+    const FF  = "'IBM Plex Mono', ui-monospace, Menlo, monospace";
+    const drawText = () => {
+      tctx.font = `600 ${FS}px ${FF}`;
+      const metrics = tctx.measureText(TXT);
+      const w = Math.ceil(metrics.width) + 20;
+      const h = Math.ceil((metrics.actualBoundingBoxAscent || FS) + (metrics.actualBoundingBoxDescent || FS * 0.2)) + 20;
+      textCanvas.width = w;
+      textCanvas.height = h;
+      tctx.clearRect(0, 0, w, h);
+      tctx.fillStyle = '#fdf9f3';
+      tctx.font = `600 ${FS}px ${FF}`;
+      const y = 10 + (metrics.actualBoundingBoxAscent || FS);
+      tctx.fillText(TXT, 10, y);
+    };
+    drawText();
+
+    const texture = new THREE.CanvasTexture(textCanvas);
+    texture.minFilter = THREE.NearestFilter;
+
+    const textAspect = textCanvas.width / textCanvas.height;
+    const baseH = 8;
+    const planeW = baseH * textAspect;
+    const planeH = baseH;
+    const geometry = new THREE.PlaneGeometry(planeW, planeH, 36, 36);
+
+    const material = new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: {
+        uTime:         { value: 0 },
+        mouse:         { value: 1.0 },
+        uTexture:      { value: texture },
+        uEnableWaves:  { value: 1.0 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        uniform float uTime;
+        uniform float uEnableWaves;
+        void main() {
+          vUv = uv;
+          float time = uTime * 5.0;
+          float w = uEnableWaves;
+          vec3 transformed = position;
+          transformed.x += sin(time + position.y) * 0.5 * w;
+          transformed.y += cos(time + position.z) * 0.15 * w;
+          transformed.z += sin(time + position.x) * w;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+        }
+      `,
+      fragmentShader: `
+        precision highp float;
+        varying vec2 vUv;
+        uniform float uTime;
+        uniform float mouse;
+        uniform sampler2D uTexture;
+        void main() {
+          float time = uTime;
+          vec2 pos = vUv;
+          float r = texture2D(uTexture, pos + cos(time * 2.0 - time + pos.x) * 0.01).r;
+          float g = texture2D(uTexture, pos + tan(time * 0.5 + pos.x - time) * 0.01).g;
+          float b = texture2D(uTexture, pos - cos(time * 2.0 + time + pos.y) * 0.01).b;
+          float a = texture2D(uTexture, pos).a;
+          gl_FragColor = vec4(r, g, b, a);
+        }
+      `
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+    renderer.setPixelRatio(1);
+    renderer.setClearColor(0x000000, 0);
+    renderer.setSize(width, height);
+
+    /* ── ASCII filter overlay ── */
+    const filterEl = document.createElement('div');
+    filterEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+    const pre = document.createElement('pre');
+    const ascCanvas = document.createElement('canvas');
+    const actx = ascCanvas.getContext('2d');
+    actx.imageSmoothingEnabled = false;
+    filterEl.appendChild(pre);
+    filterEl.appendChild(ascCanvas);
+    container.appendChild(filterEl);
+
+    const fontSize = 8;
+    const fontFamily = "'IBM Plex Mono', ui-monospace, monospace";
+    const charset = " .'`^\",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+
+    pre.style.cssText = `font-family:${fontFamily};font-size:${fontSize}px;`;
+
+    const filter = {
+      width: 0, height: 0, cols: 0, rows: 0, deg: 0,
+      mouse: { x: width/2, y: height/2 },
+      center: { x: width/2, y: height/2 },
+      setSize(w, h) {
+        this.width = w; this.height = h;
+        renderer.setSize(w, h);
+        actx.font = `${fontSize}px ${fontFamily}`;
+        const cw = actx.measureText('A').width;
+        this.cols = Math.floor(w / (fontSize * (cw / fontSize)));
+        this.rows = Math.floor(h / fontSize);
+        ascCanvas.width = this.cols;
+        ascCanvas.height = this.rows;
+        this.center = { x: w / 2, y: h / 2 };
+      },
+      render() {
+        renderer.render(scene, camera);
+        const w = ascCanvas.width, h = ascCanvas.height;
+        if (!w || !h) return;
+        actx.clearRect(0, 0, w, h);
+        actx.drawImage(renderer.domElement, 0, 0, w, h);
+        const data = actx.getImageData(0, 0, w, h).data;
+        let s = '';
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const i = x * 4 + y * 4 * w;
+            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+            if (a === 0) { s += ' '; continue; }
+            const gray = (0.3 * r + 0.6 * g + 0.1 * b) / 255;
+            let idx = Math.floor((1 - gray) * (charset.length - 1));
+            idx = charset.length - idx - 1;
+            s += charset[idx];
+          }
+          s += '\n';
+        }
+        pre.textContent = s;
+
+        /* hue follow */
+        const dx = this.mouse.x - this.center.x;
+        const dy = this.mouse.y - this.center.y;
+        const deg = Math.atan2(dy, dx) * 180 / Math.PI;
+        this.deg += (deg - this.deg) * 0.075;
+        filterEl.style.filter = `hue-rotate(${this.deg.toFixed(1)}deg)`;
+      }
+    };
+
+    const onMouse = e => {
+      filter.mouse = { x: e.clientX, y: e.clientY };
+    };
+    document.addEventListener('mousemove', onMouse);
+
+    const resize = () => {
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      filter.setSize(w, h);
+    };
+    window.addEventListener('resize', resize);
+    filter.setSize(width, height);
+
+    this._container = container;
+    this._renderer = renderer;
+    this._scene = scene;
+    this._camera = camera;
+    this._mesh = mesh;
+    this._material = material;
+    this._texture = texture;
+    this._filter = filter;
+    this._textCanvas = textCanvas;
+    this._drawText = drawText;
+    this.inited = true;
+  },
+  show() {
+    if (!this.inited) this.init();
+    this.active = true;
+    if (!this.raf) this.tick();
+  },
+  hide() {
+    this.active = false;
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = 0;
+  },
+  tick() {
+    this.raf = requestAnimationFrame(() => this.tick());
+    if (!this._material) return;
+    const t = Date.now() * 0.001;
+    this._drawText();
+    this._texture.needsUpdate = true;
+    this._material.uniforms.uTime.value = Math.sin(t);
+    this._filter.render();
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   FUZZY TEXT · port of React Bits component (vanilla canvas)
+   ════════════════════════════════════════════════════════════ */
+const fuzzyText = {
+  inited: false,
+  active: false,
+  raf: 0,
+  init() {
+    if (this.inited) return;
+    const canvas = $('#notes-fuzzy');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const fontSize = 48;
+    const fontWeight = 900;
+    const fontFamily = "'Playfair Display', serif";
+    const fontStyle = 'italic';
+    const text = 'notes for Glenn';
+    const baseIntensity = 0.18;
+    const hoverIntensity = 0.55;
+    const fuzzRange = 22;
+    const fps = 60;
+
+    const fontString = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+
+    /* draw text onto offscreen canvas (gradient fill) */
+    const offscreen = document.createElement('canvas');
+    const offCtx = offscreen.getContext('2d');
+    offCtx.font = fontString;
+    offCtx.textBaseline = 'alphabetic';
+    const metrics = offCtx.measureText(text);
+    const ascent = metrics.actualBoundingBoxAscent  || fontSize;
+    const descent = metrics.actualBoundingBoxDescent || fontSize * 0.25;
+    const textW = Math.ceil(metrics.width);
+    const textH = Math.ceil(ascent + descent);
+    const extraW = 10;
+    const offW = textW + extraW;
+    const offH = textH;
+    offscreen.width = offW;
+    offscreen.height = offH;
+    offCtx.font = fontString;
+    offCtx.textBaseline = 'alphabetic';
+
+    const grad = offCtx.createLinearGradient(0, 0, offW, 0);
+    grad.addColorStop(0,   '#E8B547');  // honey
+    grad.addColorStop(0.5, '#F2C969');  // honey soft
+    grad.addColorStop(1,   '#E8B547');  // honey
+    offCtx.fillStyle = grad;
+    offCtx.fillText(text, extraW / 2 - (metrics.actualBoundingBoxLeft || 0), ascent);
+
+    const horizontalMargin = fuzzRange + 20;
+    canvas.width = offW + horizontalMargin * 2;
+    canvas.height = textH;
+    canvas.style.width = (canvas.width / window.devicePixelRatio || 1) + 'px';
+    ctx.translate(horizontalMargin, 0);
+
+    const interactiveLeft = horizontalMargin + extraW / 2;
+    const interactiveRight = interactiveLeft + textW;
+    const interactiveTop = 0;
+    const interactiveBottom = textH;
+
+    let isHovering = false;
+    const frameDuration = 1000 / fps;
+    let lastFrame = 0;
+
+    canvas.addEventListener('mousemove', e => {
+      const r = canvas.getBoundingClientRect();
+      const sx = canvas.width / r.width;
+      const sy = canvas.height / r.height;
+      const x = (e.clientX - r.left) * sx;
+      const y = (e.clientY - r.top) * sy;
+      isHovering =
+        x >= interactiveLeft && x <= interactiveRight &&
+        y >= interactiveTop  && y <= interactiveBottom;
+    });
+    canvas.addEventListener('mouseleave', () => { isHovering = false; });
+
+    const draw = ts => {
+      this.raf = requestAnimationFrame(draw);
+      if (!this.active) return;
+      if (ts - lastFrame < frameDuration) return;
+      lastFrame = ts;
+
+      const intensity = isHovering ? hoverIntensity : baseIntensity;
+      ctx.clearRect(-fuzzRange - 20, 0, offW + 2 * (fuzzRange + 20), textH);
+      for (let j = 0; j < textH; j++) {
+        const dx = Math.floor(intensity * (Math.random() - 0.5) * fuzzRange);
+        ctx.drawImage(offscreen, 0, j, offW, 1, dx, j, offW, 1);
+      }
+    };
+    this.raf = requestAnimationFrame(draw);
+    this.inited = true;
+  },
+  show() {
+    if (!this.inited) this.init();
+    this.active = true;
+  },
+  hide() {
+    this.active = false;
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   NOTES WAVES · port of React Bits Waves component (canvas, Perlin)
+   ════════════════════════════════════════════════════════════ */
+const notesWaves = {
+  inited: false,
+  active: false,
+  raf: 0,
+  canvas: null,
+  ctx: null,
+  bounding: { width: 0, height: 0, left: 0, top: 0 },
+  noise: null,
+  lines: [],
+  mouse: { x: -10, y: 0, lx: 0, ly: 0, sx: 0, sy: 0, v: 0, vs: 0, a: 0, set: false },
+  cfg: {
+    lineColor: '#8B1A1A',
+    waveSpeedX: 0.02,
+    waveSpeedY: 0.01,
+    waveAmpX: 36,
+    waveAmpY: 18,
+    friction: 0.92,
+    tension: 0.008,
+    maxCursorMove: 110,
+    xGap: 12,
+    yGap: 34
+  },
+  _makeNoise() {
+    const Grad = function(x, y) { this.x = x; this.y = y; };
+    Grad.prototype.dot2 = function(x, y) { return this.x * x + this.y * y; };
+    const grad3 = [
+      new Grad(1,1), new Grad(-1,1), new Grad(1,-1), new Grad(-1,-1),
+      new Grad(1,0), new Grad(-1,0), new Grad(1,0), new Grad(-1,0),
+      new Grad(0,1), new Grad(0,-1), new Grad(0,1), new Grad(0,-1)
+    ];
+    const p = [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180];
+    const perm = new Array(512);
+    const gradP = new Array(512);
+    let seed = Math.random();
+    if (seed > 0 && seed < 1) seed *= 65536;
+    seed = Math.floor(seed);
+    if (seed < 256) seed |= seed << 8;
+    for (let i = 0; i < 256; i++) {
+      const v = i & 1 ? p[i] ^ (seed & 255) : p[i] ^ ((seed >> 8) & 255);
+      perm[i] = perm[i + 256] = v;
+      gradP[i] = gradP[i + 256] = grad3[v % 12];
+    }
+    const fade = t => t * t * t * (t * (t * 6 - 15) + 10);
+    const lerp = (a, b, t) => (1 - t) * a + t * b;
+    return {
+      perlin2(x, y) {
+        let X = Math.floor(x), Y = Math.floor(y);
+        x -= X; y -= Y;
+        X &= 255; Y &= 255;
+        const n00 = gradP[X + perm[Y]].dot2(x, y);
+        const n01 = gradP[X + perm[Y + 1]].dot2(x, y - 1);
+        const n10 = gradP[X + 1 + perm[Y]].dot2(x - 1, y);
+        const n11 = gradP[X + 1 + perm[Y + 1]].dot2(x - 1, y - 1);
+        const u = fade(x);
+        return lerp(lerp(n00, n10, u), lerp(n01, n11, u), fade(y));
+      }
+    };
+  },
+  init() {
+    if (this.inited) return;
+    const canvas = $('#notes-waves-canvas');
+    if (!canvas) return;
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.noise = this._makeNoise();
+
+    const setSize = () => {
+      this.bounding = canvas.getBoundingClientRect();
+      canvas.width = this.bounding.width;
+      canvas.height = this.bounding.height;
+      this._setLines();
+    };
+    setSize();
+    window.addEventListener('resize', setSize);
+
+    const updateMouse = (x, y) => {
+      const m = this.mouse;
+      m.x = x - this.bounding.left;
+      m.y = y - this.bounding.top;
+      if (!m.set) {
+        m.sx = m.x; m.sy = m.y;
+        m.lx = m.x; m.ly = m.y;
+        m.set = true;
+      }
+    };
+    window.addEventListener('mousemove', e => updateMouse(e.clientX, e.clientY));
+    window.addEventListener('touchmove', e => {
+      const t = e.touches[0];
+      updateMouse(t.clientX, t.clientY);
+    }, { passive: true });
+
+    this.inited = true;
+  },
+  _setLines() {
+    const { width, height } = this.bounding;
+    const { xGap, yGap } = this.cfg;
+    this.lines = [];
+    const oW = width + 200, oH = height + 30;
+    const totalLines = Math.ceil(oW / xGap);
+    const totalPoints = Math.ceil(oH / yGap);
+    const xStart = (width - xGap * totalLines) / 2;
+    const yStart = (height - yGap * totalPoints) / 2;
+    for (let i = 0; i <= totalLines; i++) {
+      const pts = [];
+      for (let j = 0; j <= totalPoints; j++) {
+        pts.push({
+          x: xStart + xGap * i,
+          y: yStart + yGap * j,
+          wave: { x: 0, y: 0 },
+          cursor: { x: 0, y: 0, vx: 0, vy: 0 }
+        });
+      }
+      this.lines.push(pts);
+    }
+  },
+  _movePoints(time) {
+    const { waveSpeedX, waveSpeedY, waveAmpX, waveAmpY, friction, tension, maxCursorMove } = this.cfg;
+    const noise = this.noise;
+    const m = this.mouse;
+    this.lines.forEach(pts => {
+      pts.forEach(p => {
+        const move = noise.perlin2((p.x + time * waveSpeedX) * 0.002, (p.y + time * waveSpeedY) * 0.0015) * 12;
+        p.wave.x = Math.cos(move) * waveAmpX;
+        p.wave.y = Math.sin(move) * waveAmpY;
+        const dx = p.x - m.sx, dy = p.y - m.sy;
+        const dist = Math.hypot(dx, dy);
+        const l = Math.max(175, m.vs);
+        if (dist < l) {
+          const s = 1 - dist / l;
+          const f = Math.cos(dist * 0.001) * s;
+          p.cursor.vx += Math.cos(m.a) * f * l * m.vs * 0.00065;
+          p.cursor.vy += Math.sin(m.a) * f * l * m.vs * 0.00065;
+        }
+        p.cursor.vx += (0 - p.cursor.x) * tension;
+        p.cursor.vy += (0 - p.cursor.y) * tension;
+        p.cursor.vx *= friction;
+        p.cursor.vy *= friction;
+        p.cursor.x += p.cursor.vx * 2;
+        p.cursor.y += p.cursor.vy * 2;
+        p.cursor.x = Math.min(maxCursorMove, Math.max(-maxCursorMove, p.cursor.x));
+        p.cursor.y = Math.min(maxCursorMove, Math.max(-maxCursorMove, p.cursor.y));
+      });
+    });
+  },
+  _draw() {
+    const ctx = this.ctx;
+    const { width, height } = this.bounding;
+    ctx.clearRect(0, 0, width, height);
+    ctx.beginPath();
+    ctx.strokeStyle = this.cfg.lineColor;
+    ctx.lineWidth = 1;
+    const moved = (pt, c = true) => {
+      const x = pt.x + pt.wave.x + (c ? pt.cursor.x : 0);
+      const y = pt.y + pt.wave.y + (c ? pt.cursor.y : 0);
+      return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+    };
+    this.lines.forEach(pts => {
+      let p1 = moved(pts[0], false);
+      ctx.moveTo(p1.x, p1.y);
+      pts.forEach((p, i) => {
+        const isLast = i === pts.length - 1;
+        p1 = moved(p, !isLast);
+        const p2 = moved(pts[i + 1] || pts[pts.length - 1], !isLast);
+        ctx.lineTo(p1.x, p1.y);
+        if (isLast) ctx.moveTo(p2.x, p2.y);
+      });
+    });
+    ctx.stroke();
+  },
+  show() {
+    if (!this.inited) this.init();
+    this.active = true;
+    if (!this.raf) this.tick();
+  },
+  hide() {
+    this.active = false;
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = 0;
+  },
+  tick() {
+    this.raf = requestAnimationFrame(t => this.tick(t));
+    if (!this.active) return;
+    const m = this.mouse;
+    m.sx += (m.x - m.sx) * 0.1;
+    m.sy += (m.y - m.sy) * 0.1;
+    const dx = m.x - m.lx, dy = m.y - m.ly;
+    const d = Math.hypot(dx, dy);
+    m.v = d;
+    m.vs += (d - m.vs) * 0.1;
+    m.vs = Math.min(100, m.vs);
+    m.lx = m.x; m.ly = m.y;
+    m.a = Math.atan2(dy, dx);
+    this._movePoints(performance.now());
+    this._draw();
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
    AUTH
    ════════════════════════════════════════════════════════════ */
 async function sha256(s) {
@@ -2669,6 +3393,9 @@ function go(view) {
   /* Backgrounds — only one runs at a time */
   if (view === 'home')   terminal.show();   else terminal.hide();
   if (view === 'photos') lineWaves.show();  else lineWaves.hide();
+  if (view === 'events') asciiText.show();  else asciiText.hide();
+  if (view === 'notes')  { notesWaves.show(); fuzzyText.show(); }
+  else                   { notesWaves.hide(); fuzzyText.hide(); }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -3419,6 +4146,8 @@ function init() {
     const view = t.dataset.go;
     if (view === 'photos' && t.classList.contains('tile')) {
       transitionToPhotos();
+    } else if (view === 'events' && t.classList.contains('tile')) {
+      transitionToEvents();
     } else {
       go(view);
     }
