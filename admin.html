@@ -3518,10 +3518,19 @@ function b64decodeUtf8(b64) {
    PHOTOS — load + render
    ════════════════════════════════════════════════════════════ */
 async function loadGalleryFromLive() {
+  /* Prefer the GitHub Contents API (no CDN cache) when a token is saved,
+     so admin always reflects what is actually on main. Fall back to RAW. */
+  const token = localStorage.getItem('vv_gh_token');
   try {
-    const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now());
-    if (!res.ok) throw new Error(res.status);
-    const html = await res.text();
+    let html;
+    if (token) {
+      const fileData = await ghGet('gallery.html', token);
+      html = b64decodeUtf8(fileData.content);
+    } else {
+      const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      html = await res.text();
+    }
     MEDIA = parseGallery(html);
   } catch {
     MEDIA = [];
@@ -3769,6 +3778,8 @@ async function publishPhotos() {
     renderPhotos();
     toast('Gallery published ✓', 'success');
     setStatus('Live');
+    /* Re-sync from live so admin can never drift from the deployed gallery */
+    await loadGalleryFromLive();
   } catch (err) {
     toast(apiErrMsg(err), 'error');
     setStatus('Error');
@@ -3781,9 +3792,17 @@ async function publishPhotos() {
    EVENTS
    ════════════════════════════════════════════════════════════ */
 async function loadEvents() {
+  const token = localStorage.getItem('vv_gh_token');
   try {
-    const res = await fetch(RAW_BASE + 'events.json?t=' + Date.now());
-    events = await res.json();
+    let json;
+    if (token) {
+      const fileData = await ghGet('events.json', token);
+      json = b64decodeUtf8(fileData.content);
+    } else {
+      const res = await fetch(RAW_BASE + 'events.json?t=' + Date.now(), { cache: 'no-store' });
+      json = await res.text();
+    }
+    events = JSON.parse(json);
     if (!Array.isArray(events)) events = [];
   } catch { events = []; }
   renderEvents();
@@ -3835,6 +3854,7 @@ function renderEvents() {
         await pushEventsJSON(token);
         toast('Event removed from the site ✓', 'success');
         setStatus('Live');
+        await loadEvents();
       } catch (err) {
         events.splice(0, events.length, ...snapshot);
         renderEvents();
@@ -3918,6 +3938,7 @@ async function addEvent() {
     resetPoster();
     toast('Event live on the site ✓', 'success');
     setStatus('Live');
+    await loadEvents();
   } catch (err) {
     toast(apiErrMsg(err), 'error');
     setStatus('Error');
@@ -3937,6 +3958,7 @@ async function publishEvents() {
     await pushEventsJSON(token);
     toast('Events synced ✓', 'success');
     setStatus('Live');
+    await loadEvents();
   } catch (err) {
     toast(apiErrMsg(err), 'error');
     setStatus('Error');
