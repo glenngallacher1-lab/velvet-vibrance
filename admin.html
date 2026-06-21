@@ -1488,7 +1488,7 @@
 
       <div class="card">
         <div class="help">
-          <strong>How to update:</strong> Drop photos or video clips below. Each tile is a square — the preview here is exactly what shows on the live gallery. Drag tiles to reorder. Click <strong>Publish to site</strong> to push the new gallery to <code>gallery.html</code>.
+          <strong>How to update:</strong> Uploads <strong>add to</strong> the existing gallery — they don't replace it. New tiles appear with a gold border and the counter shows <em>N items · M new</em>. Use the trash icon on a tile to mark it for removal. Drag to reorder. Click <strong>Publish to site</strong> to push your additions, removals, and reordering to the live gallery.
         </div>
 
         <div class="upload-zone" id="upload-zone">
@@ -3806,6 +3806,13 @@ async function publishPhotos() {
   setStatus('Publishing photos');
 
   try {
+    /* Step 0 — short-circuit if there's nothing to change. */
+    if (pendingMedia.length === 0 && removedSrcs.size === 0) {
+      toast('Nothing to publish — drop new photos or remove some first', 'error');
+      setStatus('Idle');
+      return;
+    }
+
     /* Step 1 — pull the CURRENT live gallery.html, parse the live MEDIA.
        This is the source of truth. Anything we publish is built on top of
        it, never replacing it from possibly-stale admin in-memory state. */
