@@ -3806,7 +3806,15 @@ async function publishPhotos() {
   setStatus('Publishing photos');
 
   try {
-    /* upload new files */
+    /* Step 1 — pull the CURRENT live gallery.html, parse the live MEDIA.
+       This is the source of truth. Anything we publish is built on top of
+       it, never replacing it from possibly-stale admin in-memory state. */
+    toast('Reading live gallery…');
+    const fileData = await ghGet('gallery.html', token);
+    let html = b64decodeUtf8(fileData.content);
+    const liveMedia = parseGallery(html);
+
+    /* Step 2 — upload new files */
     let i = 0;
     for (const p of pendingMedia) {
       i++;
@@ -3817,26 +3825,36 @@ async function publishPhotos() {
         sha = existing.sha;
       } catch { /* not present */ }
       await ghPut(encodeURIComponent(p.name), p.base64, `admin: add ${p.type} ${p.name}`, sha, token);
-      MEDIA.push({ src: p.name, label: p.label, ...(p.type === 'video' ? { type: 'video' } : {}) });
     }
-    pendingMedia = [];
 
-    /* rewrite gallery.html MEDIA array */
+    /* Step 3 — build the new MEDIA = live ∖ removed ∪ pending, dedup by src */
+    const pendingEntries = pendingMedia.map(p => ({
+      src: p.name,
+      label: p.label,
+      ...(p.type === 'video' ? { type: 'video' } : {})
+    }));
+    const kept = liveMedia.filter(m => !removedSrcs.has(m.src));
+    /* Dedup: pending wins over live if same filename appears in both */
+    const pendingSrcs = new Set(pendingEntries.map(p => p.src));
+    const merged = [
+      ...kept.filter(m => !pendingSrcs.has(m.src)),
+      ...pendingEntries
+    ];
+
+    /* Step 4 — rewrite gallery.html with the merged MEDIA */
     toast('Updating gallery.html…');
-    const live = MEDIA.filter(m => !removedSrcs.has(m.src));
-    const arrJs = '[\n' + live.map(m => {
+    const arrJs = '[\n' + merged.map(m => {
       const lines = [`src: ${JSON.stringify(m.src)}`];
       if (m.type) lines.push(`type: ${JSON.stringify(m.type)}`);
       lines.push(`label: ${JSON.stringify(m.label || '')}`);
       return '      { ' + lines.join(', ') + ' }';
     }).join(',\n') + '\n    ]';
-
-    const fileData = await ghGet('gallery.html', token);
-    let html = b64decodeUtf8(fileData.content);
     html = html.replace(/const\s+MEDIA\s*=\s*\[[\s\S]*?\];/, `const MEDIA = ${arrJs};`);
     await ghPut('gallery.html', b64encodeUtf8(html), 'admin: update gallery media', fileData.sha, token);
 
+    pendingMedia = [];
     removedSrcs.clear();
+    MEDIA = merged;
     renderPhotos();
     toast('Gallery published ✓', 'success');
     setStatus('Live');
