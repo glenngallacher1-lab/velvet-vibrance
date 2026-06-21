@@ -3504,7 +3504,11 @@ async function ghPut(path, contentB64, message, sha, token) {
   const res = await fetch(API_BASE + path, {
     method: 'PUT', headers: ghHeaders(token), body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error(`PUT ${path} → ${res.status}`);
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = j.message ? ` — ${j.message}` : ''; } catch {}
+    throw new Error(`PUT ${path} → ${res.status}${detail}`);
+  }
   return res.json();
 }
 function b64encodeUtf8(str) {
@@ -3710,22 +3714,80 @@ function reorder(from, to) {
   renderPhotos();
 }
 
+/* ── Upload helpers ── */
+/* GitHub Contents API soft-limits PUT payloads near 1 MB. iPhone photos are
+   often 3–6 MB. Downscale images to 2048px max & re-encode JPEG before upload.
+   Videos pass through untouched (they hit a separate manual size warning). */
+async function downscaleImage(file, maxDim = 2048, quality = 0.85) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = dataUrl;
+  });
+  const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+  const w = Math.round(img.width  * scale);
+  const h = Math.round(img.height * scale);
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  /* Always re-encode as JPEG — smaller, universally supported, predictable */
+  const out = canvas.toDataURL('image/jpeg', quality);
+  return {
+    base64: out.split(',')[1],
+    mime: 'image/jpeg',
+    /* Force .jpg extension so the new filename matches the new encoding */
+    name: file.name.replace(/\.[^.]+$/, '') + '.jpg',
+    width: w, height: h
+  };
+}
+
 /* ── Upload ── */
 function handleFiles(files) {
-  Array.from(files).forEach(file => {
+  Array.from(files).forEach(async file => {
     const isVideo = file.type.startsWith('video/');
     if (file.size > 50 * 1024 * 1024) {
       toast(`${file.name} is over 50MB — skip`, 'error');
       return;
     }
+    const labelGuess = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+
+    /* Images: downscale + re-encode so the PUT fits under GitHub's 1MB cap */
+    if (!isVideo) {
+      try {
+        const shrunk = await downscaleImage(file);
+        pendingMedia.push({
+          name: shrunk.name,
+          base64: shrunk.base64,
+          type: 'image',
+          label: labelGuess,
+          mime: shrunk.mime
+        });
+        renderPhotos();
+      } catch (err) {
+        toast(`Could not process ${file.name}: ${err.message || err}`, 'error');
+      }
+      return;
+    }
+
+    /* Videos: pass through, but warn loudly if the base64 payload is huge */
     const reader = new FileReader();
     reader.onload = e => {
       const base64 = e.target.result.split(',')[1];
-      const labelGuess = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+      /* Base64 inflates by ~33%. GitHub Contents API soft limit ≈ 1MB → ≈ 1.4MB base64 */
+      if (base64.length > 1.4 * 1024 * 1024) {
+        toast(`${file.name} is large — GitHub may reject it. Try a shorter clip.`, 'error');
+      }
       pendingMedia.push({
         name: file.name,
         base64,
-        type: isVideo ? 'video' : 'image',
+        type: 'video',
         label: labelGuess,
         mime: file.type || (isVideo ? 'video/mp4' : 'image/jpeg')
       });
@@ -4211,9 +4273,11 @@ async function toggleMaintenance() {
 function apiErrMsg(err) {
   const m = String(err.message || err);
   if (m.includes('401')) return 'Token rejected — check write access';
+  if (m.includes('403')) return '403 forbidden — token lacks Contents: Write on this repo';
   if (m.includes('404')) return 'Repo/file not found — check token scope';
   if (m.includes('409')) return 'Conflict — file changed since load, reload and try again';
-  if (m.includes('422')) return 'No changes detected';
+  if (/413|too large|exceeds/i.test(m)) return 'File too large for GitHub API — try a smaller clip';
+  if (m.includes('422')) return m.includes('—') ? m : 'No changes detected (or invalid request)';
   return 'Error: ' + m;
 }
 
