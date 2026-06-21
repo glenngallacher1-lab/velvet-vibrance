@@ -3523,23 +3523,40 @@ function b64decodeUtf8(b64) {
    PHOTOS — load + render
    ════════════════════════════════════════════════════════════ */
 async function loadGalleryFromLive() {
-  /* Prefer the GitHub Contents API (no CDN cache) when a token is saved,
-     so admin always reflects what is actually on main. Fall back to RAW. */
+  /* Try API first (no CDN cache), fall back to RAW if API fails.
+     Visible diagnostics so a silent failure can't hide. */
   const token = localStorage.getItem('vv_gh_token');
+  let html, source = 'none';
   try {
-    let html;
     if (token) {
-      const fileData = await ghGet('gallery.html', token);
-      html = b64decodeUtf8(fileData.content);
+      try {
+        const fileData = await ghGet('gallery.html', token);
+        html = b64decodeUtf8(fileData.content);
+        source = 'api';
+      } catch (apiErr) {
+        console.warn('[admin] API read failed, falling back to RAW:', apiErr);
+        const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('RAW ' + res.status);
+        html = await res.text();
+        source = 'raw';
+      }
     } else {
       const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) throw new Error(res.status);
+      if (!res.ok) throw new Error('RAW ' + res.status);
       html = await res.text();
+      source = 'raw';
     }
     MEDIA = parseGallery(html);
-  } catch {
+    if (MEDIA.length === 0) {
+      toast('Loaded gallery.html but found 0 MEDIA items (parse miss?)', 'error');
+      console.warn('[admin] parse miss. Source =', source, '. HTML head:', (html || '').slice(0, 200));
+    } else {
+      console.log('[admin] gallery loaded via', source, '·', MEDIA.length, 'items');
+    }
+  } catch (err) {
     MEDIA = [];
-    toast('Could not load live gallery', 'error');
+    toast('Could not load live gallery: ' + (err.message || err), 'error');
+    console.error('[admin] loadGalleryFromLive failed:', err);
   }
   renderPhotos();
 }
