@@ -1484,6 +1484,7 @@
           <button class="btn btn-ghost" data-go="home">← Console</button>
           <button class="btn btn-ghost" id="refresh-photos" title="Re-fetch gallery.html from the live site">↻ Refresh</button>
           <button class="btn btn-primary" id="publish-photos">Publish to site →</button>
+          <span style="font-size:0.62rem;letter-spacing:0.18em;color:rgba(245,237,224,0.32);align-self:center;">build·sync-v3</span>
         </div>
       </div>
 
@@ -3581,6 +3582,27 @@ function renderPhotos() {
       _dataUrl: 'data:' + p.mime + ';base64,' + p.base64
     }))
   ];
+
+  /* Visible empty state with a retry button — so a silent load failure
+     can't look like "the admin has no photos". */
+  if (items.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'grid-column:1/-1;padding:3rem 1.5rem;text-align:center;border:1px dashed rgba(232,181,71,0.3);border-radius:12px;background:rgba(232,181,71,0.04);';
+    const h = document.createElement('div');
+    h.style.cssText = 'font-family:Playfair Display,serif;font-size:1.3rem;font-weight:700;color:#e8b547;margin-bottom:0.4rem;';
+    h.textContent = 'No photos loaded';
+    const p = document.createElement('div');
+    p.style.cssText = 'font-size:0.9rem;color:rgba(245,237,224,0.6);margin-bottom:1.2rem;';
+    p.textContent = 'Admin could not read the live gallery. Click below to retry.';
+    const b = document.createElement('button');
+    b.className = 'btn btn-primary';
+    b.textContent = '↻ Load from live site';
+    b.addEventListener('click', () => loadGalleryFromLive());
+    empty.append(h, p, b);
+    grid.appendChild(empty);
+    count.textContent = '0 items';
+    return;
+  }
 
   items.forEach((it, i) => {
     const card = document.createElement('div');
