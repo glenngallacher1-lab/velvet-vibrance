@@ -1482,6 +1482,7 @@
         </div>
         <div class="ws-actions">
           <button class="btn btn-ghost" data-go="home">← Console</button>
+          <button class="btn btn-ghost" id="refresh-photos" title="Re-fetch gallery.html from the live site">↻ Refresh</button>
           <button class="btn btn-primary" id="publish-photos">Publish to site →</button>
         </div>
       </div>
@@ -4396,6 +4397,18 @@ function init() {
   ['dragleave','drop'].forEach(ev => uz.addEventListener(ev, e => { e.preventDefault(); uz.classList.remove('drag'); }));
   uz.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
   $('#publish-photos').addEventListener('click', publishPhotos);
+  $('#refresh-photos').addEventListener('click', async () => {
+    const btn = $('#refresh-photos');
+    btn.disabled = true;
+    const orig = btn.textContent;
+    btn.textContent = '↻ Refreshing…';
+    pendingMedia = [];
+    removedSrcs.clear();
+    await loadGalleryFromLive();
+    toast('Pulled latest gallery from the site ✓', 'success');
+    btn.disabled = false;
+    btn.textContent = orig;
+  });
 
   /* Events */
   const pz = $('#poster-zone');
