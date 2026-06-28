@@ -3525,68 +3525,99 @@ function b64decodeUtf8(b64) {
    PHOTOS — load + render
    ════════════════════════════════════════════════════════════ */
 async function loadGalleryFromLive(opts = {}) {
-  /* Source order, fastest → freshest:
-     1. Same-origin gallery.html  — sibling file, instant, no token, no network.
-     2. GitHub API (if token set) — pulls freshest committed content.
-     3. RAW                       — CDN fallback if API errors or no token.
-     Same-origin will fail for file:// in Chrome (CORS) and we fall through.
-     Pass { forceRemote: true } to skip same-origin (use after publish so
-     we don't read a stale local gallery.html that pre-dates the push). */
+  /* Two-stage load:
+     Stage 1 — same-origin gallery.html for an INSTANT render (no token, no
+               network). Skipped on file:// (Chrome blocks) and skipped when
+               forceRemote is true (e.g. post-publish, where the on-disk
+               copy pre-dates the push).
+     Stage 2 — authoritative remote pull (API if token, else RAW). Always
+               runs. If it disagrees with what we rendered locally (e.g.
+               because the user's same-origin copy was stale or cached),
+               re-render with the remote. This guarantees the admin
+               eventually shows every photo the live gallery actually has. */
   const { forceRemote = false } = opts;
   galleryLoadState = 'loading';
   renderPhotos();
-  let html, source = 'none';
-  try {
-    /* 1. Same-origin */
-    if (!forceRemote) {
-      try {
-        const res = await fetch('gallery.html?t=' + Date.now(), { cache: 'no-store' });
-        if (res.ok) { html = await res.text(); source = 'local'; }
-      } catch { /* same-origin not available (file:// in Chrome) — fall through */ }
-    }
 
-    /* 2. API (if token) */
-    if (!html) {
-      const token = localStorage.getItem('vv_gh_token');
-      if (token) {
-        try {
-          const fileData = await ghGet('gallery.html', token);
-          html = b64decodeUtf8(fileData.content);
-          source = 'api';
-        } catch (apiErr) {
-          console.warn('[admin] API read failed, falling back to RAW:', apiErr);
+  /* ── Stage 1: same-origin ── */
+  let localLiveMedia = null;
+  if (!forceRemote) {
+    try {
+      const res = await fetch('gallery.html?t=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) {
+        const parsed = parseGallery(await res.text());
+        if (parsed.length > 0) {
+          localLiveMedia = parsed;
+          MEDIA = applySavedAdminState(parsed);
+          galleryLoadState = 'loaded';
+          renderPhotos();
+          console.log('[admin] rendered from local ·', parsed.length, 'items');
         }
       }
-    }
+    } catch { /* file:// CORS or offline — fall through to remote */ }
+  }
 
-    /* 3. RAW */
-    if (!html) {
+  /* ── Stage 2: authoritative remote ── */
+  let remoteLiveMedia = null;
+  let remoteSource = null;
+  try {
+    const token = localStorage.getItem('vv_gh_token');
+    if (token) {
+      try {
+        const fileData = await ghGet('gallery.html', token);
+        remoteLiveMedia = parseGallery(b64decodeUtf8(fileData.content));
+        remoteSource = 'api';
+      } catch (apiErr) {
+        console.warn('[admin] API read failed, falling back to RAW:', apiErr);
+      }
+    }
+    if (!remoteLiveMedia) {
       const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) throw new Error('RAW ' + res.status);
-      html = await res.text();
-      source = 'raw';
-    }
-
-    const liveMedia = parseGallery(html);
-    /* Apply any locally-saved un-published edits on top of the live array.
-       This rewrites MEDIA + restores removedSrcs + pendingMedia.
-       Callers that want a clean load must call clearAdminState() first. */
-    MEDIA = applySavedAdminState(liveMedia);
-    galleryLoadState = 'loaded';
-    if (liveMedia.length === 0) {
-      toast('Loaded gallery.html but found 0 MEDIA items (parse miss?)', 'error');
-      console.warn('[admin] parse miss. Source =', source, '. HTML head:', (html || '').slice(0, 200));
-    } else {
-      console.log('[admin] gallery loaded via', source, '·', liveMedia.length, 'live items',
-        (pendingMedia.length || removedSrcs.size) ? `(+${pendingMedia.length} pending, ${removedSrcs.size} removed locally)` : '');
+      remoteLiveMedia = parseGallery(await res.text());
+      remoteSource = 'raw';
     }
   } catch (err) {
-    MEDIA = [];
-    galleryLoadState = 'failed';
-    toast('Could not load live gallery: ' + (err.message || err), 'error');
-    console.error('[admin] loadGalleryFromLive failed:', err);
+    if (!localLiveMedia) {
+      MEDIA = [];
+      galleryLoadState = 'failed';
+      toast('Could not load live gallery: ' + (err.message || err), 'error');
+      console.error('[admin] loadGalleryFromLive failed:', err);
+      renderPhotos();
+    } else {
+      /* Local rendered fine — silently keep it. */
+      console.warn('[admin] remote unreachable, keeping local copy');
+    }
+    return;
   }
-  renderPhotos();
+
+  if (remoteLiveMedia.length === 0) {
+    if (!localLiveMedia) {
+      toast('Loaded gallery.html but found 0 MEDIA items (parse miss?)', 'error');
+      MEDIA = [];
+      galleryLoadState = 'failed';
+      renderPhotos();
+    }
+    return;
+  }
+
+  /* ── Reconcile ── compare raw live arrays (src + label + type, in order). */
+  const sameAsLocal = localLiveMedia &&
+    localLiveMedia.length === remoteLiveMedia.length &&
+    localLiveMedia.every((m, i) => {
+      const r = remoteLiveMedia[i];
+      return r && r.src === m.src
+                && (r.label || '') === (m.label || '')
+                && (r.type  || '') === (m.type  || '');
+    });
+
+  if (!localLiveMedia || !sameAsLocal) {
+    MEDIA = applySavedAdminState(remoteLiveMedia);
+    galleryLoadState = 'loaded';
+    renderPhotos();
+    console.log('[admin] gallery loaded via', remoteSource, '·', remoteLiveMedia.length, 'items',
+      localLiveMedia ? `(reconciled — local had ${localLiveMedia.length})` : '');
+  }
 }
 function parseGallery(html) {
   const m = html.match(/const\s+MEDIA\s*=\s*(\[[\s\S]*?\]);/);
