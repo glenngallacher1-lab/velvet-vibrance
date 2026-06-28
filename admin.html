@@ -1389,8 +1389,31 @@
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--paper-mute);
-      margin-bottom: 1rem;
+      margin-bottom: 0.6rem;
       min-height: 1em;
+    }
+    .tm-detail {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--paper-dim);
+      background: rgba(0,0,0,0.45);
+      border-left: 2px solid var(--honey);
+      padding: 0.7rem 0.9rem;
+      margin-bottom: 1.1rem;
+      border-radius: 2px;
+      word-break: break-word;
+    }
+    .tm-detail::before {
+      content: 'GitHub says · ';
+      color: var(--honey);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 0.3rem;
+      opacity: 0.85;
     }
     .tm-body {
       font-size: 0.86rem;
@@ -1782,6 +1805,7 @@
   <div class="tm-rule"></div>
   <h2 class="tm-title" id="tm-title">Token can't <em>write</em> to this repo</h2>
   <p class="tm-reason" id="tm-reason"></p>
+  <p class="tm-detail" id="tm-detail" hidden></p>
   <p class="tm-body">
     Your token needs <code>Contents: Read &amp; write</code> on
     <code>glenngallacher1-lab/velvet-vibrance</code>. Generate or update the
@@ -4727,11 +4751,22 @@ function apiErrMsg(err) {
 
 /* ── Token error modal ──
    401/403 from the GitHub API means the token can't write. A toast isn't
-   enough — surface a modal with a direct link to the token settings page
-   and a shortcut to paste a new one. */
-function showTokenModal(reason) {
+   enough — surface a modal with a direct link to the token settings page,
+   a shortcut to paste a new one, AND the verbatim message GitHub returned
+   (so the root cause isn't hidden behind a generic explainer). */
+function showTokenModal(reason, detail) {
   const r = $('#tm-reason');
+  const d = $('#tm-detail');
   if (r) r.textContent = reason || '';
+  if (d) {
+    if (detail) {
+      d.textContent = detail;
+      d.hidden = false;
+    } else {
+      d.textContent = '';
+      d.hidden = true;
+    }
+  }
   $('#tm-veil').classList.add('open');
   $('#tm-modal').classList.add('open');
   $('#tm-veil').setAttribute('aria-hidden', 'false');
@@ -4745,13 +4780,20 @@ function hideTokenModal() {
 }
 /* Centralised error reporter for GitHub API calls.
    401/403 → modal (actionable). Anything else → toast (informational).
-   Always updates the topbar status so callers don't need a second line. */
+   Always updates the topbar status so callers don't need a second line.
+   Extracts GitHub's raw message ("PUT path → 403 — <message>") so the
+   modal can surface it verbatim. */
 function reportApiError(err) {
   const raw = String((err && err.message) || err || '');
+  console.error('[admin] API error:', raw);
+  const detail = (raw.match(/—\s*(.+)$/) || [])[1] || '';
   if (raw.includes('401') || raw.includes('403')) {
-    showTokenModal(raw.includes('401')
-      ? 'Token rejected (401) — invalid or expired'
-      : 'Token rejected (403) — no write access on this repo');
+    showTokenModal(
+      raw.includes('401')
+        ? 'Token rejected (401) — invalid or expired'
+        : 'Write blocked (403) — token, repo access, or branch protection',
+      detail
+    );
     setStatus('Token error');
     return;
   }
