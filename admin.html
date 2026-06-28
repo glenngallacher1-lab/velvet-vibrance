@@ -1326,6 +1326,103 @@
     }
 
     /* ════════════════════════════════════════════════════════════
+       TOKEN ERROR MODAL
+       ════════════════════════════════════════════════════════════ */
+    .tm-veil {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.66);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s var(--ease);
+      z-index: 70;
+    }
+    .tm-veil.open { opacity: 1; pointer-events: auto; }
+    .tm-modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, calc(-50% + 12px));
+      width: min(480px, 92vw);
+      padding: 2.2rem 2rem 1.6rem;
+      background: linear-gradient(180deg, rgba(20,9,11,0.94), rgba(8,4,5,0.97));
+      border: 1px solid var(--line-warm);
+      border-radius: 3px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(245,237,224,0.04);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+      z-index: 71;
+    }
+    .tm-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+    }
+    .tm-close { position: absolute; top: 0.8rem; right: 0.8rem; }
+    .tm-mark {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 0.7rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--honey);
+    }
+    .tm-rule {
+      width: 1px; height: 28px;
+      margin: 0.6rem 0 0.9rem;
+      background: linear-gradient(to bottom, transparent, var(--honey), transparent);
+      opacity: 0.6;
+    }
+    .tm-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: clamp(1.6rem, 3.4vw, 2.1rem);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--paper);
+      margin-bottom: 0.6rem;
+    }
+    .tm-title em { color: var(--honey); font-style: italic; }
+    .tm-reason {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--paper-mute);
+      margin-bottom: 1rem;
+      min-height: 1em;
+    }
+    .tm-body {
+      font-size: 0.86rem;
+      line-height: 1.55;
+      color: var(--paper-dim);
+      margin-bottom: 1.4rem;
+    }
+    .tm-body code, .tm-hint code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.78rem;
+      background: rgba(232,181,71,0.08);
+      color: var(--honey);
+      padding: 0.1rem 0.35rem;
+      border-radius: 2px;
+    }
+    .tm-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .tm-actions .btn { flex: 1; min-width: 160px; text-align: center; text-decoration: none; }
+    .tm-hint {
+      font-size: 0.72rem;
+      color: var(--paper-mute);
+      line-height: 1.55;
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--line);
+      margin-top: 0.4rem;
+    }
+
+    /* ════════════════════════════════════════════════════════════
        TOAST
        ════════════════════════════════════════════════════════════ */
     #toast {
@@ -1673,6 +1770,35 @@
     </p>
   </div>
 </aside>
+
+<!-- Token error modal — surfaces on 401 / 403 with a direct link to the
+     GitHub token settings page. -->
+<div class="tm-veil" id="tm-veil" aria-hidden="true"></div>
+<div class="tm-modal" id="tm-modal" role="dialog" aria-modal="true" aria-labelledby="tm-title" aria-hidden="true">
+  <button class="icon-btn tm-close" id="tm-close" aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div class="tm-mark">GitHub · Token</div>
+  <div class="tm-rule"></div>
+  <h2 class="tm-title" id="tm-title">Token can't <em>write</em> to this repo</h2>
+  <p class="tm-reason" id="tm-reason"></p>
+  <p class="tm-body">
+    Your token needs <code>Contents: Read &amp; write</code> on
+    <code>glenngallacher1-lab/velvet-vibrance</code>. Generate or update the
+    token, then paste it back here.
+  </p>
+  <div class="tm-actions">
+    <a class="btn btn-primary" id="tm-open-gh" href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">
+      Open token settings →
+    </a>
+    <button class="btn" id="tm-open-drawer">Paste new token</button>
+  </div>
+  <p class="tm-hint">
+    Classic PAT: tick the whole <code>repo</code> scope.
+    Fine-grained PAT: include <code>velvet-vibrance</code> under repository access, with
+    <code>Contents → Read and write</code>.
+  </p>
+</div>
 
 <!-- GRIDSCAN TRANSITION OVERLAY -->
 <div id="gridscan" aria-hidden="true">
@@ -4166,8 +4292,7 @@ async function publishPhotos() {
        the remote has the just-pushed bytes. */
     await loadGalleryFromLive({ forceRemote: true });
   } catch (err) {
-    toast(apiErrMsg(err), 'error');
-    setStatus('Error');
+    reportApiError(err);
   } finally {
     btn.disabled = false; btn.textContent = 'Publish to site →';
   }
@@ -4243,8 +4368,7 @@ function renderEvents() {
       } catch (err) {
         events.splice(0, events.length, ...snapshot);
         renderEvents();
-        toast(apiErrMsg(err), 'error');
-        setStatus('Error');
+        reportApiError(err);
       }
     });
 
@@ -4325,8 +4449,7 @@ async function addEvent() {
     setStatus('Live');
     await loadEvents();
   } catch (err) {
-    toast(apiErrMsg(err), 'error');
-    setStatus('Error');
+    reportApiError(err);
   } finally {
     btn.disabled = false; btn.textContent = '+ Post event';
   }
@@ -4345,8 +4468,7 @@ async function publishEvents() {
     setStatus('Live');
     await loadEvents();
   } catch (err) {
-    toast(apiErrMsg(err), 'error');
-    setStatus('Error');
+    reportApiError(err);
   } finally {
     btn.disabled = false; btn.textContent = 'Publish to site →';
   }
@@ -4587,8 +4709,7 @@ async function toggleMaintenance() {
     toast(target ? 'Site under maintenance ✓' : 'Site is live ✓', 'success');
     setStatus(target ? 'Offline' : 'Live');
   } catch (err) {
-    toast(apiErrMsg(err), 'error');
-    setStatus('Error');
+    reportApiError(err);
     paintMaintUI();
   }
 }
@@ -4602,6 +4723,40 @@ function apiErrMsg(err) {
   if (/413|too large|exceeds/i.test(m)) return 'File too large for GitHub API — try a smaller clip';
   if (m.includes('422')) return m.includes('—') ? m : 'No changes detected (or invalid request)';
   return 'Error: ' + m;
+}
+
+/* ── Token error modal ──
+   401/403 from the GitHub API means the token can't write. A toast isn't
+   enough — surface a modal with a direct link to the token settings page
+   and a shortcut to paste a new one. */
+function showTokenModal(reason) {
+  const r = $('#tm-reason');
+  if (r) r.textContent = reason || '';
+  $('#tm-veil').classList.add('open');
+  $('#tm-modal').classList.add('open');
+  $('#tm-veil').setAttribute('aria-hidden', 'false');
+  $('#tm-modal').setAttribute('aria-hidden', 'false');
+}
+function hideTokenModal() {
+  $('#tm-veil').classList.remove('open');
+  $('#tm-modal').classList.remove('open');
+  $('#tm-veil').setAttribute('aria-hidden', 'true');
+  $('#tm-modal').setAttribute('aria-hidden', 'true');
+}
+/* Centralised error reporter for GitHub API calls.
+   401/403 → modal (actionable). Anything else → toast (informational).
+   Always updates the topbar status so callers don't need a second line. */
+function reportApiError(err) {
+  const raw = String((err && err.message) || err || '');
+  if (raw.includes('401') || raw.includes('403')) {
+    showTokenModal(raw.includes('401')
+      ? 'Token rejected (401) — invalid or expired'
+      : 'Token rejected (403) — no write access on this repo');
+    setStatus('Token error');
+    return;
+  }
+  toast(apiErrMsg(err), 'error');
+  setStatus('Error');
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -4629,14 +4784,15 @@ async function testToken() {
       headers: { Authorization: `Bearer ${t}`, Accept: 'application/vnd.github+json' }
     });
     if (!res.ok) {
-      if (res.status === 401) toast('Token invalid or expired', 'error');
-      else if (res.status === 404) toast('Repo not visible to this token', 'error');
-      else toast('Error ' + res.status, 'error');
+      if (res.status === 401)      showTokenModal('Token rejected (401) — invalid or expired');
+      else if (res.status === 403) showTokenModal('Token rejected (403) — no access on this repo');
+      else if (res.status === 404) showTokenModal('Repo not visible to this token (404) — check repository access');
+      else                         toast('Error ' + res.status, 'error');
       return;
     }
     const data = await res.json();
     if (data.permissions && data.permissions.push) toast('Token OK · write access ✓', 'success');
-    else toast('Token valid but no write access', 'error');
+    else showTokenModal('Token can read but cannot write — needs Contents: Read & write');
   } catch (e) {
     toast('Network error: ' + e.message, 'error');
   }
@@ -4676,6 +4832,19 @@ function init() {
   $('#open-settings').addEventListener('click', openSettings);
   $('#close-settings').addEventListener('click', closeSettings);
   $('#drawer-veil').addEventListener('click', closeSettings);
+
+  /* Token error modal */
+  $('#tm-close').addEventListener('click', hideTokenModal);
+  $('#tm-veil').addEventListener('click', hideTokenModal);
+  $('#tm-open-drawer').addEventListener('click', () => {
+    hideTokenModal();
+    openSettings();
+    /* Focus the token input so the user can paste immediately. */
+    setTimeout(() => { const t = $('#gh-token'); if (t) t.focus(); }, 200);
+  });
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('#tm-modal').classList.contains('open')) hideTokenModal();
+  });
 
   /* Tile pointer follow */
   $$('.tile').forEach(tile => {
