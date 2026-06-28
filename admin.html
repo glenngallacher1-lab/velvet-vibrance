@@ -1727,6 +1727,7 @@ const API_BASE   = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/cont
 let MEDIA        = [];      // { src, type?, label }
 let removedSrcs  = new Set();
 let pendingMedia = [];      // { name, base64, type, label, mime }
+let galleryLoadState = 'loading';  // 'loading' | 'loaded' | 'failed'
 let events       = [];
 let posterBase64 = null;
 let posterName   = null;
@@ -3523,39 +3524,65 @@ function b64decodeUtf8(b64) {
 /* ════════════════════════════════════════════════════════════
    PHOTOS — load + render
    ════════════════════════════════════════════════════════════ */
-async function loadGalleryFromLive() {
-  /* Try API first (no CDN cache), fall back to RAW if API fails.
-     Visible diagnostics so a silent failure can't hide. */
-  const token = localStorage.getItem('vv_gh_token');
+async function loadGalleryFromLive(opts = {}) {
+  /* Source order, fastest → freshest:
+     1. Same-origin gallery.html  — sibling file, instant, no token, no network.
+     2. GitHub API (if token set) — pulls freshest committed content.
+     3. RAW                       — CDN fallback if API errors or no token.
+     Same-origin will fail for file:// in Chrome (CORS) and we fall through.
+     Pass { forceRemote: true } to skip same-origin (use after publish so
+     we don't read a stale local gallery.html that pre-dates the push). */
+  const { forceRemote = false } = opts;
+  galleryLoadState = 'loading';
+  renderPhotos();
   let html, source = 'none';
   try {
-    if (token) {
+    /* 1. Same-origin */
+    if (!forceRemote) {
       try {
-        const fileData = await ghGet('gallery.html', token);
-        html = b64decodeUtf8(fileData.content);
-        source = 'api';
-      } catch (apiErr) {
-        console.warn('[admin] API read failed, falling back to RAW:', apiErr);
-        const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) throw new Error('RAW ' + res.status);
-        html = await res.text();
-        source = 'raw';
+        const res = await fetch('gallery.html?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) { html = await res.text(); source = 'local'; }
+      } catch { /* same-origin not available (file:// in Chrome) — fall through */ }
+    }
+
+    /* 2. API (if token) */
+    if (!html) {
+      const token = localStorage.getItem('vv_gh_token');
+      if (token) {
+        try {
+          const fileData = await ghGet('gallery.html', token);
+          html = b64decodeUtf8(fileData.content);
+          source = 'api';
+        } catch (apiErr) {
+          console.warn('[admin] API read failed, falling back to RAW:', apiErr);
+        }
       }
-    } else {
+    }
+
+    /* 3. RAW */
+    if (!html) {
       const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) throw new Error('RAW ' + res.status);
       html = await res.text();
       source = 'raw';
     }
-    MEDIA = parseGallery(html);
-    if (MEDIA.length === 0) {
+
+    const liveMedia = parseGallery(html);
+    /* Apply any locally-saved un-published edits on top of the live array.
+       This rewrites MEDIA + restores removedSrcs + pendingMedia.
+       Callers that want a clean load must call clearAdminState() first. */
+    MEDIA = applySavedAdminState(liveMedia);
+    galleryLoadState = 'loaded';
+    if (liveMedia.length === 0) {
       toast('Loaded gallery.html but found 0 MEDIA items (parse miss?)', 'error');
       console.warn('[admin] parse miss. Source =', source, '. HTML head:', (html || '').slice(0, 200));
     } else {
-      console.log('[admin] gallery loaded via', source, '·', MEDIA.length, 'items');
+      console.log('[admin] gallery loaded via', source, '·', liveMedia.length, 'live items',
+        (pendingMedia.length || removedSrcs.size) ? `(+${pendingMedia.length} pending, ${removedSrcs.size} removed locally)` : '');
     }
   } catch (err) {
     MEDIA = [];
+    galleryLoadState = 'failed';
     toast('Could not load live gallery: ' + (err.message || err), 'error');
     console.error('[admin] loadGalleryFromLive failed:', err);
   }
@@ -3566,6 +3593,78 @@ function parseGallery(html) {
   if (!m) return [];
   try { return (new Function('return ' + m[1]))(); }
   catch { return []; }
+}
+
+/* ── Local admin state (localStorage) ──
+   Persists un-published edits across page refreshes: order of kept tiles,
+   caption overrides, removals, and (best-effort) pending uploads. After a
+   successful publish we clear this — the committed gallery.html is then
+   the source of truth again. */
+const ADMIN_STATE_KEY = 'vv_admin_photos_state';
+function saveAdminState() {
+  const payload = {
+    v: 1,
+    media: MEDIA,
+    removed: [...removedSrcs],
+    pending: pendingMedia
+  };
+  try {
+    localStorage.setItem(ADMIN_STATE_KEY, JSON.stringify(payload));
+  } catch (err) {
+    /* Quota exceeded — pending uploads can be megabytes. Retry without them
+       so order/labels/removals still survive a refresh. */
+    if (err && (err.name === 'QuotaExceededError' || err.code === 22)) {
+      try {
+        payload.pending = [];
+        localStorage.setItem(ADMIN_STATE_KEY, JSON.stringify(payload));
+        toast('Local memory full — pending uploads were not saved for refresh', 'error');
+      } catch { /* give up silently */ }
+    }
+  }
+}
+function clearAdminState() {
+  try { localStorage.removeItem(ADMIN_STATE_KEY); } catch {}
+}
+function loadAdminState() {
+  try {
+    const raw = localStorage.getItem(ADMIN_STATE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    return (s && s.v === 1) ? s : null;
+  } catch { return null; }
+}
+/* Reconcile saved state with freshly-fetched live MEDIA. Returns the
+   reordered/relabeled MEDIA array. Also restores removedSrcs and
+   pendingMedia as a side effect. Stale entries (srcs no longer on live)
+   are dropped. */
+function applySavedAdminState(liveMedia) {
+  const saved = loadAdminState();
+  if (!saved) return liveMedia;
+
+  const liveBySrc = new Map(liveMedia.map(m => [m.src, m]));
+  const savedMedia = Array.isArray(saved.media) ? saved.media : [];
+  const seen = new Set();
+  const ordered = [];
+
+  /* Saved order, keeping saved label override. Type comes from live (it's
+     intrinsic to the file, not editable). */
+  for (const sm of savedMedia) {
+    const live = liveBySrc.get(sm.src);
+    if (!live) continue;
+    seen.add(sm.src);
+    const e = { src: live.src, label: (sm.label != null ? sm.label : live.label) };
+    if (live.type) e.type = live.type;
+    ordered.push(e);
+  }
+  /* Any live items not represented in saved order → append. */
+  for (const lm of liveMedia) {
+    if (!seen.has(lm.src)) ordered.push({ ...lm });
+  }
+
+  removedSrcs = new Set((saved.removed || []).filter(s => liveBySrc.has(s)));
+  pendingMedia = Array.isArray(saved.pending) ? saved.pending : [];
+
+  return ordered;
 }
 function renderPhotos() {
   const grid = $('#photo-grid');
@@ -3583,23 +3682,40 @@ function renderPhotos() {
     }))
   ];
 
-  /* Visible empty state with a retry button — so a silent load failure
-     can't look like "the admin has no photos". */
+  /* Empty-state handling — discriminate by load state so the user never
+     sees a "Load from live site" placeholder during normal startup. */
   if (items.length === 0) {
-    const empty = document.createElement('div');
-    empty.style.cssText = 'grid-column:1/-1;padding:3rem 1.5rem;text-align:center;border:1px dashed rgba(232,181,71,0.3);border-radius:12px;background:rgba(232,181,71,0.04);';
-    const h = document.createElement('div');
-    h.style.cssText = 'font-family:Playfair Display,serif;font-size:1.3rem;font-weight:700;color:#e8b547;margin-bottom:0.4rem;';
-    h.textContent = 'No photos loaded';
-    const p = document.createElement('div');
-    p.style.cssText = 'font-size:0.9rem;color:rgba(245,237,224,0.6);margin-bottom:1.2rem;';
-    p.textContent = 'Admin could not read the live gallery. Click below to retry.';
-    const b = document.createElement('button');
-    b.className = 'btn btn-primary';
-    b.textContent = '↻ Load from live site';
-    b.addEventListener('click', () => loadGalleryFromLive());
-    empty.append(h, p, b);
-    grid.appendChild(empty);
+    if (galleryLoadState === 'loading') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'grid-column:1/-1;padding:2.4rem 1.5rem;text-align:center;color:rgba(245,237,224,0.45);font-size:0.78rem;letter-spacing:0.32em;text-transform:uppercase;';
+      wrap.textContent = 'Loading gallery…';
+      grid.appendChild(wrap);
+      count.textContent = '…';
+      return;
+    }
+    if (galleryLoadState === 'failed') {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'grid-column:1/-1;padding:3rem 1.5rem;text-align:center;border:1px dashed rgba(232,181,71,0.3);border-radius:12px;background:rgba(232,181,71,0.04);';
+      const h = document.createElement('div');
+      h.style.cssText = 'font-family:Playfair Display,serif;font-size:1.3rem;font-weight:700;color:#e8b547;margin-bottom:0.4rem;';
+      h.textContent = 'Could not load gallery';
+      const p = document.createElement('div');
+      p.style.cssText = 'font-size:0.9rem;color:rgba(245,237,224,0.6);margin-bottom:1.2rem;';
+      p.textContent = 'Admin could not read the live gallery.';
+      const b = document.createElement('button');
+      b.className = 'btn btn-primary';
+      b.textContent = '↻ Retry';
+      b.addEventListener('click', () => loadGalleryFromLive());
+      empty.append(h, p, b);
+      grid.appendChild(empty);
+      count.textContent = '0 items';
+      return;
+    }
+    /* loaded + truly empty */
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'grid-column:1/-1;padding:2.4rem 1.5rem;text-align:center;color:rgba(245,237,224,0.4);font-size:0.85rem;';
+    wrap.textContent = 'Gallery is empty. Drop media above to add the first tile.';
+    grid.appendChild(wrap);
     count.textContent = '0 items';
     return;
   }
@@ -3664,6 +3780,7 @@ function renderPhotos() {
         const target = MEDIA.find(x => x.src === it.src);
         if (target) target.label = newLabel;
       }
+      saveAdminState();
     });
 
     /* ── bottom bar ── */
@@ -3686,6 +3803,7 @@ function renderPhotos() {
         removedSrcs.add(it.src);
       }
       renderPhotos();
+      saveAdminState();
       toast('Removed — Publish to update site');
     });
     rm.addEventListener('mousedown', e => e.stopPropagation());
@@ -3694,7 +3812,10 @@ function renderPhotos() {
 
     card.append(mediaWrap, cap, bottom);
 
-    /* ── drag-to-reorder ── */
+    /* ── drag-to-reorder + drag-to-replace ──
+       Cards are both draggable (for reordering existing tiles) AND drop
+       targets for OS file drops (to replace this tile's media in place).
+       The drop handler discriminates by inspecting dataTransfer.files. */
     card.draggable = true;
     card.dataset.idx = i;
     card.addEventListener('dragstart', e => {
@@ -3708,6 +3829,16 @@ function renderPhotos() {
     card.addEventListener('drop', e => {
       e.preventDefault();
       card.classList.remove('drag-over');
+      /* File drop from OS → replace this tile's media. */
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (e.dataTransfer.files.length > 1) {
+          toast('Replace accepts one file at a time — using the first', 'error');
+        }
+        replaceTile(i, file);
+        return;
+      }
+      /* Otherwise it's an internal card-reorder drag. */
       if (dragSrcIndex === null || dragSrcIndex === i) return;
       reorder(dragSrcIndex, i);
     });
@@ -3752,6 +3883,7 @@ function reorder(from, to) {
   pendingMedia = newPending;
   dragSrcIndex = null;
   renderPhotos();
+  saveAdminState();
 }
 
 /* ── Upload helpers ── */
@@ -3789,34 +3921,35 @@ async function downscaleImage(file, maxDim = 2048, quality = 0.85) {
 }
 
 /* ── Upload ── */
-function handleFiles(files) {
-  Array.from(files).forEach(async file => {
-    const isVideo = file.type.startsWith('video/');
-    if (file.size > 50 * 1024 * 1024) {
-      toast(`${file.name} is over 50MB — skip`, 'error');
-      return;
-    }
-    const labelGuess = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+/* Process a single File → pending entry object (or null on failure).
+   Shared by the upload zone and the drag-to-replace handler. */
+async function processFile(file) {
+  const isVideo = file.type.startsWith('video/');
+  if (file.size > 50 * 1024 * 1024) {
+    toast(`${file.name} is over 50MB — skip`, 'error');
+    return null;
+  }
+  const labelGuess = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
 
-    /* Images: downscale + re-encode so the PUT fits under GitHub's 1MB cap */
-    if (!isVideo) {
-      try {
-        const shrunk = await downscaleImage(file);
-        pendingMedia.push({
-          name: shrunk.name,
-          base64: shrunk.base64,
-          type: 'image',
-          label: labelGuess,
-          mime: shrunk.mime
-        });
-        renderPhotos();
-      } catch (err) {
-        toast(`Could not process ${file.name}: ${err.message || err}`, 'error');
-      }
-      return;
+  /* Images: downscale + re-encode so the PUT fits under GitHub's 1MB cap */
+  if (!isVideo) {
+    try {
+      const shrunk = await downscaleImage(file);
+      return {
+        name: shrunk.name,
+        base64: shrunk.base64,
+        type: 'image',
+        label: labelGuess,
+        mime: shrunk.mime
+      };
+    } catch (err) {
+      toast(`Could not process ${file.name}: ${err.message || err}`, 'error');
+      return null;
     }
+  }
 
-    /* Videos: pass through, but warn loudly if the base64 payload is huge */
+  /* Videos: pass through, but warn loudly if the base64 payload is huge */
+  return new Promise(resolve => {
     const reader = new FileReader();
     reader.onload = e => {
       const base64 = e.target.result.split(',')[1];
@@ -3824,17 +3957,91 @@ function handleFiles(files) {
       if (base64.length > 1.4 * 1024 * 1024) {
         toast(`${file.name} is large — GitHub may reject it. Try a shorter clip.`, 'error');
       }
-      pendingMedia.push({
+      resolve({
         name: file.name,
         base64,
         type: 'video',
         label: labelGuess,
-        mime: file.type || (isVideo ? 'video/mp4' : 'image/jpeg')
+        mime: file.type || 'video/mp4'
       });
-      renderPhotos();
+    };
+    reader.onerror = () => {
+      toast(`Could not read ${file.name}`, 'error');
+      resolve(null);
     };
     reader.readAsDataURL(file);
   });
+}
+
+function handleFiles(files) {
+  Array.from(files).forEach(async file => {
+    const entry = await processFile(file);
+    if (!entry) return;
+    pendingMedia.push(entry);
+    renderPhotos();
+    saveAdminState();
+  });
+}
+
+/* Drag-to-replace: drop a file onto an existing tile to swap that tile's
+   media in place. Old src is dropped (live → removedSrcs; pending → spliced).
+   New pending entry takes the replaced tile's slot in the combined order.
+   The caption from the replaced tile is inherited if present. */
+async function replaceTile(combinedIdx, file) {
+  const entry = await processFile(file);
+  if (!entry) return;
+
+  const combined = [
+    ...MEDIA.map(m => ({ ...m, _origin: 'live' })),
+    ...pendingMedia.map(p => ({
+      src: p.name, label: p.label, type: p.type, _origin: 'pending', _ref: p
+    }))
+  ];
+  const target = combined[combinedIdx];
+  if (!target) {
+    pendingMedia.push(entry);
+    renderPhotos();
+    saveAdminState();
+    return;
+  }
+
+  /* Inherit caption from the replaced tile if it has one. */
+  const inheritedLabel = target._origin === 'live' ? target.label : (target._ref && target._ref.label);
+  if (inheritedLabel) entry.label = inheritedLabel;
+
+  /* Drop the replaced item from its source list. */
+  if (target._origin === 'live') {
+    MEDIA = MEDIA.filter(m => m.src !== target.src);
+    removedSrcs.add(target.src);
+  } else {
+    const pi = pendingMedia.findIndex(p => p.name === target.src);
+    if (pi !== -1) pendingMedia.splice(pi, 1);
+  }
+
+  /* Put the new entry into the combined slot the replaced tile occupied,
+     then deconstruct back into MEDIA + pendingMedia preserving that order. */
+  combined[combinedIdx] = {
+    src: entry.name, label: entry.label, type: entry.type, _origin: 'pending', _ref: entry
+  };
+
+  MEDIA = [];
+  pendingMedia = [];
+  combined.forEach(item => {
+    if (item._origin === 'live') {
+      /* Skip the removed target if it appears here (it shouldn't, since we
+         filtered it above, but be defensive). */
+      if (removedSrcs.has(item.src) && item.src !== entry.name) return;
+      const e = { src: item.src, label: item.label };
+      if (item.type) e.type = item.type;
+      MEDIA.push(e);
+    } else {
+      pendingMedia.push(item._ref);
+    }
+  });
+
+  renderPhotos();
+  saveAdminState();
+  toast(`Replaced “${target.label || target.src}” — Publish to update site`);
 }
 
 /* ── Publish photos ── */
@@ -3846,22 +4053,34 @@ async function publishPhotos() {
   setStatus('Publishing photos');
 
   try {
-    /* Step 0 — short-circuit if there's nothing to change. */
-    if (pendingMedia.length === 0 && removedSrcs.size === 0) {
-      toast('Nothing to publish — drop new photos or remove some first', 'error');
-      setStatus('Idle');
-      return;
-    }
-
     /* Step 1 — pull the CURRENT live gallery.html, parse the live MEDIA.
-       This is the source of truth. Anything we publish is built on top of
-       it, never replacing it from possibly-stale admin in-memory state. */
+       Used as the base for the rewrite + as the divergence reference for
+       the "nothing to publish" guard. */
     toast('Reading live gallery…');
     const fileData = await ghGet('gallery.html', token);
     let html = b64decodeUtf8(fileData.content);
     const liveMedia = parseGallery(html);
 
-    /* Step 2 — upload new files */
+    /* Step 2 — short-circuit only if there is truly nothing to publish:
+       no adds, no removals, AND admin's kept items match live in order +
+       label + type. Pure reorders / caption edits must still publish. */
+    const liveSrcs = new Set(liveMedia.map(m => m.src));
+    const keptPreview = MEDIA.filter(m => !removedSrcs.has(m.src) && liveSrcs.has(m.src));
+    const sameAsLive =
+      keptPreview.length === liveMedia.length &&
+      keptPreview.every((m, idx) => {
+        const l = liveMedia[idx];
+        return l && l.src === m.src &&
+               (l.label || '') === (m.label || '') &&
+               (l.type || '') === (m.type || '');
+      });
+    if (pendingMedia.length === 0 && removedSrcs.size === 0 && sameAsLive) {
+      toast('Nothing to publish — no changes vs. live gallery', 'error');
+      setStatus('Idle');
+      return;
+    }
+
+    /* Step 3 — upload new files */
     let i = 0;
     for (const p of pendingMedia) {
       i++;
@@ -3874,21 +4093,24 @@ async function publishPhotos() {
       await ghPut(encodeURIComponent(p.name), p.base64, `admin: add ${p.type} ${p.name}`, sha, token);
     }
 
-    /* Step 3 — build the new MEDIA = live ∖ removed ∪ pending, dedup by src */
+    /* Step 4 — build the new MEDIA.
+       Use admin's in-memory MEDIA as the source of truth for kept items so
+       reorders and caption edits survive. Intersect with liveSrcs so a
+       concurrent removal from another session can't get resurrected. */
     const pendingEntries = pendingMedia.map(p => ({
       src: p.name,
       label: p.label,
       ...(p.type === 'video' ? { type: 'video' } : {})
     }));
-    const kept = liveMedia.filter(m => !removedSrcs.has(m.src));
-    /* Dedup: pending wins over live if same filename appears in both */
+    const kept = MEDIA.filter(m => !removedSrcs.has(m.src) && liveSrcs.has(m.src));
+    /* Dedup: pending wins over kept if same filename appears in both */
     const pendingSrcs = new Set(pendingEntries.map(p => p.src));
     const merged = [
       ...kept.filter(m => !pendingSrcs.has(m.src)),
       ...pendingEntries
     ];
 
-    /* Step 4 — rewrite gallery.html with the merged MEDIA */
+    /* Step 5 — rewrite gallery.html with the merged MEDIA */
     toast('Updating gallery.html…');
     const arrJs = '[\n' + merged.map(m => {
       const lines = [`src: ${JSON.stringify(m.src)}`];
@@ -3902,11 +4124,16 @@ async function publishPhotos() {
     pendingMedia = [];
     removedSrcs.clear();
     MEDIA = merged;
+    /* Committed state is now the truth — wipe local override memory so the
+       re-sync below doesn't re-apply already-published edits. */
+    clearAdminState();
     renderPhotos();
     toast('Gallery published ✓', 'success');
     setStatus('Live');
-    /* Re-sync from live so admin can never drift from the deployed gallery */
-    await loadGalleryFromLive();
+    /* Re-sync from live so admin can never drift from the deployed gallery.
+       forceRemote: local gallery.html on disk is pre-publish (stale); only
+       the remote has the just-pushed bytes. */
+    await loadGalleryFromLive({ forceRemote: true });
   } catch (err) {
     toast(apiErrMsg(err), 'error');
     setStatus('Error');
@@ -4428,6 +4655,18 @@ function init() {
     });
   });
 
+  /* Page-level guard: prevent the browser from navigating to a file when
+     the user misses a drop target (a card or the upload zone). Without
+     this, a near-miss on a photo-card opens the file and the admin session
+     is gone. */
+  ['dragover', 'drop'].forEach(ev => {
+    window.addEventListener(ev, e => {
+      if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.includes('Files')) {
+        e.preventDefault();
+      }
+    });
+  });
+
   /* Photos */
   const uz = $('#upload-zone');
   uz.addEventListener('click', () => $('#upload-input').click());
@@ -4441,9 +4680,13 @@ function init() {
     btn.disabled = true;
     const orig = btn.textContent;
     btn.textContent = '↻ Refreshing…';
+    /* Refresh = discard local edits AND pull the freshest committed copy
+       (skip same-origin since on-disk gallery.html may be older than what
+       another admin just pushed). */
     pendingMedia = [];
     removedSrcs.clear();
-    await loadGalleryFromLive();
+    clearAdminState();
+    await loadGalleryFromLive({ forceRemote: true });
     toast('Pulled latest gallery from the site ✓', 'success');
     btn.disabled = false;
     btn.textContent = orig;
