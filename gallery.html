@@ -135,9 +135,21 @@
       { src: '4A2E3D97-47D6-48A3-86AE-560F807ADFE0.jpeg',                        label: 'Velvet · Latest' }
     ];
 
+    /* Fisher–Yates shuffle so every visit gets a fresh mosaic order.
+       Admin still edits the canonical MEDIA[] source; the live page just
+       reshuffles that same set on each load. */
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
     (function renderMosaic() {
       const mosaic = document.getElementById('mosaic');
-      MEDIA.forEach(function (m) {
+      shuffleArray(MEDIA).forEach(function (m) {
         const isVideo = m.type === 'video';
         const item = document.createElement('div');
         item.className = 'rg-item' + (isVideo ? ' rg-video' : '');
