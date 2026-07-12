@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Velvet Vibrance — Admin Console" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data: blob:; media-src 'self' https://raw.githubusercontent.com data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com; frame-ancestors 'none';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data: blob:; media-src 'self' https://raw.githubusercontent.com data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
   <title>VELVET VIBRANCE — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1498,7 +1499,7 @@
     <p class="login-sub">Where the frequency is tuned</p>
 
     <form class="login-form" id="login-form" autocomplete="off">
-      <input id="pw" class="login-input" type="password" placeholder="Passphrase" autofocus />
+      <input id="pw" class="login-input" type="password" placeholder="Passphrase" autofocus autocomplete="off" spellcheck="false" />
       <button class="login-btn" type="submit">Enter the Frequency</button>
       <div class="login-err" id="login-err">Wrong passphrase. Try again.</div>
     </form>
@@ -1769,7 +1770,7 @@
     </p>
     <div class="field">
       <label>Personal access token</label>
-      <input type="password" id="gh-token" placeholder="github_pat_..." />
+      <input type="password" id="gh-token" placeholder="github_pat_..." autocomplete="off" spellcheck="false" />
     </div>
     <div class="actions-row">
       <button class="btn" id="test-token">Test</button>
@@ -1852,7 +1853,7 @@
 <!-- ════════════════════════════════════════════════════════════
      SCRIPTS
      ════════════════════════════════════════════════════════════ -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" integrity="sha384-9EQoUIJYrv09/oYhSxnw1VpLcfPw3BM9dE7+D/3wGUPeLLa7F9Z6OAoD+i/M6FK9" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 /* ════════════════════════════════════════════════════════════
    CONFIG
