@@ -847,6 +847,7 @@
       opacity: 0.7;
     }
     .photo-card-remove {
+      display: none !important;   /* reorder-only mode: add/subtract disabled */
       padding: 0.32rem 0.7rem;
       background: transparent;
       color: var(--paper-mute);
@@ -1610,16 +1611,7 @@
 
       <div class="card">
         <div class="help">
-          <strong>How to update:</strong> Uploads <strong>add to</strong> the existing gallery — they don't replace it. New tiles appear with a gold border and the counter shows <em>N items · M new</em>. Use the trash icon on a tile to mark it for removal. Drag to reorder. Click <strong>Publish to site</strong> to push your additions, removals, and reordering to the live gallery.
-        </div>
-
-        <div class="upload-zone" id="upload-zone">
-          <div>
-            <div class="uz-icon">↑</div>
-            <div class="uz-title">Drop media or click to upload</div>
-            <div class="uz-hint">Images and MP4 video — under 50MB each</div>
-          </div>
-          <input type="file" id="upload-input" class="file-input-hidden" accept="image/*,video/*" multiple />
+          <strong>How to update:</strong> This panel mirrors the live gallery. <strong>Drag any tile</strong> to change its position, then click <strong>Publish to site</strong> to push the new order live. Renaming captions and reordering are the only edits supported here — new uploads and removals are handled elsewhere.
         </div>
       </div>
 
@@ -4010,16 +4002,12 @@ function renderPhotos() {
     card.addEventListener('drop', e => {
       e.preventDefault();
       card.classList.remove('drag-over');
-      /* File drop from OS → replace this tile's media. */
+      /* Reorder-only mode: file drops from the OS are ignored so tiles
+         can't be replaced. Only internal card-reorder drags proceed. */
       if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        if (e.dataTransfer.files.length > 1) {
-          toast('Replace accepts one file at a time — using the first', 'error');
-        }
-        replaceTile(i, file);
+        toast('Uploads disabled — this panel only reorders existing tiles', 'error');
         return;
       }
-      /* Otherwise it's an internal card-reorder drag. */
       if (dragSrcIndex === null || dragSrcIndex === i) return;
       reorder(dragSrcIndex, i);
     });
@@ -4909,13 +4897,15 @@ function init() {
     });
   });
 
-  /* Photos */
+  /* Photos — reorder-only mode: upload UI is gone, so bindings are skipped. */
   const uz = $('#upload-zone');
-  uz.addEventListener('click', () => $('#upload-input').click());
-  $('#upload-input').addEventListener('change', e => { handleFiles(e.target.files); e.target.value=''; });
-  ['dragenter','dragover'].forEach(ev => uz.addEventListener(ev, e => { e.preventDefault(); uz.classList.add('drag'); }));
-  ['dragleave','drop'].forEach(ev => uz.addEventListener(ev, e => { e.preventDefault(); uz.classList.remove('drag'); }));
-  uz.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+  if (uz) {
+    uz.addEventListener('click', () => $('#upload-input').click());
+    $('#upload-input').addEventListener('change', e => { handleFiles(e.target.files); e.target.value=''; });
+    ['dragenter','dragover'].forEach(ev => uz.addEventListener(ev, e => { e.preventDefault(); uz.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(ev => uz.addEventListener(ev, e => { e.preventDefault(); uz.classList.remove('drag'); }));
+    uz.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+  }
   $('#publish-photos').addEventListener('click', publishPhotos);
   $('#refresh-photos').addEventListener('click', async () => {
     const btn = $('#refresh-photos');
