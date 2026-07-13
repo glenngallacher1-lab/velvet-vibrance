@@ -848,7 +848,6 @@
       opacity: 0.7;
     }
     .photo-card-remove {
-      display: none !important;   /* reorder-only mode: add/subtract disabled */
       padding: 0.32rem 0.7rem;
       background: transparent;
       color: var(--paper-mute);
@@ -1612,7 +1611,7 @@
 
       <div class="card">
         <div class="help">
-          <strong>How to update:</strong> This panel mirrors the live gallery. <strong>Drag any tile</strong> to change its position, then click <strong>Publish to site</strong> to push the new order live. Renaming captions and reordering are the only edits supported here — new uploads and removals are handled elsewhere.
+          <strong>How to update:</strong> This panel mirrors the live gallery. <strong>Drag any tile</strong> to change its position, or click <strong>Remove</strong> on a tile to mark it for deletion. Then click <strong>Publish to site</strong> to push the new order and removals live. New media is added through Claude, not from this panel.
         </div>
       </div>
 
@@ -4284,7 +4283,8 @@ async function publishPhotos() {
     toast('Updating gallery.html…');
     const arrJs = '[\n' + merged.map(m => {
       const lines = [`src: ${JSON.stringify(m.src)}`];
-      if (m.type) lines.push(`type: ${JSON.stringify(m.type)}`);
+      if (m.type)   lines.push(`type: ${JSON.stringify(m.type)}`);
+      if (m.poster) lines.push(`poster: ${JSON.stringify(m.poster)}`);
       lines.push(`label: ${JSON.stringify(m.label || '')}`);
       return '      { ' + lines.join(', ') + ' }';
     }).join(',\n') + '\n    ]';
