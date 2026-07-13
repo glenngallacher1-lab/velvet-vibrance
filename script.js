@@ -459,60 +459,53 @@ function splitWords(el) {
   });
 })();
 
-/* ── L. Gallery Lightbox (Image + Video) ────────────────────── */
-(function initLightbox() {
-  const lightbox      = document.getElementById('lightbox');
-  const lightboxImg   = document.getElementById('lightbox-img');
-  const lightboxVideo = document.getElementById('lightbox-video');
-  const lightboxClose = document.getElementById('lightbox-close');
-  if (!lightbox) return;
+/* ── L. Page Fade Transition ─────────────────────────────────
+   Smooth curtain wipe between internal pages. Fades in on arrival
+   (skipped on pages that already run their own entry animation),
+   and fades out on any same-origin .html link — except links with
+   [data-transition] on index.html, which run the gridscan/circular
+   shader transitions instead. */
+(function initPageFade() {
+  const hasEntryScreen = !!document.getElementById('entry-screen');
 
-  const gallerySection = document.getElementById('gallery');
-  if (gallerySection) {
-    gallerySection.querySelectorAll('.rg-item').forEach(function (item) {
-      item.addEventListener('click', function () {
-        const isVideo = item.classList.contains('rg-video');
-        const src = isVideo
-          ? item.querySelector('video').src
-          : item.querySelector('img').src;
+  const fade = document.createElement('div');
+  fade.id = 'page-fade';
+  fade.setAttribute('aria-hidden', 'true');
+  if (!hasEntryScreen) fade.classList.add('active');
+  document.body.appendChild(fade);
 
-        if (isVideo) {
-          lightboxImg.style.display   = 'none';
-          lightboxVideo.style.display = 'block';
-          lightboxVideo.src = src;
-          lightboxVideo.play();
-        } else {
-          lightboxVideo.pause();
-          lightboxVideo.src = '';
-          lightboxVideo.style.display = 'none';
-          lightboxImg.style.display   = 'block';
-          lightboxImg.src = src;
-        }
-
-        lightbox.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        if (window._lenis) window._lenis.stop();
-      });
+  if (!hasEntryScreen) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { fade.classList.remove('active'); });
     });
   }
 
-  function closeLightbox() {
-    lightbox.classList.remove('active');
-    document.body.style.overflow = '';
-    lightboxImg.src = '';
-    lightboxVideo.pause();
-    lightboxVideo.src = '';
-    lightboxVideo.style.display = 'none';
-    lightboxImg.style.display   = 'block';
-    if (window._lenis) window._lenis.start();
-  }
+  document.addEventListener('click', function (e) {
+    const a = e.target.closest('a');
+    if (!a) return;
+    if (e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+    if (a.hasAttribute('data-transition')) return;
+    if (a.target && a.target !== '' && a.target !== '_self') return;
 
-  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', function (e) {
-    if (e.target === lightbox) closeLightbox();
+    const href = a.getAttribute('href');
+    if (!href) return;
+    if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+
+    let url;
+    try { url = new URL(a.href, window.location.href); } catch (_) { return; }
+    if (url.origin !== window.location.origin) return;
+
+    const samePath = url.pathname === window.location.pathname;
+    if (samePath && url.hash) return;
+
+    e.preventDefault();
+    fade.classList.add('active');
+    setTimeout(function () { window.location.href = a.href; }, 480);
   });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeLightbox();
+
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) fade.classList.remove('active');
   });
 })();
 
