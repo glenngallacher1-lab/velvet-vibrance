@@ -12,7 +12,7 @@
 // ─── EDIT THIS BEFORE DEPLOYING ─────────────────────────────────────
 // Change to a long random string. This same value must be pasted into
 // admin.html's window.VV_ADMIN_SECRET so the admin can read the list.
-const SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
+const SECRET = '[REDACTED_SECRET_ROTATED]';
 // ────────────────────────────────────────────────────────────────────
 
 const SHEET_NAME = 'Subscribers';
