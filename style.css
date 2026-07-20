@@ -650,13 +650,19 @@ h1, h2, h3, h4 {
   color: var(--text-primary);
 }
 
+.about-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
 .about-body p {
   font-family: var(--font-prose);
-  font-size: 1.15rem;
+  font-size: clamp(1.25rem, 1.55vw, 1.7rem);
   font-weight: 400;
-  color: rgba(245, 237, 224, 0.78);
+  color: rgba(245, 237, 224, 0.82);
   letter-spacing: 0.005em;
-  line-height: 1.55;
+  line-height: 1.45;
+  margin: 0;
 }
 
 .about-image {
