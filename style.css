@@ -1565,10 +1565,11 @@ h1, h2, h3, h4 {
 .gallery-hero {
   position: relative;
   min-height: 44vh;
-  display: flex; align-items: flex-end;
-  padding: 0 clamp(1.5rem, 6vw, 6rem) clamp(1.4rem, 3.5vw, 2.6rem);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 6vw, 6rem);
   overflow: hidden;
   background: #3a0a0a;
+  text-align: center;
 }
 .gallery-hero::before {
   content: "";
@@ -1577,13 +1578,21 @@ h1, h2, h3, h4 {
               linear-gradient(180deg, #2a0707 0%, #3a0a0a 55%, var(--bg) 100%);
   z-index: 0;
 }
-.gallery-hero-inner { position: relative; z-index: 1; max-width: 1100px; }
+.gallery-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
 .gallery-hero h1 {
   font-family: var(--font-display);
   font-weight: 900;
   font-size: clamp(3rem, 9vw, 8rem);
-  line-height: 0.95; letter-spacing: -0.01em;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
   margin: 0.6rem 0 1.4rem;
+  padding-bottom: 0.12em;
   color: var(--text-primary);
 }
 .gallery-hero h1 em {
@@ -1591,7 +1600,11 @@ h1, h2, h3, h4 {
   background: linear-gradient(180deg, #e6c14c 0%, #8b1a1a 95%);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding-bottom: 0.08em;
+  line-height: 1.15;
 }
+.gallery-hero p { margin-left: auto; margin-right: auto; }
 .gallery-hero p {
   font-family: var(--font-prose);
   font-weight: 400; font-size: 1.25rem;
