@@ -1583,6 +1583,14 @@
           </div>
           <span class="tile-cta">Upload vibrance →</span>
         </button>
+
+        <button class="tile" data-go="subscribers">
+          <div>
+            <div class="tile-name">Subscribers</div>
+            <p class="tile-desc">Everyone who joined the frequency. Fresh signups from the last week, plus the full archive. Copy the list, send invites.</p>
+          </div>
+          <span class="tile-cta">Read the room →</span>
+        </button>
       </div>
 
       <div class="home-foot">
@@ -1664,6 +1672,64 @@
         </div>
         <div class="notes-grid" id="notes-grid"></div>
         <div class="empty-state hide" id="notes-empty">No notes yet — write the first one <em>above</em>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBSCRIBERS -->
+  <section class="view" id="view-subscribers">
+    <div class="ws-wrap">
+      <div class="ws-head">
+        <div>
+          <p class="ws-eyebrow">04 · The Frequency</p>
+          <h2><em>Subscribers</em> &amp; Emails</h2>
+        </div>
+        <div class="ws-actions">
+          <button class="btn btn-ghost" data-go="home">← Console</button>
+          <button class="btn btn-ghost" id="subs-refresh">↻ Refresh</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="help">
+          <strong>Recent</strong> holds everyone who joined in the last 7 days. Older signups drop into <strong>Archive</strong> automatically — nothing is deleted, ever. Both lists give you Copy All so you can paste into your email tool for invites.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">
+          Recent · last 7 days
+          <span class="count-badge" id="subs-recent-count">0 emails</span>
+          <button class="btn btn-ghost" id="subs-copy-recent" style="margin-left:auto;">Copy all</button>
+        </div>
+        <textarea id="subs-recent-list" readonly rows="6"
+          style="width:100%;padding:0.9rem 1rem;background:rgba(0,0,0,0.45);border:1px solid var(--line-warm);border-radius:2px;color:var(--paper);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.85rem;letter-spacing:0.02em;line-height:1.55;resize:vertical;"
+          placeholder="No new subscribers this week. Yet."></textarea>
+      </div>
+
+      <div class="card">
+        <div class="card-label">
+          Archive · older than 7 days
+          <span class="count-badge" id="subs-archive-count">0 emails</span>
+          <button class="btn btn-ghost" id="subs-copy-archive" style="margin-left:auto;">Copy all</button>
+        </div>
+        <textarea id="subs-archive-list" readonly rows="10"
+          style="width:100%;padding:0.9rem 1rem;background:rgba(0,0,0,0.45);border:1px solid var(--line-warm);border-radius:2px;color:var(--paper);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.85rem;letter-spacing:0.02em;line-height:1.55;resize:vertical;"
+          placeholder="No archived subscribers yet."></textarea>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Connection</div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Backend status</div>
+            <div class="toggle-sub" id="subs-status-line">Not yet fetched.</div>
+          </div>
+          <div class="maint-status" id="subs-status-pill">
+            <span class="dot"></span>
+            <span id="subs-status-text">Idle</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -3607,7 +3673,7 @@ function go(view) {
   if (view === 'home') {
     crumb.innerHTML = '<a href="#" data-go="home">Console</a>';
   } else {
-    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes' };
+    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes', subscribers: 'Subscribers' };
     const cap = caps[view] || view;
     crumb.innerHTML = `<a href="#" data-go="home">Console</a><span class="sep">/</span><span>${cap}</span>`;
   }
@@ -3616,7 +3682,89 @@ function go(view) {
   if (view === 'photos') lineWaves.show();  else lineWaves.hide();
   if (view === 'events') asciiText.show();  else asciiText.hide();
   if (view === 'notes')  notesWaves.show();   else notesWaves.hide();
+  if (view === 'subscribers') renderSubscribers();
   window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+/* ════════════════════════════════════════════════════════════
+   SUBSCRIBERS  · reads Apps Script backend, splits by age
+   ════════════════════════════════════════════════════════════ */
+/* Paste the deployed Apps Script web-app URL and the SAME secret
+   you set in WEBAPP.gs (SECRET constant). If either is missing,
+   the Subscribers view will show a setup-pending message. */
+window.VV_ADMIN_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+window.VV_ADMIN_SECRET   = 'PASTE_SAME_SECRET_AS_IN_WEBAPP_GS';
+
+const VV_SUBS = { recent: [], archive: [] };
+
+function setSubsStatus(text, kind) {
+  const line = $('#subs-status-line');
+  const pill = $('#subs-status-pill');
+  const label = $('#subs-status-text');
+  if (line) line.textContent = text;
+  if (label) label.textContent = kind === 'error' ? 'Error' : (kind === 'ok' ? 'Connected' : 'Idle');
+  if (pill) pill.classList.toggle('on', kind === 'error');
+}
+
+async function renderSubscribers() {
+  const endpoint = window.VV_ADMIN_ENDPOINT || '';
+  const secret   = window.VV_ADMIN_SECRET || '';
+  const recentEl  = $('#subs-recent-list');
+  const archiveEl = $('#subs-archive-list');
+  const recentN   = $('#subs-recent-count');
+  const archiveN  = $('#subs-archive-count');
+
+  if (/PASTE_YOUR|PASTE_SAME/.test(endpoint) || /PASTE_YOUR|PASTE_SAME/.test(secret) || !endpoint) {
+    recentEl.value = '';
+    archiveEl.value = '';
+    recentN.textContent = '0 emails';
+    archiveN.textContent = '0 emails';
+    setSubsStatus('Backend not configured — see SETUP-EMAILS.md, then paste the URL + secret into admin.html.', 'error');
+    return;
+  }
+
+  setSubsStatus('Fetching…', null);
+  try {
+    const url = endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') + 'secret=' + encodeURIComponent(secret);
+    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data || !data.ok) throw new Error(data && data.error ? data.error : 'unknown_error');
+
+    const subs = Array.isArray(data.subscribers) ? data.subscribers : [];
+    const now = Date.now();
+    const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+    const recent = [];
+    const archive = [];
+    subs.forEach(s => {
+      const ts = new Date(s.timestamp).getTime();
+      if (!isFinite(ts)) { archive.push(s); return; }
+      (ts >= cutoff ? recent : archive).push(s);
+    });
+    /* newest first inside each bucket */
+    recent.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    archive.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    VV_SUBS.recent  = recent;
+    VV_SUBS.archive = archive;
+    recentEl.value  = recent.map(s => s.email).join('\n');
+    archiveEl.value = archive.map(s => s.email).join('\n');
+    recentN.textContent  = recent.length + ' email' + (recent.length === 1 ? '' : 's');
+    archiveN.textContent = archive.length + ' email' + (archive.length === 1 ? '' : 's');
+    setSubsStatus('Last fetched ' + new Date().toLocaleTimeString() + ' · ' + subs.length + ' total.', 'ok');
+  } catch (err) {
+    console.error('[subscribers] fetch failed:', err);
+    setSubsStatus('Fetch failed: ' + err.message + '. Check the URL, secret, and web-app deployment access.', 'error');
+  }
+}
+
+function copySubs(list, btn) {
+  const text = (list || []).map(s => s.email).join('\n');
+  if (!text) { toast('Nothing to copy'); return; }
+  navigator.clipboard.writeText(text).then(
+    () => { toast('Copied ' + list.length + ' email' + (list.length === 1 ? '' : 's'), 'success'); },
+    () => { toast('Copy blocked by browser', 'error'); }
+  );
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -4863,6 +5011,14 @@ function init() {
   $('#open-settings').addEventListener('click', openSettings);
   $('#close-settings').addEventListener('click', closeSettings);
   $('#drawer-veil').addEventListener('click', closeSettings);
+
+  /* Subscribers view — refresh + copy-all buttons */
+  const subsRefresh = $('#subs-refresh');
+  if (subsRefresh) subsRefresh.addEventListener('click', renderSubscribers);
+  const subsCopyRecent = $('#subs-copy-recent');
+  if (subsCopyRecent) subsCopyRecent.addEventListener('click', () => copySubs(VV_SUBS.recent));
+  const subsCopyArchive = $('#subs-copy-archive');
+  if (subsCopyArchive) subsCopyArchive.addEventListener('click', () => copySubs(VV_SUBS.archive));
 
   /* Token error modal */
   $('#tm-close').addEventListener('click', hideTokenModal);

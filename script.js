@@ -44,6 +44,14 @@
   var titleEl = document.getElementById('entry-title');
   if (!entry) return;
 
+  /* Skip the entry preloader on any same-session return to home.
+     First visit: runs full animation, sets the flag on dismiss.
+     Coming back from Gallery/Events/Contact: no preloader, home shows immediately. */
+  if (sessionStorage.getItem('vv_entry_seen') === '1') {
+    entry.style.display = 'none';
+    return;
+  }
+
   document.body.classList.add('entry-open');
 
   /* Letter-by-letter title animation */
@@ -72,6 +80,7 @@
     if (entry.classList.contains('sweep-out')) return;
     entry.classList.add('sweep-out');
     document.body.classList.remove('entry-open');
+    sessionStorage.setItem('vv_entry_seen', '1');
     setTimeout(function () { entry.style.display = 'none'; }, 600);
   };
 
@@ -88,6 +97,8 @@
   if (typeof THREE === 'undefined') return;
   var container = document.getElementById('entry-screen');
   if (!container) return;
+  /* Skip if the entry preloader was already dismissed this session. */
+  if (sessionStorage.getItem('vv_entry_seen') === '1' || container.style.display === 'none') return;
 
   var SEP    = 115;   /* dot spacing */
   var NX     = 44;    /* columns (wide enough to bleed off-screen) */
@@ -132,7 +143,7 @@
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
     var mat = new THREE.PointsMaterial({
-      size: 14, vertexColors: true, transparent: true, opacity: 0.72, sizeAttenuation: true,
+      size: 9, vertexColors: true, transparent: true, opacity: 0.72, sizeAttenuation: true,
     });
     scene.add(new THREE.Points(geo, mat));
     return { geo: geo, mat: mat, yBase: yBase, sign: sign };
@@ -171,7 +182,7 @@
     }
 
     renderer.render(scene, camera);
-    count += 0.022;
+    count += 0.010;
   }
 
   function onResize() {
@@ -561,26 +572,71 @@ window.staggerCards = function () {
   });
 })();
 
-/* ── P. Join Form ────────────────────────────────────────────── */
+/* ── P. Join Form ─────────────────────────────────────────────
+   Posts the visitor's email to the Google Apps Script backend
+   (see WEBAPP.gs). Uses text/plain body to avoid CORS preflight.
+   Endpoint is set on window.VV_ENDPOINT by an inline <script>
+   above this file so it can be edited without redeploying JS. */
 (function initJoinForm() {
   const form = document.getElementById('join-form');
   if (!form) return;
+
+  function resetForm(btn, input, delayMs) {
+    setTimeout(function () {
+      btn.textContent = 'JOIN';
+      btn.style.color = '';
+      btn.disabled = false;
+      input.placeholder = 'Your email address';
+    }, delayMs);
+  }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     const input = form.querySelector('.join-input');
     const btn   = form.querySelector('.join-btn');
-    if (!input || !input.value.trim()) return;
+    if (!input || !btn) return;
 
-    btn.textContent = "YOU'RE IN";
-    btn.style.color = '#fff';
-    input.value = '';
-    input.placeholder = "YOU'RE IN THE FREQUENCY";
+    const email = (input.value || '').trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      btn.textContent = 'CHECK EMAIL';
+      resetForm(btn, input, 2500);
+      return;
+    }
 
-    setTimeout(function () {
-      btn.textContent = 'JOIN';
-      btn.style.color = '';
-      input.placeholder = 'Your email address';
-    }, 4000);
+    const endpoint = window.VV_ENDPOINT;
+    if (!endpoint || /PASTE_YOUR/.test(endpoint)) {
+      // Endpoint not configured yet — fail loudly in console, show soft UI.
+      console.warn('[VV] window.VV_ENDPOINT is not set. See SETUP-EMAILS.md.');
+      btn.textContent = 'SETUP PENDING';
+      resetForm(btn, input, 3000);
+      return;
+    }
+
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    fetch(endpoint, {
+      method: 'POST',
+      /* text/plain avoids a CORS preflight against Apps Script */
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ email: email, source: 'join-form' }),
+      redirect: 'follow'
+    })
+      .then(function (r) { return r.json().catch(function () { return { ok: true }; }); })
+      .then(function (res) {
+        if (res && res.ok) {
+          btn.textContent = res.duplicate ? "ALREADY IN" : "YOU'RE IN";
+          btn.style.color = '#fff';
+          input.value = '';
+          input.placeholder = "YOU'RE IN THE FREQUENCY";
+        } else {
+          btn.textContent = 'TRY AGAIN';
+        }
+        resetForm(btn, input, 4000);
+      })
+      .catch(function () {
+        btn.textContent = 'TRY AGAIN';
+        resetForm(btn, input, 3000);
+      });
   });
 })();
