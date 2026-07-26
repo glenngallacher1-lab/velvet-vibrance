@@ -19,17 +19,20 @@ Total time: about 5 minutes.
 ## 3. Paste the backend code
 
 1. Open `WEBAPP.gs` from this repo.
-2. **Before pasting**, edit the line near the top:
+2. Copy the entire file (no edits needed — the secret is read from a Script Property, not baked into source).
+3. Paste it into the Apps Script editor (replacing anything that was there).
+4. Click the **floppy disk icon** to save. Name the project **Velvet Vibrance Backend**.
 
-   ```
-   const SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
-   ```
+## 3b. Set the shared secret in Script Properties
 
-   Replace the placeholder with a long random string you generate. Anything unguessable works — use a password generator, or mash your keyboard. Save that string somewhere; you will paste it into admin.html in a moment.
+The Apps Script reads the secret from a project property so it never lives in source or in git.
 
-3. Copy the entire edited file.
-4. Paste it into the Apps Script editor (replacing anything that was there).
-5. Click the **floppy disk icon** to save. Name the project **Velvet Vibrance Backend**.
+1. In the Apps Script editor, click the **gear icon** (Project Settings) in the left sidebar.
+2. Scroll to **Script Properties** and click **Add script property**.
+3. Property: `VV_SECRET`
+4. Value: a long random string. Generate one with `python3 -c "import secrets,string;print(''.join(secrets.choice(string.ascii_letters+string.digits) for _ in range(48)))"` or a password manager.
+5. Click **Save script properties**.
+6. Copy that same value — you'll paste it into `admin.html` locally in step 5 (never commit it).
 
 ## 4. Deploy as a Web App
 
@@ -59,18 +62,23 @@ Find this block near the bottom:
 
 Replace `PASTE_YOUR_APPS_SCRIPT_URL_HERE` with your Web app URL.
 
-### `admin.html` (admin view)
+### `admin.html` (admin view — DO NOT COMMIT)
 
 Search for this block:
 
 ```js
 window.VV_ADMIN_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
-window.VV_ADMIN_SECRET   = 'PASTE_SAME_SECRET_AS_IN_WEBAPP_GS';
+window.VV_ADMIN_SECRET   = 'PASTE_YOUR_ADMIN_SECRET_LOCALLY_DO_NOT_COMMIT';
 ```
 
-Replace both placeholders. `VV_ADMIN_ENDPOINT` is the same Web app URL. `VV_ADMIN_SECRET` is the random string you set in step 3.
+Replace both placeholders with the real values. `VV_ADMIN_ENDPOINT` is the Web app URL. `VV_ADMIN_SECRET` is the `VV_SECRET` value you set in step 3b.
 
-Save both files, commit, push. Live.
+**Only commit the endpoint change, never the secret.** Easiest workflow:
+- Edit both fields locally, test that the Subscribers view works.
+- Before `git add admin.html`, revert `VV_ADMIN_SECRET` back to the placeholder string.
+- Only push the endpoint change. Keep the secret pasted-only on your machine (a private note or password manager entry).
+
+For `index.html`, the endpoint is public-safe and can be committed.
 
 ---
 
@@ -85,7 +93,9 @@ Save both files, commit, push. Live.
 
 ## Security note
 
-The admin secret is stored in `admin.html` source. Anyone who guesses or discovers the admin URL and views source can read the emails. Realistic threat for a small collective site is low. If you ever need stronger auth on the list, tell me and I will wire a proper serverless proxy.
+The Apps Script secret lives in Script Properties (server-side) and in `admin.html` on your local machine (never committed). Anyone who obtains your local `admin.html` copy — or who watches you open the admin console — can read the list. That's an acceptable posture for one owner; if you add collaborators or expand what the sheet holds, upgrade to Cloudflare Access or a real backend.
+
+The Apps Script `doPost` also rejects submissions that don't come from the site's own origin (via a `?origin=` param) so a random attacker page can't stuff junk into the sheet.
 
 ## Troubleshooting
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Velvet Vibrance — Admin Console" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data: blob:; media-src 'self' https://raw.githubusercontent.com data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data: blob:; media-src 'self' https://raw.githubusercontent.com data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://script.google.com https://script.googleusercontent.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="robots" content="noindex, nofollow, noarchive" />
@@ -1494,16 +1494,16 @@
   <div class="login-card">
     <div class="login-mark">Velvet Vibrance</div>
     <div class="login-rule"></div>
-    <h1 class="login-title">The <em>Console</em></h1>
-    <p class="login-sub">Where the frequency is tuned</p>
+    <h1 class="login-title">Owner <em>Check</em></h1>
+    <p class="login-sub">This is a soft gate, not real security. Publishing requires a GitHub token.</p>
 
     <form class="login-form" id="login-form" autocomplete="off">
       <input id="pw" class="login-input" type="password" placeholder="Passphrase" autofocus autocomplete="off" spellcheck="false" />
-      <button class="login-btn" type="submit">Enter the Frequency</button>
+      <button class="login-btn" type="submit">Enter</button>
       <div class="login-err" id="login-err">Wrong passphrase. Try again.</div>
     </form>
 
-    <div class="login-foot">est. 2024 · vol. 01</div>
+    <div class="login-foot">soft gate · real auth via github token</div>
   </div>
 </div>
 
@@ -1928,6 +1928,36 @@ const REPO_OWNER = 'glenngallacher1-lab';
 const REPO_NAME  = 'velvet-vibrance';
 const RAW_BASE   = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
 const API_BASE   = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`;
+
+/* ════════════════════════════════════════════════════════════
+   TOKEN STORE — GitHub PAT lives in sessionStorage (tab lifetime)
+   instead of localStorage so an XSS can't exfil a long-lived
+   credential. One-time migration on load moves any pre-existing
+   localStorage token over and wipes the old copy.
+   ════════════════════════════════════════════════════════════ */
+const tokenStore = {
+  get() {
+    try { return sessionStorage.getItem('vv_gh_token'); }
+    catch (_) { return null; }
+  },
+  set(v) {
+    try { sessionStorage.setItem('vv_gh_token', v); } catch (_) {}
+  },
+  clear() {
+    try { sessionStorage.removeItem('vv_gh_token'); } catch (_) {}
+    try { localStorage.removeItem('vv_gh_token'); } catch (_) {}
+  }
+};
+(function migrateLegacyToken() {
+  try {
+    const legacy = localStorage.getItem('vv_gh_token');
+    if (legacy && !sessionStorage.getItem('vv_gh_token')) {
+      sessionStorage.setItem('vv_gh_token', legacy);
+    }
+    if (legacy) localStorage.removeItem('vv_gh_token');
+  } catch (_) {}
+})();
+window.addEventListener('beforeunload', function () { tokenStore.clear(); });
 
 /* ════════════════════════════════════════════════════════════
    STATE
@@ -3693,7 +3723,7 @@ function go(view) {
    you set in WEBAPP.gs (SECRET constant). If either is missing,
    the Subscribers view will show a setup-pending message. */
 window.VV_ADMIN_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
-window.VV_ADMIN_SECRET   = '[REDACTED_SECRET_ROTATED]';
+window.VV_ADMIN_SECRET   = 'PASTE_YOUR_ADMIN_SECRET_LOCALLY_DO_NOT_COMMIT';
 
 const VV_SUBS = { recent: [], archive: [] };
 
@@ -3771,7 +3801,7 @@ function copySubs(list, btn) {
    GITHUB API
    ════════════════════════════════════════════════════════════ */
 function getToken() {
-  const t = localStorage.getItem('vv_gh_token');
+  const t = tokenStore.get();
   if (!t) {
     openSettings();
     toast('Paste a GitHub token in Settings first', 'error');
@@ -3851,7 +3881,7 @@ async function loadGalleryFromLive(opts = {}) {
   let remoteLiveMedia = null;
   let remoteSource = null;
   try {
-    const token = localStorage.getItem('vv_gh_token');
+    const token = tokenStore.get();
     if (token) {
       try {
         const fileData = await ghGet('gallery.html', token);
@@ -4463,7 +4493,7 @@ async function publishPhotos() {
    EVENTS
    ════════════════════════════════════════════════════════════ */
 async function loadEvents() {
-  const token = localStorage.getItem('vv_gh_token');
+  const token = tokenStore.get();
   try {
     let json;
     if (token) {
@@ -4945,7 +4975,7 @@ function openSettings() {
   $('#drawer').classList.add('open');
   $('#drawer-veil').classList.add('open');
   $('#drawer').setAttribute('aria-hidden', 'false');
-  const t = localStorage.getItem('vv_gh_token');
+  const t = tokenStore.get();
   if (t) $('#gh-token').placeholder = '••••••••••••• (saved)';
   loadMaintenance();
 }
@@ -4955,7 +4985,7 @@ function closeSettings() {
   $('#drawer').setAttribute('aria-hidden', 'true');
 }
 async function testToken() {
-  const t = $('#gh-token').value.trim() || localStorage.getItem('vv_gh_token');
+  const t = $('#gh-token').value.trim() || tokenStore.get();
   if (!t) { toast('Enter a token first', 'error'); return; }
   toast('Testing token…');
   try {
@@ -4979,7 +5009,7 @@ async function testToken() {
 function saveToken() {
   const v = $('#gh-token').value.trim();
   if (!v) { toast('Paste a token first', 'error'); return; }
-  localStorage.setItem('vv_gh_token', v);
+  tokenStore.set(v);
   $('#gh-token').value = '';
   $('#gh-token').placeholder = '••••••••••••• (saved)';
   toast('Token saved ✓', 'success');

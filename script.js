@@ -7,6 +7,12 @@
 (function initLenis() {
   const script = document.createElement('script');
   script.src = 'https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js';
+  /* SRI: pin to the exact bytes of 1.0.42 so a compromised unpkg mirror
+     cannot swap in a hostile bundle. If Lenis is upgraded, recompute:
+       curl -sS <url> | openssl dgst -sha384 -binary | openssl base64 -A */
+  script.integrity   = 'sha384-li4UtcFCH6QeUqR4JyV58/VgTprMuz9aauj+oWtew7V4Y7ZVjnvz5px9Y3UCG0Ea';
+  script.crossOrigin = 'anonymous';
+  script.referrerPolicy = 'no-referrer';
   script.onload = function () {
     const lenis = new Lenis({
       duration: 1.35,
@@ -46,11 +52,15 @@
 
   /* Skip the entry preloader on any same-session return to home.
      First visit: runs full animation, sets the flag on dismiss.
-     Coming back from Gallery/Events/Contact: no preloader, home shows immediately. */
-  if (sessionStorage.getItem('vv_entry_seen') === '1') {
-    entry.style.display = 'none';
-    return;
-  }
+     Coming back from Gallery/Events/Contact: no preloader, home shows
+     immediately. sessionStorage can throw in Safari private mode /
+     when storage is disabled — treat any throw as "first visit". */
+  try {
+    if (sessionStorage.getItem('vv_entry_seen') === '1') {
+      entry.style.display = 'none';
+      return;
+    }
+  } catch (_) {}
 
   document.body.classList.add('entry-open');
 
@@ -80,7 +90,7 @@
     if (entry.classList.contains('sweep-out')) return;
     entry.classList.add('sweep-out');
     document.body.classList.remove('entry-open');
-    sessionStorage.setItem('vv_entry_seen', '1');
+    try { sessionStorage.setItem('vv_entry_seen', '1'); } catch (_) {}
     setTimeout(function () { entry.style.display = 'none'; }, 600);
   };
 
@@ -98,7 +108,9 @@
   var container = document.getElementById('entry-screen');
   if (!container) return;
   /* Skip if the entry preloader was already dismissed this session. */
-  if (sessionStorage.getItem('vv_entry_seen') === '1' || container.style.display === 'none') return;
+  var seen = false;
+  try { seen = sessionStorage.getItem('vv_entry_seen') === '1'; } catch (_) {}
+  if (seen || container.style.display === 'none') return;
 
   var SEP    = 115;   /* dot spacing */
   var NX     = 44;    /* columns (wide enough to bleed off-screen) */
@@ -520,49 +532,6 @@ function splitWords(el) {
   });
 })();
 
-/* ── M. 3D Card Hover ────────────────────────────────────────── */
-window.initCard3D = function () {
-  const grid = document.getElementById('events-grid');
-  if (!grid) return;
-
-  grid.addEventListener('mousemove', function (e) {
-    const card = e.target.closest('.event-card');
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    const x    = (e.clientX - rect.left) / rect.width;
-    const y    = (e.clientY - rect.top)  / rect.height;
-    const rotX = (y - 0.5) * -10;
-    const rotY = (x - 0.5) *  10;
-    card.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px)`;
-  });
-
-  grid.addEventListener('mouseout', function (e) {
-    const card = e.target.closest('.event-card');
-    if (card && !card.contains(e.relatedTarget)) {
-      card.style.transform = '';
-    }
-  });
-};
-
-/* ── N. Event Card Staggered Entrance ───────────────────────── */
-window.staggerCards = function () {
-  const cards = document.querySelectorAll('.event-card');
-  if (!cards.length) return;
-
-  const observer = new IntersectionObserver(function (entries) {
-    if (!entries.some(e => e.isIntersecting)) return;
-    cards.forEach(function (card, i) {
-      setTimeout(function () {
-        card.classList.add('card-visible');
-      }, i * 120);
-    });
-    observer.disconnect();
-  }, { threshold: 0.05 });
-
-  const grid = document.getElementById('events-grid');
-  if (grid) observer.observe(grid);
-};
-
 /* ── O. Video Gallery Hover Autoplay ────────────────────────── */
 (function initVideoHover() {
   document.querySelectorAll('.rg-item.rg-video video').forEach(function (video) {
@@ -615,26 +584,39 @@ window.staggerCards = function () {
     btn.textContent = '...';
     btn.disabled = true;
 
-    fetch(endpoint, {
+    /* Pass origin as a query param so the Apps Script can reject cross-site
+       submissions. text/plain body keeps the request preflight-free. */
+    var url = endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') +
+              'origin=' + encodeURIComponent(location.origin);
+
+    fetch(url, {
       method: 'POST',
-      /* text/plain avoids a CORS preflight against Apps Script */
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ email: email, source: 'join-form' }),
       redirect: 'follow'
     })
-      .then(function (r) { return r.json().catch(function () { return { ok: true }; }); })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text().then(function (txt) {
+          try { return JSON.parse(txt); }
+          catch (_) { throw new Error('Non-JSON response'); }
+        });
+      })
       .then(function (res) {
         if (res && res.ok) {
           btn.textContent = res.duplicate ? "ALREADY IN" : "YOU'RE IN";
           btn.style.color = '#fff';
           input.value = '';
           input.placeholder = "YOU'RE IN THE FREQUENCY";
+          resetForm(btn, input, 4000);
         } else {
+          console.warn('[VV] join failed:', res && res.error);
           btn.textContent = 'TRY AGAIN';
+          resetForm(btn, input, 3000);
         }
-        resetForm(btn, input, 4000);
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.warn('[VV] join fetch failed:', err && err.message);
         btn.textContent = 'TRY AGAIN';
         resetForm(btn, input, 3000);
       });
