@@ -3,46 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Velvet Vibrance · Stage Loop</title>
+<title>Velvet Vibrance · Stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold: #E8B547;
-    --cream: #f5ede0;
-    --plum: #14090b;
-  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
-    height: 100%;
+    height: 100vh;
     background: #050303;
-    color: var(--cream);
+    color: #f5ede0;
     font-family: 'Playfair Display', Georgia, serif;
     overflow: hidden;
     cursor: none;
   }
   body.show-cursor { cursor: default; }
 
-  /* ─── Video layer ─── */
-  .stage {
+  /* Base warm radial gradient — matches the site's plum→black palette */
+  .backdrop {
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse at center, var(--plum) 0%, #050303 100%);
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(232,181,71,0.18), transparent 55%),
+      radial-gradient(ellipse at 70% 65%, rgba(180,55,85,0.20), transparent 55%),
+      radial-gradient(ellipse at center, #14090b 0%, #050303 100%);
+    animation: drift 24s ease-in-out infinite alternate;
+    background-size: 200% 200%, 200% 200%, 100% 100%;
   }
-  .stage video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  /* Subtle darkening vignette so logos sit cleanly on top */
-  .stage::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, transparent 30%, rgba(5,3,3,0.55) 100%);
-    pointer-events: none;
+  @keyframes drift {
+    0%   { background-position: 0% 30%, 100% 70%, center; }
+    50%  { background-position: 20% 50%, 80% 50%, center; }
+    100% { background-position: 40% 20%, 60% 90%, center; }
   }
 
-  /* ─── Logo overlay ─── */
+  /* Slow rotating warm glow to keep the light feeling alive */
+  .glow {
+    position: fixed;
+    inset: -30%;
+    background: radial-gradient(circle at center, rgba(232,181,71,0.09) 0%, transparent 42%);
+    animation: rotate 55s linear infinite;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Ambient particles rising slowly */
+  .particles {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    bottom: -12px;
+    background: #E8B547;
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 10px rgba(232,181,71,0.6);
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0%   { transform: translate3d(0, 0, 0);            opacity: 0; }
+    12%  { opacity: 0.85; }
+    88%  { opacity: 0.5; }
+    100% { transform: translate3d(30px, -110vh, 0);    opacity: 0; }
+  }
+
+  /* Final darkening vignette for depth around the logos */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.65) 100%);
+  }
+
+  /* Logo layer — image files if present, text fallback if not */
   .overlay {
     position: fixed;
     inset: 0;
@@ -50,212 +89,139 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5vh;
+    gap: 3.5vh;
     pointer-events: none;
     transition: opacity 0.6s;
   }
   .overlay.hidden { opacity: 0; }
-  .logo {
-    max-width: 42vw;
-    max-height: 22vh;
-    opacity: 0.92;
+
+  .logo-img {
+    max-width: 44vw;
+    max-height: 26vh;
     mix-blend-mode: screen;
-    filter: drop-shadow(0 0 30px rgba(232,181,71,0.35));
+    filter: drop-shadow(0 0 30px rgba(232,181,71,0.4));
   }
-  .logo.logo-vv { max-height: 26vh; }
-  .logo.logo-stanzza { max-height: 18vh; opacity: 0.85; }
+  .logo-img.small { max-height: 16vh; opacity: 0.85; }
 
-  /* ─── Missing-video fallback ─── */
-  .missing {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    padding: 40px;
-    text-align: center;
-    background:
-      radial-gradient(ellipse at center, rgba(20,9,11,0.94) 0%, rgba(5,3,3,0.99) 100%);
-  }
-  .missing h1 {
-    font-size: clamp(28px, 5vw, 56px);
-    letter-spacing: 0.15em;
-    color: var(--gold);
+  .logo-text {
+    font-size: clamp(46px, 8vw, 128px);
     font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #E8B547;
+    text-shadow: 0 0 50px rgba(232,181,71,0.35);
+    text-align: center;
+    line-height: 0.95;
   }
-  .missing p {
-    font-size: clamp(14px, 1.6vw, 18px);
-    color: rgba(245,237,224,0.7);
-    max-width: 560px;
-    line-height: 1.7;
-    font-family: Inter, system-ui, sans-serif;
-  }
-  .missing code {
-    background: rgba(232,181,71,0.12);
-    padding: 2px 8px;
-    border-radius: 3px;
-    color: var(--gold);
-    font-family: ui-monospace, Menlo, monospace;
-    font-size: 0.9em;
-  }
-
-  /* ─── Controls (auto-hide) ─── */
-  .controls {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    gap: 8px;
-    opacity: 0;
-    transition: opacity 0.4s;
-    font-family: Inter, system-ui, sans-serif;
-  }
-  body.show-cursor .controls { opacity: 0.9; }
-  .controls button {
-    padding: 10px 14px;
-    background: rgba(0,0,0,0.55);
-    color: var(--cream);
-    border: 1px solid rgba(245,237,224,0.25);
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 11px;
-    letter-spacing: 0.12em;
+  .logo-sub {
+    font-size: clamp(16px, 2.4vw, 32px);
+    letter-spacing: 0.42em;
+    color: #f5ede0;
+    opacity: 0.75;
+    font-weight: 400;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
     text-transform: uppercase;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .controls button:hover {
-    background: rgba(232,181,71,0.18);
-    border-color: var(--gold);
   }
 
+  /* Hint bar — auto-fades unless cursor moves */
   .hint {
     position: fixed;
-    bottom: 24px;
-    left: 24px;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: ui-monospace, Menlo, monospace;
     font-size: 10px;
-    color: rgba(245,237,224,0.35);
-    letter-spacing: 0.12em;
+    color: rgba(245,237,224,0.4);
+    letter-spacing: 0.18em;
     opacity: 0;
-    transition: opacity 0.4s;
+    transition: opacity 0.5s;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
-  body.show-cursor .hint { opacity: 0.6; }
+  body.show-cursor .hint { opacity: 0.7; }
 </style>
 </head>
 <body>
 
-<div class="stage" id="stage">
-  <video id="loop-video" autoplay muted loop playsinline preload="auto">
-    <source src="loop.mp4" type="video/mp4">
-  </video>
-</div>
+<div class="backdrop"></div>
+<div class="glow"></div>
+<div class="particles" id="particles"></div>
+<div class="vignette"></div>
 
 <div class="overlay" id="overlay">
-  <!-- onerror hides silently if the logo file isn't there yet -->
-  <img class="logo logo-vv"      src="../vv-logo.png"      alt=""
-       onerror="this.remove()">
-  <img class="logo logo-stanzza" src="../stanzza-logo.png" alt=""
-       onerror="this.remove()">
+  <!-- If logo files exist in the repo root they take over; otherwise the
+       text fallback below stays visible. onerror removes the failed <img>. -->
+  <img class="logo-img"       src="../vv-logo.png"      alt="" onerror="this.remove()">
+  <img class="logo-img small" src="../stanzza-logo.png" alt="" onerror="this.remove()">
+  <div class="logo-text" id="fallback-title">VELVET<br>VIBRANCE</div>
+  <div class="logo-sub"  id="fallback-sub">Stanzza</div>
 </div>
 
-<div class="missing" id="missing" hidden>
-  <h1>VELVET VIBRANCE</h1>
-  <p>Drop your generated MP4 into <code>stage/loop.mp4</code> and refresh this page. See <code>stage/prompt.md</code> for the AI generator prompt.</p>
-</div>
-
-<div class="controls" id="controls">
-  <button id="btn-play">Pause</button>
-  <button id="btn-fs">Fullscreen</button>
-  <button id="btn-logos">Hide Logos</button>
-</div>
-
-<div class="hint">SPACE pause · F fullscreen · H logos · ESC exit</div>
+<div class="hint">F fullscreen · H hide logos · Esc exit</div>
 
 <script>
-const video    = document.getElementById('loop-video');
-const overlay  = document.getElementById('overlay');
-const missing  = document.getElementById('missing');
-const stage    = document.getElementById('stage');
-const btnPlay  = document.getElementById('btn-play');
-const btnFs    = document.getElementById('btn-fs');
-const btnLogos = document.getElementById('btn-logos');
-
-let logosVisible = true;
-let cursorTimer = null;
-
-/* ─── Missing-video detection ───
-   The <source> 'error' event fires when the browser can't load the file
-   (missing, 404, unsupported codec). We swap in the fallback panel. */
-video.querySelector('source').addEventListener('error', showMissing);
-video.addEventListener('error', showMissing);
-
-function showMissing() {
-  stage.hidden = true;
-  overlay.hidden = true;
-  missing.hidden = false;
-}
-
-/* ─── Controls ─── */
-function togglePlay() {
-  if (video.paused) { video.play(); btnPlay.textContent = 'Pause'; }
-  else              { video.pause(); btnPlay.textContent = 'Play'; }
-}
-btnPlay.addEventListener('click', togglePlay);
-
-function toggleFullscreen() {
-  const el = document.documentElement;
-  const isFs = document.fullscreenElement || document.webkitFullscreenElement;
-  if (isFs) {
-    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-  } else {
-    (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+/* Spawn ambient particles — count scales down on smaller viewports so
+   phones don't melt. */
+(function spawnParticles() {
+  const container = document.getElementById('particles');
+  const count = window.innerWidth < 700 ? 22 : 48;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = -Math.random() * 14 + 's';
+    p.style.animationDuration = (9 + Math.random() * 10) + 's';
+    const size = 1 + Math.random() * 3.2;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    container.appendChild(p);
   }
-}
-btnFs.addEventListener('click', toggleFullscreen);
+})();
 
-function toggleLogos() {
-  logosVisible = !logosVisible;
-  overlay.classList.toggle('hidden', !logosVisible);
-  btnLogos.textContent = logosVisible ? 'Hide Logos' : 'Show Logos';
-}
-btnLogos.addEventListener('click', toggleLogos);
-
-/* ─── Keyboard shortcuts ─── */
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === ' ' || e.key.toLowerCase() === 'k') { togglePlay(); e.preventDefault(); }
-  else if (e.key.toLowerCase() === 'f')             { toggleFullscreen(); }
-  else if (e.key.toLowerCase() === 'h')             { toggleLogos(); }
+/* Hide the text fallback the moment either logo image loads, so we don't
+   double up. Runs after the <img>'s natural load event. */
+document.querySelectorAll('.logo-img').forEach(img => {
+  img.addEventListener('load', () => {
+    document.getElementById('fallback-title')?.remove();
+    document.getElementById('fallback-sub')?.remove();
+  });
 });
 
-/* ─── Cursor + controls auto-hide ─── */
-function showCursor() {
+/* Cursor + hint auto-hide */
+let cursorTimer = null;
+function bumpCursor() {
   document.body.classList.add('show-cursor');
   clearTimeout(cursorTimer);
-  cursorTimer = setTimeout(() => document.body.classList.remove('show-cursor'), 2200);
+  cursorTimer = setTimeout(() => document.body.classList.remove('show-cursor'), 2500);
 }
-document.addEventListener('mousemove', showCursor);
-document.addEventListener('touchstart', showCursor);
-showCursor();
+document.addEventListener('mousemove', bumpCursor);
+document.addEventListener('touchstart', bumpCursor);
+bumpCursor();
 
-/* ─── Screen wake lock ───
-   Keeps the display from sleeping mid-set. Requires a user gesture first
-   on most browsers, so we request it on the first click. Silently ignored
-   if the API isn't supported (older Safari, etc.). */
-let wakeLock = null;
+/* Keyboard: F fullscreen, H toggle logos */
+const overlay = document.getElementById('overlay');
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (k === 'f') {
+    const el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    }
+  } else if (k === 'h') {
+    overlay.classList.toggle('hidden');
+  }
+});
+
+/* Screen wake lock — keeps the display awake mid-set. Fires on first
+   interaction because browsers gate it behind a user gesture. Silently
+   ignored if the API isn't there. */
 async function requestWakeLock() {
   if (!('wakeLock' in navigator)) return;
-  try {
-    wakeLock = await navigator.wakeLock.request('screen');
-    wakeLock.addEventListener('release', () => { wakeLock = null; });
-  } catch (err) { /* user denied or unavailable — ignore */ }
+  try { await navigator.wakeLock.request('screen'); } catch (e) {}
 }
-document.addEventListener('visibilitychange', () => {
-  if (!wakeLock && document.visibilityState === 'visible') requestWakeLock();
-});
-document.addEventListener('click', requestWakeLock, { once: true });
+document.addEventListener('click',   requestWakeLock, { once: true });
 document.addEventListener('keydown', requestWakeLock, { once: true });
 </script>
 </body>
