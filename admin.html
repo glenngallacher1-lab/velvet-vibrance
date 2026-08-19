@@ -1599,6 +1599,14 @@
           </div>
           <span class="tile-cta">Book the room →</span>
         </button>
+
+        <button class="tile" data-go="loops">
+          <div>
+            <div class="tile-name">Loops</div>
+            <p class="tile-desc">Fullscreen stage backdrops for behind the decks. Warm gold or crimson — one click, drop into fullscreen, run until you stop.</p>
+          </div>
+          <span class="tile-cta">Fire the room →</span>
+        </button>
       </div>
 
       <div class="home-foot">
@@ -1884,6 +1892,65 @@
         <div class="actions-row">
           <a class="btn btn-primary" href="templates/invoice.html" target="_blank" rel="noopener">Open invoice builder →</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOOPS -->
+  <section class="view" id="view-loops">
+    <div class="ws-wrap">
+      <div class="ws-head">
+        <div>
+          <p class="ws-eyebrow">06 · Stage</p>
+          <h2><em>Loops</em> for the Room</h2>
+        </div>
+        <div class="ws-actions">
+          <button class="btn btn-ghost" data-go="home">← Console</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="help">
+          Fullscreen animated backdrops for behind the decks. Click <strong>Open</strong> on either card — the loop takes over the browser tab. Hit <strong>F</strong> for fullscreen, <strong>H</strong> to hide the logos, <strong>Esc</strong> to exit.
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;">
+
+        <div style="background:rgba(0,0,0,0.4);border:1px solid var(--line-warm);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="aspect-ratio:16/9;background:
+              radial-gradient(ellipse at 30% 40%, rgba(232,181,71,0.45), transparent 55%),
+              radial-gradient(ellipse at 70% 65%, rgba(180,55,85,0.35), transparent 55%),
+              radial-gradient(ellipse at center, #14090b 0%, #050303 100%);
+              position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#E8B547;font-family:'Playfair Display',serif;font-weight:700;letter-spacing:0.15em;font-size:clamp(20px,2.2vw,32px);text-shadow:0 0 30px rgba(232,181,71,0.5);text-align:center;line-height:1;">
+              VELVET<br>VIBRANCE
+            </div>
+          </div>
+          <div style="padding:1.1rem 1.2rem;">
+            <div style="font-size:1rem;font-weight:700;letter-spacing:0.06em;margin-bottom:0.4rem;">Warm Gold</div>
+            <p style="font-size:0.82rem;color:rgba(245,237,224,0.6);margin-bottom:0.9rem;line-height:1.55;">Plum and gold, ambient dust drift. Matches the main site palette.</p>
+            <a class="btn btn-primary" href="stage/loop-gold.html" target="_blank" rel="noopener">Open loop →</a>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.4);border:1px solid var(--line-warm);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="aspect-ratio:16/9;background:
+              radial-gradient(ellipse at 30% 40%, rgba(255,60,110,0.4), transparent 55%),
+              radial-gradient(ellipse at 70% 65%, rgba(200,25,60,0.4), transparent 55%),
+              radial-gradient(ellipse at center, #1a0508 0%, #050202 100%);
+              position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ff5a85;font-family:'Playfair Display',serif;font-weight:700;letter-spacing:0.15em;font-size:clamp(20px,2.2vw,32px);text-shadow:0 0 30px rgba(255,90,133,0.5);text-align:center;line-height:1;">
+              VELVET<br>VIBRANCE
+            </div>
+          </div>
+          <div style="padding:1.1rem 1.2rem;">
+            <div style="font-size:1rem;font-weight:700;letter-spacing:0.06em;margin-bottom:0.4rem;">Crimson Red</div>
+            <p style="font-size:0.82rem;color:rgba(245,237,224,0.6);margin-bottom:0.9rem;line-height:1.55;">Deep burgundy and hot pink. Reads like the pink-crowd energy of the site's intro.</p>
+            <a class="btn btn-primary" href="stage/loop-red.html" target="_blank" rel="noopener">Open loop →</a>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -3790,7 +3857,7 @@ function go(view) {
   if (view === 'home') {
     crumb.innerHTML = '<a href="#" data-go="home">Console</a>';
   } else {
-    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes', subscribers: 'Subscribers', bookings: 'Bookings' };
+    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes', subscribers: 'Subscribers', bookings: 'Bookings', loops: 'Loops' };
     const cap = caps[view] || view;
     crumb.innerHTML = `<a href="#" data-go="home">Console</a><span class="sep">/</span><span>${cap}</span>`;
   }

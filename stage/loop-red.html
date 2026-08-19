@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Velvet Vibrance · Stage · Red</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100vh;
+    background: #050202;
+    color: #f5ede0;
+    font-family: 'Playfair Display', Georgia, serif;
+    overflow: hidden;
+    cursor: none;
+  }
+  body.show-cursor { cursor: default; }
+
+  /* Base deep-red gradient — echoes the pink-crowd hero on index.html */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(255,60,110,0.24), transparent 55%),
+      radial-gradient(ellipse at 70% 65%, rgba(200,25,60,0.28), transparent 55%),
+      radial-gradient(ellipse at center, #1a0508 0%, #050202 100%);
+    animation: drift 24s ease-in-out infinite alternate;
+    background-size: 200% 200%, 200% 200%, 100% 100%;
+  }
+  @keyframes drift {
+    0%   { background-position: 0% 30%, 100% 70%, center; }
+    50%  { background-position: 20% 50%, 80% 50%, center; }
+    100% { background-position: 40% 20%, 60% 90%, center; }
+  }
+
+  /* Slow rotating crimson glow */
+  .glow {
+    position: fixed;
+    inset: -30%;
+    background: radial-gradient(circle at center, rgba(255,60,110,0.11) 0%, transparent 42%);
+    animation: rotate 55s linear infinite;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Ambient rose-pink particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    bottom: -12px;
+    background: #ff5a85;
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 10px rgba(255,90,133,0.65);
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0%   { transform: translate3d(0, 0, 0);            opacity: 0; }
+    12%  { opacity: 0.85; }
+    88%  { opacity: 0.5; }
+    100% { transform: translate3d(30px, -110vh, 0);    opacity: 0; }
+  }
+
+  /* Final darkening vignette for depth around the logos */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.65) 100%);
+  }
+
+  /* Logo layer — image files if present, text fallback if not */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3.5vh;
+    pointer-events: none;
+    transition: opacity 0.6s;
+  }
+  .overlay.hidden { opacity: 0; }
+
+  .logo-img {
+    max-width: 44vw;
+    max-height: 26vh;
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 30px rgba(255,90,133,0.45));
+  }
+  .logo-img.small { max-height: 16vh; opacity: 0.85; }
+
+  .logo-text {
+    font-size: clamp(46px, 8vw, 128px);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #ff5a85;
+    text-shadow: 0 0 50px rgba(255,90,133,0.4);
+    text-align: center;
+    line-height: 0.95;
+  }
+  .logo-sub {
+    font-size: clamp(16px, 2.4vw, 32px);
+    letter-spacing: 0.42em;
+    color: #f5ede0;
+    opacity: 0.78;
+    font-weight: 400;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    text-transform: uppercase;
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 10px;
+    color: rgba(245,237,224,0.42);
+    letter-spacing: 0.18em;
+    opacity: 0;
+    transition: opacity 0.5s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  body.show-cursor .hint { opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<div class="backdrop"></div>
+<div class="glow"></div>
+<div class="particles" id="particles"></div>
+<div class="vignette"></div>
+
+<div class="overlay" id="overlay">
+  <img class="logo-img"       src="../vv-logo.png"      alt="" onerror="this.remove()">
+  <img class="logo-img small" src="../stanzza-logo.png" alt="" onerror="this.remove()">
+  <div class="logo-text" id="fallback-title">VELVET<br>VIBRANCE</div>
+  <div class="logo-sub"  id="fallback-sub">Stanzza</div>
+</div>
+
+<div class="hint">F fullscreen · H hide logos · Esc exit</div>
+
+<script>
+(function spawnParticles() {
+  const container = document.getElementById('particles');
+  const count = window.innerWidth < 700 ? 22 : 48;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = -Math.random() * 14 + 's';
+    p.style.animationDuration = (9 + Math.random() * 10) + 's';
+    const size = 1 + Math.random() * 3.2;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    container.appendChild(p);
+  }
+})();
+
+document.querySelectorAll('.logo-img').forEach(img => {
+  img.addEventListener('load', () => {
+    document.getElementById('fallback-title')?.remove();
+    document.getElementById('fallback-sub')?.remove();
+  });
+});
+
+let cursorTimer = null;
+function bumpCursor() {
+  document.body.classList.add('show-cursor');
+  clearTimeout(cursorTimer);
+  cursorTimer = setTimeout(() => document.body.classList.remove('show-cursor'), 2500);
+}
+document.addEventListener('mousemove', bumpCursor);
+document.addEventListener('touchstart', bumpCursor);
+bumpCursor();
+
+const overlay = document.getElementById('overlay');
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (k === 'f') {
+    const el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    }
+  } else if (k === 'h') {
+    overlay.classList.toggle('hidden');
+  }
+});
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { await navigator.wakeLock.request('screen'); } catch (e) {}
+}
+document.addEventListener('click',   requestWakeLock, { once: true });
+document.addEventListener('keydown', requestWakeLock, { once: true });
+</script>
+</body>
+</html>
