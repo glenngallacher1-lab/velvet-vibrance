@@ -260,6 +260,35 @@
     #app[data-view="photos"] #linewaves-canvas,
     #app[data-view="photos"] #linewaves-overlay { opacity: 1; }
 
+    /* ── Cybernetic grid shader layers (bookings + loops views) ── */
+    #cyber-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      display: block;
+      z-index: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s var(--ease);
+    }
+    #cyber-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s var(--ease);
+      /* Darken the edges heavily so the form/card content stays readable
+         while the centre glow of the shader still comes through. */
+      background:
+        radial-gradient(ellipse at center, transparent 15%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.92) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.4) 100%);
+    }
+    #app[data-view="bookings"] #cyber-canvas,
+    #app[data-view="loops"]    #cyber-canvas   { opacity: 0.45; }
+    #app[data-view="bookings"] #cyber-overlay,
+    #app[data-view="loops"]    #cyber-overlay  { opacity: 1; }
+
     /* ── ASCII text layers (events view only) ── */
     #events-ascii {
       position: fixed;
@@ -1527,6 +1556,10 @@
   <!-- Perlin waves background (notes view only) -->
   <canvas id="notes-waves-canvas"></canvas>
   <div id="notes-overlay"></div>
+
+  <!-- Cybernetic grid shader background (bookings + loops views) -->
+  <canvas id="cyber-canvas"></canvas>
+  <div id="cyber-overlay"></div>
 
   <!-- Topbar -->
   <header class="topbar">
@@ -3836,6 +3869,142 @@ const notesWaves = {
 };
 
 /* ════════════════════════════════════════════════════════════
+   CYBERNETIC · WebGL shader ported from the React component.
+   Runs behind bookings + loops views. Same show/hide/tick pattern
+   as the other backgrounds so the go() dispatcher stays symmetric.
+   ════════════════════════════════════════════════════════════ */
+const cybernetic = {
+  inited: false,
+  active: false,
+  raf: 0,
+  uniforms: null,
+  renderer: null,
+  scene: null,
+  camera: null,
+  mouseTarget:  { x: 0, y: 0 },
+  mouseCurrent: { x: 0, y: 0 },
+  init() {
+    if (this.inited) return;
+    const canvas = $('#cyber-canvas');
+    if (!canvas) return;
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas, antialias: true, alpha: true, premultipliedAlpha: false
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const scene  = new THREE.Scene();
+
+    const u = {
+      iTime:       { value: 0 },
+      iResolution: { value: new THREE.Vector2(1, 1) },
+      iMouse:      { value: new THREE.Vector2(0, 0) }
+    };
+    this.uniforms = u;
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: u,
+      transparent: true,
+      depthWrite: false,
+      depthTest:  false,
+      vertexShader: `
+        void main() {
+          gl_Position = vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        precision highp float;
+        uniform vec2  iResolution;
+        uniform float iTime;
+        uniform vec2  iMouse;
+
+        float random(vec2 st) {
+          return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+        }
+
+        void main() {
+          vec2 uv    = (gl_FragCoord.xy - 0.5 * iResolution.xy) / iResolution.y;
+          vec2 mouse = (iMouse           - 0.5 * iResolution.xy) / iResolution.y;
+
+          float t         = iTime * 0.2;
+          float mouseDist = length(uv - mouse);
+
+          float warp = sin(mouseDist * 20.0 - t * 4.0) * 0.1;
+          warp *= smoothstep(0.4, 0.0, mouseDist);
+          uv += warp;
+
+          vec2 gridUv = abs(fract(uv * 10.0) - 0.5);
+          float line  = pow(1.0 - min(gridUv.x, gridUv.y), 50.0);
+
+          vec3 gridColor = vec3(0.1, 0.5, 1.0);
+          vec3 color     = gridColor * line * (0.5 + sin(t * 2.0) * 0.2);
+
+          float energy = sin(uv.x * 20.0 + t * 5.0) * sin(uv.y * 20.0 + t * 3.0);
+          energy = smoothstep(0.8, 1.0, energy);
+          color += vec3(1.0, 0.2, 0.8) * energy * line;
+
+          float glow = smoothstep(0.1, 0.0, mouseDist);
+          color += vec3(1.0) * glow * 0.5;
+
+          color += random(uv + t * 0.1) * 0.05;
+
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `
+    });
+
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+    scene.add(mesh);
+
+    this.renderer = renderer;
+    this.scene    = scene;
+    this.camera   = camera;
+
+    const resize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      u.iResolution.value.set(w, h);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    /* Shader flips Y (canvas origin is bottom-left in GL), so we invert
+       the mouse Y when we store it. Damping is applied in tick(). */
+    document.addEventListener('mousemove', (e) => {
+      this.mouseTarget.x = e.clientX;
+      this.mouseTarget.y = window.innerHeight - e.clientY;
+    });
+
+    this.inited = true;
+  },
+  show() {
+    if (!this.inited) this.init();
+    this.active = true;
+    if (!this.raf) this.tick();
+  },
+  hide() {
+    this.active = false;
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = 0;
+  },
+  tick() {
+    if (!this.active) return;
+    this.raf = requestAnimationFrame(() => this.tick());
+    if (!this.uniforms) return;
+    this.uniforms.iTime.value = performance.now() / 1000;
+
+    this.mouseCurrent.x += (this.mouseTarget.x - this.mouseCurrent.x) * 0.05;
+    this.mouseCurrent.y += (this.mouseTarget.y - this.mouseCurrent.y) * 0.05;
+    this.uniforms.iMouse.value.set(this.mouseCurrent.x, this.mouseCurrent.y);
+
+    this.renderer.render(this.scene, this.camera);
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
    AUTH
    ════════════════════════════════════════════════════════════ */
 async function sha256(s) {
@@ -3886,6 +4055,7 @@ function go(view) {
   if (view === 'photos') lineWaves.show();  else lineWaves.hide();
   if (view === 'events') asciiText.show();  else asciiText.hide();
   if (view === 'notes')  notesWaves.show();   else notesWaves.hide();
+  if (view === 'bookings' || view === 'loops') cybernetic.show(); else cybernetic.hide();
   if (view === 'subscribers') renderSubscribers();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
