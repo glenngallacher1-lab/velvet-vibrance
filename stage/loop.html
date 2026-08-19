@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Velvet Vibrance · Stage Loop</title>
+<style>
+  :root {
+    --gold: #E8B547;
+    --cream: #f5ede0;
+    --plum: #14090b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: #050303;
+    color: var(--cream);
+    font-family: 'Playfair Display', Georgia, serif;
+    overflow: hidden;
+    cursor: none;
+  }
+  body.show-cursor { cursor: default; }
+
+  /* ─── Video layer ─── */
+  .stage {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, var(--plum) 0%, #050303 100%);
+  }
+  .stage video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Subtle darkening vignette so logos sit cleanly on top */
+  .stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(5,3,3,0.55) 100%);
+    pointer-events: none;
+  }
+
+  /* ─── Logo overlay ─── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5vh;
+    pointer-events: none;
+    transition: opacity 0.6s;
+  }
+  .overlay.hidden { opacity: 0; }
+  .logo {
+    max-width: 42vw;
+    max-height: 22vh;
+    opacity: 0.92;
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 30px rgba(232,181,71,0.35));
+  }
+  .logo.logo-vv { max-height: 26vh; }
+  .logo.logo-stanzza { max-height: 18vh; opacity: 0.85; }
+
+  /* ─── Missing-video fallback ─── */
+  .missing {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 40px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at center, rgba(20,9,11,0.94) 0%, rgba(5,3,3,0.99) 100%);
+  }
+  .missing h1 {
+    font-size: clamp(28px, 5vw, 56px);
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .missing p {
+    font-size: clamp(14px, 1.6vw, 18px);
+    color: rgba(245,237,224,0.7);
+    max-width: 560px;
+    line-height: 1.7;
+    font-family: Inter, system-ui, sans-serif;
+  }
+  .missing code {
+    background: rgba(232,181,71,0.12);
+    padding: 2px 8px;
+    border-radius: 3px;
+    color: var(--gold);
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.9em;
+  }
+
+  /* ─── Controls (auto-hide) ─── */
+  .controls {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.4s;
+    font-family: Inter, system-ui, sans-serif;
+  }
+  body.show-cursor .controls { opacity: 0.9; }
+  .controls button {
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.55);
+    color: var(--cream);
+    border: 1px solid rgba(245,237,224,0.25);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .controls button:hover {
+    background: rgba(232,181,71,0.18);
+    border-color: var(--gold);
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 10px;
+    color: rgba(245,237,224,0.35);
+    letter-spacing: 0.12em;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  body.show-cursor .hint { opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <video id="loop-video" autoplay muted loop playsinline preload="auto">
+    <source src="loop.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div class="overlay" id="overlay">
+  <!-- onerror hides silently if the logo file isn't there yet -->
+  <img class="logo logo-vv"      src="../vv-logo.png"      alt=""
+       onerror="this.remove()">
+  <img class="logo logo-stanzza" src="../stanzza-logo.png" alt=""
+       onerror="this.remove()">
+</div>
+
+<div class="missing" id="missing" hidden>
+  <h1>VELVET VIBRANCE</h1>
+  <p>Drop your generated MP4 into <code>stage/loop.mp4</code> and refresh this page. See <code>stage/prompt.md</code> for the AI generator prompt.</p>
+</div>
+
+<div class="controls" id="controls">
+  <button id="btn-play">Pause</button>
+  <button id="btn-fs">Fullscreen</button>
+  <button id="btn-logos">Hide Logos</button>
+</div>
+
+<div class="hint">SPACE pause · F fullscreen · H logos · ESC exit</div>
+
+<script>
+const video    = document.getElementById('loop-video');
+const overlay  = document.getElementById('overlay');
+const missing  = document.getElementById('missing');
+const stage    = document.getElementById('stage');
+const btnPlay  = document.getElementById('btn-play');
+const btnFs    = document.getElementById('btn-fs');
+const btnLogos = document.getElementById('btn-logos');
+
+let logosVisible = true;
+let cursorTimer = null;
+
+/* ─── Missing-video detection ───
+   The <source> 'error' event fires when the browser can't load the file
+   (missing, 404, unsupported codec). We swap in the fallback panel. */
+video.querySelector('source').addEventListener('error', showMissing);
+video.addEventListener('error', showMissing);
+
+function showMissing() {
+  stage.hidden = true;
+  overlay.hidden = true;
+  missing.hidden = false;
+}
+
+/* ─── Controls ─── */
+function togglePlay() {
+  if (video.paused) { video.play(); btnPlay.textContent = 'Pause'; }
+  else              { video.pause(); btnPlay.textContent = 'Play'; }
+}
+btnPlay.addEventListener('click', togglePlay);
+
+function toggleFullscreen() {
+  const el = document.documentElement;
+  const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+  if (isFs) {
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  } else {
+    (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+  }
+}
+btnFs.addEventListener('click', toggleFullscreen);
+
+function toggleLogos() {
+  logosVisible = !logosVisible;
+  overlay.classList.toggle('hidden', !logosVisible);
+  btnLogos.textContent = logosVisible ? 'Hide Logos' : 'Show Logos';
+}
+btnLogos.addEventListener('click', toggleLogos);
+
+/* ─── Keyboard shortcuts ─── */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === ' ' || e.key.toLowerCase() === 'k') { togglePlay(); e.preventDefault(); }
+  else if (e.key.toLowerCase() === 'f')             { toggleFullscreen(); }
+  else if (e.key.toLowerCase() === 'h')             { toggleLogos(); }
+});
+
+/* ─── Cursor + controls auto-hide ─── */
+function showCursor() {
+  document.body.classList.add('show-cursor');
+  clearTimeout(cursorTimer);
+  cursorTimer = setTimeout(() => document.body.classList.remove('show-cursor'), 2200);
+}
+document.addEventListener('mousemove', showCursor);
+document.addEventListener('touchstart', showCursor);
+showCursor();
+
+/* ─── Screen wake lock ───
+   Keeps the display from sleeping mid-set. Requires a user gesture first
+   on most browsers, so we request it on the first click. Silently ignored
+   if the API isn't supported (older Safari, etc.). */
+let wakeLock = null;
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => { wakeLock = null; });
+  } catch (err) { /* user denied or unavailable — ignore */ }
+}
+document.addEventListener('visibilitychange', () => {
+  if (!wakeLock && document.visibilityState === 'visible') requestWakeLock();
+});
+document.addEventListener('click', requestWakeLock, { once: true });
+document.addEventListener('keydown', requestWakeLock, { once: true });
+</script>
+</body>
+</html>

@@ -1591,6 +1591,14 @@
           </div>
           <span class="tile-cta">Read the room →</span>
         </button>
+
+        <button class="tile" data-go="bookings">
+          <div>
+            <div class="tile-name">Bookings</div>
+            <p class="tile-desc">Cold-outreach emails to venues, post-gig thank-yous, and a printable invoice builder. Every touchpoint from first hello to paid.</p>
+          </div>
+          <span class="tile-cta">Book the room →</span>
+        </button>
       </div>
 
       <div class="home-foot">
@@ -1796,6 +1804,85 @@
         </div>
         <div class="events-list" id="events-list">
           <div class="empty-state" id="events-empty">No nights posted yet — compose one <em>above</em>.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKINGS -->
+  <section class="view" id="view-bookings">
+    <div class="ws-wrap">
+      <div class="ws-head">
+        <div>
+          <p class="ws-eyebrow">05 · Outreach</p>
+          <h2><em>Bookings</em> &amp; Invoices</h2>
+        </div>
+        <div class="ws-actions">
+          <button class="btn btn-ghost" data-go="home">← Console</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="help">
+          Two email templates pre-filled from <code>templates/*.md</code>, plus a link to the invoice builder. Every field is editable — the buttons at the bottom of each card open your default mail app with To/Subject/Body already populated, or copy the body to your clipboard. Personalise before you send.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Cold outreach — first contact with a venue</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>To (booker email)</label>
+            <input type="email" id="outreach-to" placeholder="booker@venue.com" />
+          </div>
+          <div class="field">
+            <label>Subject</label>
+            <input type="text" id="outreach-subject" />
+          </div>
+          <div class="field full">
+            <label>Body</label>
+            <textarea id="outreach-body" rows="18"
+              style="width:100%;padding:0.9rem 1rem;background:rgba(0,0,0,0.45);border:1px solid var(--line-warm);border-radius:2px;color:var(--paper);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.85rem;letter-spacing:0.02em;line-height:1.6;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="actions-row">
+          <button class="btn btn-ghost" id="outreach-reset">Reset to template</button>
+          <button class="btn btn-ghost" id="outreach-copy">Copy body</button>
+          <button class="btn btn-primary" id="outreach-open">Open in mail app →</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Post-gig thank-you — 24 hours after the set</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>To (booker email)</label>
+            <input type="email" id="thanks-to" placeholder="booker@venue.com" />
+          </div>
+          <div class="field">
+            <label>Subject</label>
+            <input type="text" id="thanks-subject" />
+          </div>
+          <div class="field full">
+            <label>Body</label>
+            <textarea id="thanks-body" rows="18"
+              style="width:100%;padding:0.9rem 1rem;background:rgba(0,0,0,0.45);border:1px solid var(--line-warm);border-radius:2px;color:var(--paper);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.85rem;letter-spacing:0.02em;line-height:1.6;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="actions-row">
+          <button class="btn btn-ghost" id="thanks-reset">Reset to template</button>
+          <button class="btn btn-ghost" id="thanks-copy">Copy body</button>
+          <button class="btn btn-primary" id="thanks-open">Open in mail app →</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Invoice</div>
+        <p class="muted" style="margin:0 0 1rem;">
+          Fillable invoice with live preview and print-to-PDF. Fill your name, address, and bank details once — they're saved to this browser. Attach the resulting PDF to the thank-you email above.
+        </p>
+        <div class="actions-row">
+          <a class="btn btn-primary" href="templates/invoice.html" target="_blank" rel="noopener">Open invoice builder →</a>
         </div>
       </div>
     </div>
@@ -3703,7 +3790,7 @@ function go(view) {
   if (view === 'home') {
     crumb.innerHTML = '<a href="#" data-go="home">Console</a>';
   } else {
-    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes', subscribers: 'Subscribers' };
+    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes', subscribers: 'Subscribers', bookings: 'Bookings' };
     const cap = caps[view] || view;
     crumb.innerHTML = `<a href="#" data-go="home">Console</a><span class="sep">/</span><span>${cap}</span>`;
   }
@@ -5016,6 +5103,110 @@ function saveToken() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   BOOKINGS  · outreach + thank-you email composers
+   ════════════════════════════════════════════════════════════ */
+/* Templates are duplicated here from templates/*.md so this view
+   works offline without a fetch. Keep the two copies in sync — the
+   .md files are the canonical human-readable version; this JS is
+   what the admin UI actually loads into the composer textareas. */
+
+const OUTREACH_SUBJECT = 'Booking enquiry — Velvet Vibrance (house DJ)';
+const OUTREACH_BODY =
+  'Hi [BOOKER FIRST NAME],\n' +
+  '\n' +
+  "I'm Glenn — the DJ behind Velvet Vibrance, a house music project based in [YOUR CITY].\n" +
+  '\n' +
+  "I've been paying attention to what you're doing at [VENUE NAME] — [ONE SPECIFIC THING: a night you run, a recent booking that caught your ear, the room's sound, the residents]. Felt like there might be a fit, so wanted to introduce myself.\n" +
+  '\n' +
+  'Quick sense of what I bring:\n' +
+  '- Sound: [deep / afro / progressive / melodic] house — [ONE-LINE FEEL]\n' +
+  '- Sets: [SET LENGTH]-hour, comfortable in warm-up, peak, or closing slots\n' +
+  '- Format: [USBs / vinyl / hybrid], [CDJ-3000s / XDJ / turntables] all fine\n' +
+  '- Recent mix: [MIX LINK]\n' +
+  '- Full presence: velvet-vibrance.com · [INSTAGRAM HANDLE]\n' +
+  '\n' +
+  "I'm open for dates across [MONTH RANGE], and happy to work around what you've already got booked — support slots, opening, back-to-backs, whatever fits.\n" +
+  '\n' +
+  'Would love to have a proper chat if there\'s an opening. Happy to send more mixes, references, or come by for a night to introduce myself in person.\n' +
+  '\n' +
+  'Cheers,\n' +
+  'Glenn Gallacher\n' +
+  'Velvet Vibrance\n' +
+  '[YOUR EMAIL] · [YOUR PHONE]\n' +
+  'velvet-vibrance.com';
+
+const THANKS_SUBJECT = 'Thank you — Velvet Vibrance @ [VENUE], [DATE]';
+const THANKS_BODY =
+  'Hi [BOOKER FIRST NAME],\n' +
+  '\n' +
+  'Thanks for having me at [VENUE NAME] on [DATE] — genuinely one of the highlights of my month.\n' +
+  '\n' +
+  'The [ROOM / SOUND SYSTEM / CROWD] was excellent, and the energy through [SPECIFIC MOMENT: "the last hour", "the peak-time transition into X track", "the closing set"] made it a night I won\'t forget. Massive thanks to [SPECIFIC PERSON: sound engineer / door team / green room / other DJ on the bill if it applies] as well — they made the whole thing run smoothly.\n' +
+  '\n' +
+  "Invoice attached for the [DATE] set. Payment details are on the PDF — happy to send bank details another way if you'd prefer, or invoice through a different system if that's easier on your side.\n" +
+  '\n' +
+  "I'd love to come back. Whenever you're programming [NEXT SEASON / MONTH / RESIDENCY / SPECIAL], let me know and I'll block out dates around it. Also happy to bring [SUPPORT / GUEST / B2B PROPOSAL] to the table for future bookings if that's ever of interest.\n" +
+  '\n' +
+  'Really appreciate you giving me the room. Talk soon.\n' +
+  '\n' +
+  'Cheers,\n' +
+  'Glenn Gallacher\n' +
+  'Velvet Vibrance\n' +
+  '[YOUR EMAIL] · [YOUR PHONE]\n' +
+  'velvet-vibrance.com';
+
+const EMAIL_TEMPLATES = {
+  outreach: { subject: OUTREACH_SUBJECT, body: OUTREACH_BODY },
+  thanks:   { subject: THANKS_SUBJECT,   body: THANKS_BODY }
+};
+
+/* Pre-fill on first paint, but only if the field is empty — so an
+   in-progress edit is never blown away by re-entering the view. */
+function primeEmailTemplate(kind) {
+  const t = EMAIL_TEMPLATES[kind];
+  if (!t) return;
+  const s = $('#' + kind + '-subject');
+  const b = $('#' + kind + '-body');
+  if (s && !s.value.trim()) s.value = t.subject;
+  if (b && !b.value.trim()) b.value = t.body;
+}
+
+function resetEmailTemplate(kind) {
+  const t = EMAIL_TEMPLATES[kind];
+  if (!t) return;
+  $('#' + kind + '-subject').value = t.subject;
+  $('#' + kind + '-body').value = t.body;
+  const toEl = $('#' + kind + '-to');
+  if (toEl) toEl.value = '';
+  toast('Template reset', 'success');
+}
+
+function copyEmailBody(kind) {
+  const body = ($('#' + kind + '-body') || {}).value || '';
+  if (!body) { toast('Nothing to copy', 'error'); return; }
+  navigator.clipboard.writeText(body).then(
+    () => toast('Body copied', 'success'),
+    () => toast('Copy failed — select manually', 'error')
+  );
+}
+
+function openInMail(kind) {
+  const to      = ($('#' + kind + '-to')      || {}).value || '';
+  const subject = ($('#' + kind + '-subject') || {}).value || '';
+  const body    = ($('#' + kind + '-body')    || {}).value || '';
+  const url = 'mailto:' + encodeURIComponent(to.trim()) +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+  /* Anchor+click keeps the current page loaded — assigning to
+     location.href risks the browser navigating away if the OS mail
+     handler is misconfigured. */
+  const a = document.createElement('a');
+  a.href = url;
+  a.rel = 'noopener';
+  a.click();
+}
+
+/* ════════════════════════════════════════════════════════════
    WIRE-UP
    ════════════════════════════════════════════════════════════ */
 function init() {
@@ -5049,6 +5240,17 @@ function init() {
   if (subsCopyRecent) subsCopyRecent.addEventListener('click', () => copySubs(VV_SUBS.recent));
   const subsCopyArchive = $('#subs-copy-archive');
   if (subsCopyArchive) subsCopyArchive.addEventListener('click', () => copySubs(VV_SUBS.archive));
+
+  /* Bookings view — email composers */
+  ['outreach', 'thanks'].forEach(kind => {
+    primeEmailTemplate(kind);
+    const reset = $('#' + kind + '-reset');
+    if (reset) reset.addEventListener('click', () => resetEmailTemplate(kind));
+    const copy  = $('#' + kind + '-copy');
+    if (copy)  copy.addEventListener('click',  () => copyEmailBody(kind));
+    const open  = $('#' + kind + '-open');
+    if (open)  open.addEventListener('click',  () => openInMail(kind));
+  });
 
   /* Token error modal */
   $('#tm-close').addEventListener('click', hideTokenModal);
