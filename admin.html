@@ -4535,7 +4535,6 @@ async function loadGalleryFromLive(opts = {}) {
           MEDIA = applySavedAdminState(parsed);
           galleryLoadState = 'loaded';
           renderPhotos();
-          console.log('[admin] rendered from local ·', parsed.length, 'items');
         }
       }
     } catch { /* file:// CORS or offline — fall through to remote */ }
@@ -4599,8 +4598,6 @@ async function loadGalleryFromLive(opts = {}) {
     MEDIA = applySavedAdminState(remoteLiveMedia);
     galleryLoadState = 'loaded';
     renderPhotos();
-    console.log('[admin] gallery loaded via', remoteSource, '·', remoteLiveMedia.length, 'items',
-      localLiveMedia ? `(reconciled — local had ${localLiveMedia.length})` : '');
   }
 }
 function parseGallery(html) {

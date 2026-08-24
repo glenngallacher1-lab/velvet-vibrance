@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin
+Disallow: /templates/
+Disallow: /stage/
+Disallow: /maintenance.html
+
+Sitemap: https://glenngallacher1-lab.github.io/velvet-vibrance/sitemap.xml

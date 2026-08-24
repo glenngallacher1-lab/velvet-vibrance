@@ -550,6 +550,23 @@ function splitWords(el) {
   const form = document.getElementById('join-form');
   if (!form) return;
 
+  /* If VV_ENDPOINT isn't wired up yet, disable the form on page load and
+     show a persistent "coming soon" notice — cleaner than letting people
+     submit and see a fleeting "SETUP PENDING" flash on the button. */
+  const endpointOnLoad = window.VV_ENDPOINT;
+  if (!endpointOnLoad || /PASTE_YOUR/.test(endpointOnLoad)) {
+    const input = form.querySelector('.join-input');
+    const btn   = form.querySelector('.join-btn');
+    if (input) { input.disabled = true; input.placeholder = 'Signup opens shortly'; }
+    if (btn)   { btn.disabled = true;   btn.textContent = 'COMING SOON'; btn.style.opacity = '0.5'; }
+    const notice = document.createElement('p');
+    notice.className = 'join-privacy';
+    notice.style.color = 'rgba(232,181,71,0.7)';
+    notice.textContent = 'Signup opens shortly — check back or find us on Instagram.';
+    form.parentNode.insertBefore(notice, form.nextSibling);
+    return;
+  }
+
   function resetForm(btn, input, delayMs) {
     setTimeout(function () {
       btn.textContent = 'JOIN';
