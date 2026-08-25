@@ -146,6 +146,8 @@
           img.src = posterUrl;
           img.alt = esc(ev.name);
           img.className = 'event-poster';
+          img.loading = 'lazy';
+          img.decoding = 'async';
           img.draggable = true;
           img.title = 'Drag to copy poster';
           img.addEventListener('dragstart', e => {
