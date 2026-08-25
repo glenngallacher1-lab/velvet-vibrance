@@ -48,10 +48,18 @@ body.entry-open { overflow: hidden; }
 body.nav-open   { overflow: hidden; }
 
 /* ── Scrollbar ──────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--dark); }
-::-webkit-scrollbar-thumb { background: var(--velvet); }
-::-webkit-scrollbar-thumb:hover { background: var(--velvet-light); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(232,181,71,0.4);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fff2b5, var(--gold-light));
+}
+/* Firefox */
+html { scrollbar-color: var(--gold) var(--dark); scrollbar-width: thin; }
 
 /* ── Typography ─────────────────────────────────────────────── */
 h1, h2, h3, h4 {
@@ -66,9 +74,10 @@ h1, h2, h3, h4 {
   position: fixed;
   top: 0;
   left: 0;
-  height: 1px;
+  height: 2px;
   width: 0%;
-  background: linear-gradient(90deg, var(--velvet), var(--gold));
+  background: linear-gradient(90deg, #a67518, var(--gold), var(--gold-light), var(--gold), #a67518);
+  box-shadow: 0 0 12px rgba(232,181,71,0.55);
   z-index: 9999;
   transition: width 0.1s linear;
   pointer-events: none;
