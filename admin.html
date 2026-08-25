@@ -4386,7 +4386,11 @@ function go(view) {
 /* Paste the deployed Apps Script web-app URL and the SAME secret
    you set in WEBAPP.gs (SECRET constant). If either is missing,
    the Subscribers view will show a setup-pending message. */
-window.VV_ADMIN_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+window.VV_ADMIN_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKPcK1bRYUDijZENkCcSkNSflb3yaom7d5abVwcGUrPfFkmVFyEuU9smumyZBSAiuE5w/exec';
+/* The secret below is the admin key to download the full subscriber
+   list. It is a real credential — paste your local copy here to use
+   the Subscribers view, but ALWAYS revert to the placeholder before
+   git commit. Never push this to a public repo. */
 window.VV_ADMIN_SECRET   = 'PASTE_YOUR_ADMIN_SECRET_LOCALLY_DO_NOT_COMMIT';
 
 const VV_SUBS = { recent: [], archive: [] };
