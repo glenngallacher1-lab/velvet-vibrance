@@ -191,6 +191,20 @@
           card.append(posterWrap, info);
           grid.appendChild(card);
         });
+
+        /* Stagger the reveal so cards fade in as they land in the grid.
+           CSS ships them at opacity:0 waiting for .card-visible — this
+           IntersectionObserver is what actually promotes them once each
+           card scrolls into view. */
+        const reveal = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('card-visible');
+              obs.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -60px 0px', threshold: 0.05 });
+        grid.querySelectorAll('.event-card').forEach(c => reveal.observe(c));
       })
       .catch(() => {
         document.getElementById('events-empty').style.display = 'block';
