@@ -172,13 +172,6 @@
           item.appendChild(img);
         }
 
-        const overlay = document.createElement('div');
-        overlay.className = 'rg-overlay';
-        const span = document.createElement('span');
-        span.textContent = m.label || '';
-        overlay.appendChild(span);
-        item.appendChild(overlay);
-
         mosaic.appendChild(item);
       });
     })();
