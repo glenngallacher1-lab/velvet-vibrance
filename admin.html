@@ -5246,17 +5246,46 @@ function resetPoster() {
   $('#poster-preview').removeAttribute('src');
   $('#poster-input').value = '';
 }
-function handlePoster(file) {
+async function handlePoster(file) {
   if (!file) return;
-  posterName = file.name;
-  posterMime = file.type || 'image/jpeg';
-  const reader = new FileReader();
-  reader.onload = e => {
-    posterBase64 = e.target.result.split(',')[1];
+
+  /* Show something immediately so the UI feels responsive while the
+     downscale runs. Falls back gracefully if the browser can't preview. */
+  const previewReader = new FileReader();
+  previewReader.onload = e => {
     $('#poster-preview').src = e.target.result;
     $('#poster-zone').classList.add('has-img');
   };
-  reader.readAsDataURL(file);
+  previewReader.readAsDataURL(file);
+
+  /* Downscale to 1600px max @ q0.82 — posters render at ~320px in the
+     3:4 grid on the live site, so ~4× that is plenty for retina, and
+     the file lands in the 100–300 KB range instead of multi-MB. */
+  try {
+    setStatus('Shrinking poster…');
+    const shrunk = await downscaleImage(file, 1600, 0.82);
+    posterBase64 = shrunk.base64;
+    posterName   = shrunk.name;
+    posterMime   = shrunk.mime;
+    /* Replace preview with the actually-uploaded version so what you
+       see matches what publishes. */
+    $('#poster-preview').src = 'data:' + shrunk.mime + ';base64,' + shrunk.base64;
+    const kb = Math.round(shrunk.base64.length * 0.75 / 1024);
+    setStatus(`Poster ready · ${shrunk.width}×${shrunk.height} · ~${kb} KB`);
+  } catch (err) {
+    /* Fallback: if downscale fails for some reason, still let the user
+       proceed with the raw upload rather than blocking them. */
+    posterName = file.name;
+    posterMime = file.type || 'image/jpeg';
+    const raw = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = e => resolve(e.target.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+    posterBase64 = raw.split(',')[1];
+    toast('Poster resize failed — uploading original', 'error');
+  }
 }
 /* Re-fetch latest events.json + push the current `events` array. Shared by Add/Remove/manual Publish. */
 async function pushEventsJSON(token) {
