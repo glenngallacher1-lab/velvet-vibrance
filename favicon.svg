@@ -18,20 +18,21 @@
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="10" fill="url(#bg)"/>
-  <!-- Base V in metallic gradient -->
+  <!-- Base VV in metallic gradient. Tight kerning so the two Vs read as
+       one interlocking monogram at 16x16 favicon size. -->
   <text x="32" y="46"
         font-family="Playfair Display, Didot, Georgia, serif"
         font-weight="700" font-style="italic"
-        font-size="42"
+        font-size="34"
         text-anchor="middle"
         fill="url(#metal)"
-        style="letter-spacing:-0.02em">V</text>
+        style="letter-spacing:-0.12em">VV</text>
   <!-- Top sheen for the metallic highlight -->
   <text x="32" y="46"
         font-family="Playfair Display, Didot, Georgia, serif"
         font-weight="700" font-style="italic"
-        font-size="42"
+        font-size="34"
         text-anchor="middle"
         fill="url(#sheen)"
-        style="letter-spacing:-0.02em">V</text>
+        style="letter-spacing:-0.12em">VV</text>
 </svg>
