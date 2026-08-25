@@ -168,6 +168,10 @@
           dateEl.className = 'event-date';
           dateEl.textContent = ev.date ?? '';
 
+          const timeEl = document.createElement('p');
+          timeEl.className = 'event-time';
+          timeEl.textContent = ev.time ?? '';
+
           const nameEl = document.createElement('p');
           nameEl.className = 'event-name';
           nameEl.textContent = ev.name ?? '';
@@ -176,7 +180,7 @@
           venueEl.className = 'event-venue';
           venueEl.textContent = ev.venue ?? '';
 
-          info.append(dateEl, nameEl, venueEl);
+          info.append(dateEl, timeEl, nameEl, venueEl);
 
           if (ticketUrl) {
             const a = document.createElement('a');

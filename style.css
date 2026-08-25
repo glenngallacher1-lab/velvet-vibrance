@@ -804,9 +804,13 @@ h1, h2, h3, h4 {
 }
 
 .events-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.4rem;
+}
+
+@media (max-width: 640px) {
+  .events-grid { grid-template-columns: 1fr; gap: 1.1rem; }
 }
 
 .events-empty {
@@ -819,17 +823,18 @@ h1, h2, h3, h4 {
   padding: 4rem 0;
 }
 
-/* Event Card with 3D hover */
+/* Event Card — poster-first, info scrimmed over the bottom third.
+   Portrait aspect so each card reads like a real gig flyer. */
 .event-card {
-  background: var(--dark-card);
-  border: 1px solid rgba(212,175,55,0.15);
-  border-radius: 12px;
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: #0a0505;
+  border-radius: 10px;
   overflow: hidden;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  transition: border-color 0.4s ease, box-shadow 0.5s ease;
-  will-change: transform;
+  isolation: isolate;
+  border: 1px solid rgba(212,175,55,0.18);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  transition: border-color 0.4s ease, box-shadow 0.5s ease, transform 0.5s var(--ease-out);
   opacity: 0;
   transform: translateY(24px);
 }
@@ -842,107 +847,140 @@ h1, h2, h3, h4 {
 }
 
 .event-card:hover {
-  border-color: rgba(212,175,55,0.5);
-  box-shadow: 0 0 40px rgba(212,175,55,0.12), 0 28px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(212,175,55,0.12);
+  border-color: rgba(232,181,71,0.55);
+  box-shadow: 0 0 40px rgba(232,181,71,0.15), 0 28px 70px rgba(0,0,0,0.6);
+  transform: translateY(-4px);
 }
 
+/* Poster fills the whole card behind the scrim. */
 .event-poster-wrap {
-  position: relative;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  width: 110px;
-  flex-shrink: 0;
+  z-index: 0;
 }
 
 .event-poster {
-  width: 110px;
+  width: 100%;
   height: 100%;
-  min-height: 110px;
   object-fit: cover;
   display: block;
   cursor: grab;
-  transition: transform 0.6s var(--ease-out), filter 0.6s ease;
-  filter: saturate(0.85);
+  transition: transform 0.8s var(--ease-out), filter 0.8s ease;
+  filter: saturate(0.92) brightness(0.92);
 }
 
 .event-card:hover .event-poster {
-  transform: scale(1.1);
-  filter: saturate(1);
+  transform: scale(1.04);
+  filter: saturate(1.05) brightness(1);
 }
 
+/* Bottom-anchored dark scrim so info stays readable over any poster. */
 .event-poster-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%);
-  opacity: 0;
-  transition: opacity var(--transition);
+  z-index: 1;
+  background:
+    linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.55) 72%, rgba(0,0,0,0.92) 100%);
+  pointer-events: none;
   display: flex;
   align-items: flex-end;
-  padding: 0.8rem;
+  justify-content: flex-end;
+  padding: 0.7rem 0.85rem;
+  transition: opacity 0.35s var(--transition);
+  opacity: 0;
 }
-
 .event-card:hover .event-poster-overlay { opacity: 1; }
 
 .event-poster-hint {
   font-family: var(--font-body);
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--gold);
+  background: rgba(0,0,0,0.6);
+  padding: 0.35rem 0.6rem;
+  border-radius: 2px;
+  border: 1px solid rgba(232,181,71,0.35);
 }
 
+/* Info block sits on top of the scrim, bottom-left of the card. */
 .event-info {
-  padding: 0.9rem 1.1rem;
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  padding: 1.4rem 1.4rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  justify-content: center;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 30%, rgba(0,0,0,0.9) 100%);
 }
 
 .event-date {
   font-family: var(--font-body);
-  font-size: 0.67rem;
-  letter-spacing: 3px;
-  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: var(--gold-light);
   text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  margin-bottom: 0.15rem;
+}
+
+.event-time {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  color: rgba(245,237,224,0.7);
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  margin-top: -0.05rem;
 }
 
 .event-name {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.75);
+  margin: 0.35rem 0 0.15rem;
 }
 
 .event-venue {
   font-family: var(--font-body);
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  color: rgba(245,237,224,0.82);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
 }
 
 .event-tickets {
   display: inline-flex;
-  position: relative;
-  height: 1.6rem;
-  margin-top: 0.4rem;
-  align-items: flex-end;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.9rem;
+  padding: 0.55rem 1rem;
   font-family: var(--font-body);
   font-size: 0.65rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: #14090b;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
   text-decoration: none;
-  border: 1px solid rgba(212,175,55,0.3);
-  padding: 0.35rem 0.85rem;
-  border-radius: 50px;
-  transition: background var(--transition), border-color var(--transition);
-  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s ease, background 0.25s;
 }
 
 .event-tickets:hover {
-  background: rgba(212,175,55,0.1);
-  border-color: rgba(212,175,55,0.6);
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #fff2b5, var(--gold-light));
+  box-shadow: 0 8px 20px rgba(232,181,71,0.35), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 /* ════════════════════════════════════════════════════════════
