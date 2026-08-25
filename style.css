@@ -1638,7 +1638,9 @@ h1, h2, h3, h4 {
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
-  padding-bottom: 0.08em;
+  /* Right padding so the italic serif tail (e.g. the P in LINEUP) isn't
+     clipped by the inline-block bounding box. */
+  padding: 0 0.12em 0.08em 0;
   line-height: 1.15;
 }
 .gallery-hero p {
