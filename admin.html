@@ -4529,57 +4529,42 @@ async function loadGalleryFromLive(opts = {}) {
 
   /* ── Stage 1: same-origin ── */
   let localLiveMedia = null;
-  let stage1Diag = 'skipped';
   if (!forceRemote) {
     try {
       const res = await fetch('gallery.html?t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
-        const txt = await res.text();
-        const parsed = parseGallery(txt);
-        stage1Diag = `ok ${res.status} · ${txt.length}b · ${parsed.length} items`;
+        const parsed = parseGallery(await res.text());
         if (parsed.length > 0) {
           localLiveMedia = parsed;
           MEDIA = applySavedAdminState(parsed);
           galleryLoadState = 'loaded';
           renderPhotos();
         }
-      } else {
-        stage1Diag = `http ${res.status}`;
       }
-    } catch (err) {
-      stage1Diag = `throw: ${err.message || err}`;
-    }
+    } catch { /* file:// CORS or offline — fall through to remote */ }
   }
-  window._vvGalleryDiag = { stage1: stage1Diag };
 
   /* ── Stage 2: authoritative remote ── */
   let remoteLiveMedia = null;
   let remoteSource = null;
-  let stage2Diag = '';
   try {
     const token = tokenStore.get();
     if (token) {
       try {
         const fileData = await ghGet('gallery.html', token);
-        const decoded = b64decodeUtf8(fileData.content);
-        remoteLiveMedia = parseGallery(decoded);
+        remoteLiveMedia = parseGallery(b64decodeUtf8(fileData.content));
         remoteSource = 'api';
-        stage2Diag = `api ok · ${decoded.length}b · ${remoteLiveMedia.length} items`;
       } catch (apiErr) {
-        stage2Diag = `api fail: ${apiErr.message}`;
         console.warn('[admin] API read failed, falling back to RAW:', apiErr);
       }
     }
-    if (!remoteLiveMedia || remoteLiveMedia.length === 0) {
+    if (!remoteLiveMedia) {
       const res = await fetch(RAW_BASE + 'gallery.html?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) throw new Error('RAW ' + res.status);
-      const txt = await res.text();
-      remoteLiveMedia = parseGallery(txt);
+      remoteLiveMedia = parseGallery(await res.text());
       remoteSource = 'raw';
-      stage2Diag = (stage2Diag ? stage2Diag + ' · ' : '') + `raw ok · ${txt.length}b · ${remoteLiveMedia.length} items`;
     }
   } catch (err) {
-    stage2Diag = (stage2Diag ? stage2Diag + ' · ' : '') + `throw: ${err.message || err}`;
     if (!localLiveMedia) {
       MEDIA = [];
       galleryLoadState = 'failed';
@@ -4593,12 +4578,9 @@ async function loadGalleryFromLive(opts = {}) {
     return;
   }
 
-  window._vvGalleryDiag = { stage1: window._vvGalleryDiag?.stage1, stage2: stage2Diag };
   if (remoteLiveMedia.length === 0) {
     if (!localLiveMedia) {
-      const diagMsg = `s1[${window._vvGalleryDiag.stage1}] s2[${stage2Diag}]`;
-      toast('Parse miss · ' + diagMsg, 'error');
-      console.error('[admin] gallery parse diagnostic:', window._vvGalleryDiag);
+      toast('Loaded gallery.html but found 0 MEDIA items (parse miss?)', 'error');
       MEDIA = [];
       galleryLoadState = 'failed';
       renderPhotos();
@@ -4622,11 +4604,34 @@ async function loadGalleryFromLive(opts = {}) {
     renderPhotos();
   }
 }
+/* Parse gallery.html's `const MEDIA = [...]` array into JS objects.
+   Uses a regex-based scanner instead of new Function() because the
+   admin CSP blocks eval-equivalents — new Function() would throw a
+   CSP violation and silently return [].
+
+   Assumes the same shape gallery.html always emits:
+     { src: 'X', [type: 'Y',] [poster: 'Z',] label: 'W' }
+   Values are single-quoted strings. */
 function parseGallery(html) {
-  const m = html.match(/const\s+MEDIA\s*=\s*(\[[\s\S]*?\]);/);
-  if (!m) return [];
-  try { return (new Function('return ' + m[1]))(); }
-  catch { return []; }
+  const block = html.match(/const\s+MEDIA\s*=\s*\[([\s\S]*?)\];/);
+  if (!block) return [];
+  const items = [];
+  /* Match each { ... } entry (non-nested). */
+  const entryRe = /\{([^}]*)\}/g;
+  let em;
+  while ((em = entryRe.exec(block[1])) !== null) {
+    const body = em[1];
+    const entry = {};
+    /* Pull each key: 'value' pair. Keys are bare identifiers,
+       values are single-quoted strings. */
+    const kvRe = /(\w+)\s*:\s*'([^']*)'/g;
+    let kv;
+    while ((kv = kvRe.exec(body)) !== null) {
+      entry[kv[1]] = kv[2];
+    }
+    if (entry.src) items.push(entry);
+  }
+  return items;
 }
 
 /* ── Local admin state (localStorage) ──
