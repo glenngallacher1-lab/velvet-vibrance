@@ -279,6 +279,7 @@ function closeNav() {
   }, { passive: true });
 })();
 
+
 /* ── F. Scroll Reveals (fade-up, slide-right) ───────────────── */
 (function initReveals() {
   const els = document.querySelectorAll('.reveal-up, .reveal-right, .about-quote.reveal-clip, .join-headline.reveal-clip');

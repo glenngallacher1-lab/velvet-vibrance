@@ -69,6 +69,67 @@ h1, h2, h3, h4 {
   letter-spacing: -0.02em;
 }
 
+/* ════════════════════════════════════════════════════════════
+   SIDE RAIL — landing-hero-only navigation.
+   Lives inside <section id="hero"> as an absolutely-positioned
+   left column so it scrolls out of the viewport naturally with
+   the hero image itself. Only rendered on index.html. Other
+   pages fall back to the top #nav bar (VV + hamburger, opens
+   .nav-overlay for the menu).
+════════════════════════════════════════════════════════════ */
+#side-rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 88px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.1rem 0.6rem 2rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.55) 100%);
+  border-right: 1px solid rgba(232,181,71,0.14);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.rail-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1.85rem;
+  width: 100%;
+  align-items: center;
+}
+.rail-link {
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(245,237,224,0.7);
+  text-decoration: none;
+  padding: 0.4rem 0.2rem;
+  border-left: 1px solid transparent;
+  transition: color 0.3s ease, border-color 0.3s ease, letter-spacing 0.3s ease;
+}
+.rail-link:hover,
+.rail-link[aria-current="page"] {
+  color: var(--gold);
+  letter-spacing: 0.32em;
+}
+/* Hide rail on narrow viewports — hero has less width to spare
+   and the hamburger already covers the menu on mobile. */
+@media (max-width: 768px) {
+  #side-rail { display: none; }
+}
+
+/* On pages WITHOUT a rail (gallery, events, privacy) the top #nav
+   is the primary navigation. Force the hamburger visible at every
+   viewport width so desktop visitors can open the menu. Uses :has()
+   so the rule only applies where no rail exists. */
+body:not(:has(#side-rail)) .nav-hamburger { display: flex; }
+
 /* ── Scroll Progress Bar ────────────────────────────────────── */
 #scroll-progress {
   position: fixed;
@@ -500,9 +561,13 @@ h1, h2, h3, h4 {
   height: 100vh;
   min-height: 600px;
   display: flex;
-  align-items: flex-end;
+  /* Banner-style: content anchored to the TOP of the frame instead of
+     the bottom. Paired with the reversed overlay below to keep the
+     text against a dark backdrop. */
+  align-items: flex-start;
   justify-content: flex-start;
   overflow: hidden;
+  padding-top: 4rem;
 }
 
 .hero-bg {
@@ -517,9 +582,10 @@ h1, h2, h3, h4 {
 .hero-overlay {
   position: absolute;
   inset: 0;
+  /* Reversed: darker at top now that the headline is anchored high. */
   background: linear-gradient(
-    to top,
-    rgba(0,0,0,0.88) 0%,
+    to bottom,
+    rgba(0,0,0,0.82) 0%,
     rgba(0,0,0,0.22) 55%,
     rgba(0,0,0,0.06) 100%
   );
@@ -547,8 +613,12 @@ h1, h2, h3, h4 {
 .hero-content {
   position: relative;
   z-index: 2;
-  padding: 3rem 2.5rem;
-  max-width: 1100px;
+  padding: 3rem 2.5rem 3rem calc(88px + 2.5rem);
+  max-width: 1200px;
+}
+/* Once the rail collapses on mobile, reset the left padding. */
+@media (max-width: 768px) {
+  .hero-content { padding: 3rem 2.5rem; }
 }
 
 .hero-eyebrow {
@@ -630,16 +700,21 @@ h1, h2, h3, h4 {
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: minmax(48vh, auto);
+  /* Row height driven by whichever column is taller — usually the
+     text. Removes the previous 48vh floor that was stretching the
+     photo far beyond the text. */
   align-items: stretch;
 }
 
 .about-text {
-  padding: 2.5rem 3rem 2.5rem 3rem;
+  padding: 2rem 3rem 2.5rem 3rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1.2rem;
+  /* Anchor to top and tighten the gap so eyebrow → quote → body
+     reads as a single stacked block instead of three floating
+     pieces. Between-paragraph spacing lives inside .about-body. */
+  justify-content: flex-start;
+  gap: 0.55rem;
 }
 
 .section-eyebrow {
@@ -1195,6 +1270,151 @@ h1, h2, h3, h4 {
 .join-privacy a:hover {
   color: var(--gold-light);
   text-decoration-color: var(--gold-light);
+}
+
+/* ════════════════════════════════════════════════════════════
+   CONTACT / BOOKING PAGE — tabbed form (contact.html)
+════════════════════════════════════════════════════════════ */
+.contact-section {
+  padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 4rem) 5rem;
+  background: var(--dark);
+}
+.contact-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+}
+.contact-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2.4rem;
+  border-bottom: 1px solid rgba(232,181,71,0.18);
+}
+.contact-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 1rem 1rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(245,237,224,0.5);
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease;
+  margin-bottom: -1px;
+}
+.contact-tab:hover { color: rgba(245,237,224,0.85); }
+.contact-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.contact-form { display: none; }
+.contact-form.active { display: block; }
+
+.cf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem 1.4rem;
+}
+.cf-field { display: flex; flex-direction: column; }
+.cf-full  { grid-column: 1 / -1; }
+
+.cf-field label {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(245,237,224,0.55);
+  margin-bottom: 0.5rem;
+}
+
+.cf-field input,
+.cf-field select,
+.cf-field textarea {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(232,181,71,0.22);
+  border-radius: 2px;
+  padding: 0.85rem 1rem;
+  transition: border-color 0.3s ease, background 0.3s ease;
+  width: 100%;
+}
+.cf-field textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.55;
+  font-family: var(--font-prose);
+  font-size: 1.05rem;
+}
+.cf-field input:focus,
+.cf-field select:focus,
+.cf-field textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: rgba(0,0,0,0.6);
+}
+.cf-field select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--gold) 50%),
+    linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.5rem;
+}
+
+.cf-actions {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+.cf-submit {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #14090b;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
+  border: none;
+  padding: 0.95rem 1.8rem;
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s ease, background 0.25s;
+}
+.cf-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #fff2b5, var(--gold-light));
+  box-shadow: 0 8px 20px rgba(232,181,71,0.35), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.cf-submit:disabled { opacity: 0.55; cursor: wait; }
+
+.cf-status {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: rgba(245,237,224,0.75);
+  margin: 0;
+}
+.cf-status.success { color: var(--gold-light); }
+.cf-status.error   { color: #ff8a8a; }
+
+@media (max-width: 640px) {
+  .cf-grid { grid-template-columns: 1fr; }
+  .contact-tab {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    padding: 0.85rem 0.5rem;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════

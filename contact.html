@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Velvet Vibrance — Book a DJ set or get in touch." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="canonical" href="https://glenngallacher1-lab.github.io/velvet-vibrance/contact.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Velvet Vibrance" />
+  <meta property="og:url" content="https://glenngallacher1-lab.github.io/velvet-vibrance/contact.html" />
+  <meta property="og:title" content="VELVET VIBRANCE — Book / Contact" />
+  <meta property="og:description" content="Book a Stanzza set at your venue, or reach out for press and collabs." />
+  <meta property="og:image" content="https://glenngallacher1-lab.github.io/velvet-vibrance/crowd-pink.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data:; media-src 'self' https://raw.githubusercontent.com; connect-src 'self' https://raw.githubusercontent.com https://script.google.com https://script.googleusercontent.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>VELVET VIBRANCE — Book / Contact</title>
+  <link rel="stylesheet" href="style.css?v=fade1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="gallery-page">
+
+  <!-- Maintenance flag — toggled by admin. Do not edit by hand. -->
+  <script>(function(){var VV_MAINT='OFF';/*VV_MAINT*/if(VV_MAINT==='ON'){location.replace('maintenance.html');}})();</script>
+
+  <!-- Nav overlay -->
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <nav class="overlay-nav">
+        <a href="index.html#about"   class="overlay-link"><span>About</span></a>
+        <a href="events.html"        class="overlay-link"><span>Events</span></a>
+        <a href="gallery.html"       class="overlay-link"><span>Gallery</span></a>
+        <a href="contact.html"       class="overlay-link"><span>Contact</span></a>
+      </nav>
+      <div class="overlay-footer">
+        <a href="https://www.instagram.com/stanzzaofficial" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://open.spotify.com/user/trystanbucar?si=YCVCJeDFSdeDEXY9Dz1a8A&utm_source=copy-link&nd=1&dlsi=a971ac6fd83c4f14" target="_blank" rel="noopener noreferrer">Spotify</a>
+        <a href="https://soundcloud.com/user-411773767?ref=clipboard&p=i&c=0&si=22EA36A8152D448B8C8C91F1DC9DD014&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" target="_blank" rel="noopener noreferrer">SoundCloud</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header id="nav">
+    <a href="index.html" class="nav-logo">VV</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span class="ham-line ham-top"></span>
+      <span class="ham-line ham-bot"></span>
+    </button>
+  </header>
+
+  <!-- Hero -->
+  <section class="gallery-hero">
+    <div class="gallery-hero-inner">
+      <p class="section-eyebrow">Book · Contact</p>
+      <h1>GET IN <em>TOUCH</em></h1>
+      <p>Book a Stanzza set at your venue, or just say hi. All enquiries land straight with Glenn — usually a reply within 48 hours.</p>
+    </div>
+  </section>
+
+  <!-- Form section -->
+  <section class="contact-section">
+    <div class="contact-wrap">
+
+      <!-- Tab switcher -->
+      <div class="contact-tabs" role="tablist" aria-label="Enquiry type">
+        <button class="contact-tab active" id="tab-book"    role="tab" aria-selected="true"  aria-controls="form-book">Book a DJ Set</button>
+        <button class="contact-tab"        id="tab-contact" role="tab" aria-selected="false" aria-controls="form-contact">Get in Touch</button>
+      </div>
+
+      <!-- Book form -->
+      <form class="contact-form active" id="form-book" role="tabpanel" aria-labelledby="tab-book" novalidate>
+        <div class="cf-grid">
+          <div class="cf-field">
+            <label for="bk-name">Your name</label>
+            <input type="text" id="bk-name" name="name" required autocomplete="name" />
+          </div>
+          <div class="cf-field">
+            <label for="bk-email">Email</label>
+            <input type="email" id="bk-email" name="email" required autocomplete="email" />
+          </div>
+          <div class="cf-field">
+            <label for="bk-venue">Venue name</label>
+            <input type="text" id="bk-venue" name="venue" required />
+          </div>
+          <div class="cf-field">
+            <label for="bk-city">City</label>
+            <input type="text" id="bk-city" name="city" autocomplete="address-level2" />
+          </div>
+          <div class="cf-field">
+            <label for="bk-date">Event date</label>
+            <input type="date" id="bk-date" name="date" />
+          </div>
+          <div class="cf-field">
+            <label for="bk-type">Event type</label>
+            <select id="bk-type" name="type">
+              <option value="">Choose…</option>
+              <option>Club night</option>
+              <option>Festival</option>
+              <option>Private event</option>
+              <option>Brand event</option>
+              <option>Warehouse / underground</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="cf-field cf-full">
+            <label for="bk-budget">Budget range</label>
+            <select id="bk-budget" name="budget">
+              <option value="">Choose…</option>
+              <option>Under $500</option>
+              <option>$500 – $1,500</option>
+              <option>$1,500 – $3,000</option>
+              <option>$3,000 – $6,000</option>
+              <option>$6,000+</option>
+              <option>Let's discuss</option>
+            </select>
+          </div>
+          <div class="cf-field cf-full">
+            <label for="bk-message">Tell me about the night</label>
+            <textarea id="bk-message" name="message" rows="6" required placeholder="Room capacity, expected crowd, other DJs on the bill, vibe, anything else…"></textarea>
+          </div>
+        </div>
+        <div class="cf-actions">
+          <button type="submit" class="cf-submit">Send enquiry →</button>
+          <p class="cf-status" id="bk-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <!-- Contact form -->
+      <form class="contact-form" id="form-contact" role="tabpanel" aria-labelledby="tab-contact" hidden novalidate>
+        <div class="cf-grid">
+          <div class="cf-field">
+            <label for="cn-name">Your name</label>
+            <input type="text" id="cn-name" name="name" required autocomplete="name" />
+          </div>
+          <div class="cf-field">
+            <label for="cn-email">Email</label>
+            <input type="email" id="cn-email" name="email" required autocomplete="email" />
+          </div>
+          <div class="cf-field cf-full">
+            <label for="cn-subject">Subject</label>
+            <select id="cn-subject" name="subject">
+              <option value="">Choose…</option>
+              <option>Press / interview</option>
+              <option>Collaboration</option>
+              <option>Feedback</option>
+              <option>Just saying hi</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="cf-field cf-full">
+            <label for="cn-message">Message</label>
+            <textarea id="cn-message" name="message" rows="6" required></textarea>
+          </div>
+        </div>
+        <div class="cf-actions">
+          <button type="submit" class="cf-submit">Send message →</button>
+          <p class="cf-status" id="cn-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-monogram">VV</span>
+        <span class="footer-copy">&copy; VELVET VIBRANCE</span>
+      </div>
+      <div class="footer-social">
+        <a href="privacy.html">Privacy</a>
+        <a href="https://www.instagram.com/stanzzaofficial" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://open.spotify.com/user/trystanbucar?si=YCVCJeDFSdeDEXY9Dz1a8A&utm_source=copy-link&nd=1&dlsi=a971ac6fd83c4f14" target="_blank" rel="noopener noreferrer">Spotify</a>
+        <a href="https://soundcloud.com/user-411773767?ref=clipboard&p=i&c=0&si=22EA36A8152D448B8C8C91F1DC9DD014&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" target="_blank" rel="noopener noreferrer">SoundCloud</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Endpoint: same Apps Script deployment as the join form; the
+       backend routes on data.form so a single URL serves all forms. -->
+  <script>
+    window.VV_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKPcK1bRYUDijZENkCcSkNSflb3yaom7d5abVwcGUrPfFkmVFyEuU9smumyZBSAiuE5w/exec';
+  </script>
+  <script src="script.js" defer></script>
+
+  <script>
+    /* Tab switcher — swap active class + aria-selected + hide/show
+       the corresponding form panel. */
+    (function initTabs() {
+      const tabs = document.querySelectorAll('.contact-tab');
+      const forms = document.querySelectorAll('.contact-form');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetId = tab.getAttribute('aria-controls');
+          tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+          forms.forEach(f => {
+            const on = f.id === targetId;
+            f.classList.toggle('active', on);
+            f.hidden = !on;
+          });
+        });
+      });
+    })();
+
+    /* Form submitter — shared by both forms.
+       POSTs to VV_ENDPOINT with a `form` field the backend routes on. */
+    async function submitForm(form, formType, statusEl) {
+      const data = { form: formType };
+      new FormData(form).forEach((val, key) => { data[key] = val; });
+
+      const btn = form.querySelector('.cf-submit');
+      const origLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      statusEl.textContent = '';
+      statusEl.className = 'cf-status';
+
+      const endpoint = window.VV_ENDPOINT;
+      if (!endpoint || /PASTE_YOUR/.test(endpoint)) {
+        statusEl.textContent = 'Contact form is being set up — email velvetvibrance@gmail.com in the meantime.';
+        statusEl.classList.add('error');
+        btn.disabled = false; btn.textContent = origLabel;
+        return;
+      }
+
+      const url = endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') +
+                  'origin=' + encodeURIComponent(location.origin);
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        });
+        const txt = await res.text();
+        let parsed;
+        try { parsed = JSON.parse(txt); }
+        catch { throw new Error('Non-JSON response'); }
+
+        if (parsed && parsed.ok) {
+          form.reset();
+          statusEl.textContent = 'Sent — thanks. I\'ll be in touch within 48 hours.';
+          statusEl.classList.add('success');
+        } else {
+          const err = (parsed && parsed.error) || 'unknown';
+          statusEl.textContent = 'Could not send (' + err + '). Try again or email velvetvibrance@gmail.com.';
+          statusEl.classList.add('error');
+        }
+      } catch (err) {
+        statusEl.textContent = 'Network error. Try again or email velvetvibrance@gmail.com.';
+        statusEl.classList.add('error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = origLabel;
+      }
+    }
+
+    document.getElementById('form-book').addEventListener('submit', e => {
+      e.preventDefault();
+      submitForm(e.target, 'booking', document.getElementById('bk-status'));
+    });
+    document.getElementById('form-contact').addEventListener('submit', e => {
+      e.preventDefault();
+      submitForm(e.target, 'contact', document.getElementById('cn-status'));
+    });
+  </script>
+</body>
+</html>

@@ -53,7 +53,7 @@
         <a href="#about"        class="overlay-link"><span>About</span></a>
         <a href="events.html"   class="overlay-link" data-transition="events"><span>Events</span></a>
         <a href="gallery.html"  class="overlay-link" data-transition="gallery"><span>Gallery</span></a>
-        <a href="#join"         class="overlay-link"><span>Contact</span></a>
+        <a href="contact.html"  class="overlay-link"><span>Contact</span></a>
       </nav>
       <div class="overlay-footer">
         <a href="https://www.instagram.com/stanzzaofficial" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -64,18 +64,10 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       HEADER
+       HEADER — mobile-only fallback (hidden on desktop by CSS)
   ══════════════════════════════════════════════════════════ -->
   <header id="nav">
     <a href="#hero" class="nav-logo">VV</a>
-
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="events.html"  data-transition="events">Events</a></li>
-      <li><a href="gallery.html" data-transition="gallery">Gallery</a></li>
-      <li><a href="#join">Contact</a></li>
-    </ul>
-
     <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
       <span class="ham-line ham-top"></span>
       <span class="ham-line ham-bot"></span>
@@ -86,12 +78,22 @@
        HERO
   ══════════════════════════════════════════════════════════ -->
   <section id="hero">
+    <!-- Side rail lives INSIDE the hero so it scrolls out of frame
+         with the hero image itself. Absolutely positioned to the left. -->
+    <aside id="side-rail" aria-label="Primary">
+      <nav class="rail-nav">
+        <a href="#about" class="rail-link">About</a>
+        <a href="events.html"  class="rail-link" data-transition="events">Events</a>
+        <a href="gallery.html" class="rail-link" data-transition="gallery">Gallery</a>
+        <a href="contact.html" class="rail-link">Contact</a>
+      </nav>
+    </aside>
+
     <!-- HERO-BG-START --><div class="hero-bg" id="hero-bg" role="img" aria-label="Crowd bathed in warm pink light at a Velvet Vibrance night" style="background-image:url('crowd-pink.jpg')"></div><!-- HERO-BG-END -->
     <div class="hero-overlay"></div>
     <div class="hero-vignette" id="hero-vignette"></div>
     <div class="hero-noise"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">Music · Art · Fashion · Love</p>
       <h1 class="hero-headline">
         <span class="hl-line"><span>WHERE ART</span></span>
         <span class="hl-line"><span>BLEEDS</span></span>
@@ -113,8 +115,9 @@
       <div class="about-text">
         <p class="section-eyebrow reveal-up">The Collective</p>
         <blockquote class="about-quote reveal-clip">
-          <span>"BLOOD RUNS</span>
-          <span>VELVET GOLD"</span>
+          <span>WHERE ART</span>
+          <span>BLEEDS</span>
+          <span>INTO GOLD</span>
         </blockquote>
         <div class="about-body reveal-up" style="--delay:0.15s">
           <p>Creativity is not a gift — it is a birthright. Every event, every artist, every frequency is a prayer made physical. The velvet is our depth. The gold is our light.</p>

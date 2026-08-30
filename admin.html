@@ -1273,6 +1273,82 @@
     }
     @media (max-width: 980px) { .notes-grid { column-count: 2; } }
     @media (max-width: 600px) { .notes-grid { column-count: 1; } }
+
+    /* ── Enquiries view (bookings + contact messages) ── */
+    .enq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+    .enq-card {
+      background: linear-gradient(170deg, rgba(20,9,11,0.6), rgba(8,4,5,0.75));
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 1.1rem 1.2rem 1rem;
+      transition: border-color 0.25s, transform 0.25s var(--ease), box-shadow 0.3s;
+    }
+    .enq-card:hover {
+      border-color: var(--line-warm);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .enq-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.55rem;
+      flex-wrap: wrap;
+    }
+    .enq-who {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--paper);
+      letter-spacing: 0.02em;
+    }
+    .enq-who a {
+      color: var(--honey, #E8B547);
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 0.78rem;
+      margin-left: 0.6rem;
+    }
+    .enq-who a:hover { text-decoration: underline; }
+    .enq-when {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.7rem;
+      color: rgba(245,237,224,0.42);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .enq-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.1rem;
+      margin: 0.4rem 0 0.7rem;
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: rgba(245,237,224,0.7);
+    }
+    .enq-meta span strong {
+      color: rgba(245,237,224,0.45);
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.62rem;
+      margin-right: 0.35rem;
+    }
+    .enq-message {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: rgba(245,237,224,0.85);
+      white-space: pre-wrap;
+      margin-top: 0.4rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--line);
+    }
     .note {
       break-inside: avoid;
       page-break-inside: avoid;
@@ -1786,6 +1862,14 @@
           </div>
           <span class="tile-cta">Fire the room →</span>
         </button>
+
+        <button class="tile" data-go="enquiries">
+          <div>
+            <div class="tile-name">Enquiries</div>
+            <p class="tile-desc">Booking requests from venues and general contact messages, both submitted through the site's Contact page. Auto-emailed on arrival.</p>
+          </div>
+          <span class="tile-cta">Read the room →</span>
+        </button>
       </div>
 
       <div class="home-foot">
@@ -2150,6 +2234,62 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ENQUIRIES -->
+  <section class="view" id="view-enquiries">
+    <div class="ws-wrap">
+      <div class="ws-head">
+        <div>
+          <p class="ws-eyebrow">07 · Inbox</p>
+          <h2><em>Enquiries</em> from the Site</h2>
+        </div>
+        <div class="ws-actions">
+          <button class="btn btn-ghost" data-go="home">← Console</button>
+          <button class="btn btn-ghost" id="enq-refresh">↻ Refresh</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="help">
+          Everything submitted through <strong>contact.html</strong>. <strong>Bookings</strong> are venue/promoter enquiries; <strong>Contact</strong> is general messages. Both auto-email you the moment they arrive, but this is the audit trail. Nothing is ever deleted from here.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">
+          Bookings
+          <span class="count-badge" id="enq-book-count">0 enquiries</span>
+        </div>
+        <div class="enq-list" id="enq-book-list">
+          <div class="empty-state" id="enq-book-empty">No booking enquiries yet.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">
+          Contact
+          <span class="count-badge" id="enq-cn-count">0 messages</span>
+        </div>
+        <div class="enq-list" id="enq-cn-list">
+          <div class="empty-state" id="enq-cn-empty">No contact messages yet.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Connection</div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Backend status</div>
+            <div class="toggle-sub" id="enq-status-line">Not yet fetched.</div>
+          </div>
+          <div class="maint-status" id="enq-status-pill">
+            <span class="dot"></span>
+            <span id="enq-status-text">Idle</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -4365,7 +4505,7 @@ function go(view) {
   if (view === 'home') {
     crumb.innerHTML = '<a href="#" data-go="home">Console</a>';
   } else {
-    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes', subscribers: 'Subscribers', bookings: 'Bookings', loops: 'Loops' };
+    const caps = { photos: 'Photos', events: 'Events', notes: 'Notes', subscribers: 'Subscribers', bookings: 'Bookings', loops: 'Loops', enquiries: 'Enquiries' };
     const cap = caps[view] || view;
     crumb.innerHTML = `<a href="#" data-go="home">Console</a><span class="sep">/</span><span>${cap}</span>`;
   }
@@ -4377,6 +4517,7 @@ function go(view) {
   if (view === 'bookings') cybernetic.show(); else cybernetic.hide();
   if (view === 'loops')    godRays.show();    else godRays.hide();
   if (view === 'subscribers') renderSubscribers();
+  if (view === 'enquiries')   renderEnquiries();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -4463,6 +4604,123 @@ function copySubs(list, btn) {
     () => { toast('Copied ' + list.length + ' email' + (list.length === 1 ? '' : 's'), 'success'); },
     () => { toast('Copy blocked by browser', 'error'); }
   );
+}
+
+/* ════════════════════════════════════════════════════════════
+   ENQUIRIES  · reads the same Apps Script backend, splits the
+   payload into bookings + contact messages, renders as cards.
+   ════════════════════════════════════════════════════════════ */
+const VV_ENQ = { bookings: [], contacts: [] };
+
+function setEnqStatus(text, kind) {
+  const line  = $('#enq-status-line');
+  const label = $('#enq-status-text');
+  const pill  = $('#enq-status-pill');
+  if (line)  line.textContent  = text;
+  if (label) label.textContent = kind === 'error' ? 'Error' : (kind === 'ok' ? 'Connected' : 'Idle');
+  if (pill)  pill.classList.toggle('on', kind === 'error');
+}
+
+function escEnq(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+}
+
+function fmtEnqTime(iso) {
+  const d = new Date(iso);
+  if (!isFinite(d)) return '';
+  return d.toLocaleString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function renderBookingCard(b) {
+  const meta = [];
+  if (b.venue)  meta.push('<span><strong>Venue</strong>'  + escEnq(b.venue)  + '</span>');
+  if (b.city)   meta.push('<span><strong>City</strong>'   + escEnq(b.city)   + '</span>');
+  if (b.date)   meta.push('<span><strong>Date</strong>'   + escEnq(b.date)   + '</span>');
+  if (b.type)   meta.push('<span><strong>Type</strong>'   + escEnq(b.type)   + '</span>');
+  if (b.budget) meta.push('<span><strong>Budget</strong>' + escEnq(b.budget) + '</span>');
+
+  return '<div class="enq-card">'
+    +    '<div class="enq-head">'
+    +      '<div class="enq-who">' + escEnq(b.name)
+    +        ' <a href="mailto:' + encodeURIComponent(b.email) + '">' + escEnq(b.email) + '</a>'
+    +      '</div>'
+    +      '<div class="enq-when">' + escEnq(fmtEnqTime(b.timestamp)) + '</div>'
+    +    '</div>'
+    +    (meta.length ? '<div class="enq-meta">' + meta.join('') + '</div>' : '')
+    +    '<div class="enq-message">' + escEnq(b.message) + '</div>'
+    + '</div>';
+}
+
+function renderContactCard(c) {
+  const meta = [];
+  if (c.subject) meta.push('<span><strong>Subject</strong>' + escEnq(c.subject) + '</span>');
+
+  return '<div class="enq-card">'
+    +    '<div class="enq-head">'
+    +      '<div class="enq-who">' + escEnq(c.name)
+    +        ' <a href="mailto:' + encodeURIComponent(c.email) + '">' + escEnq(c.email) + '</a>'
+    +      '</div>'
+    +      '<div class="enq-when">' + escEnq(fmtEnqTime(c.timestamp)) + '</div>'
+    +    '</div>'
+    +    (meta.length ? '<div class="enq-meta">' + meta.join('') + '</div>' : '')
+    +    '<div class="enq-message">' + escEnq(c.message) + '</div>'
+    + '</div>';
+}
+
+async function renderEnquiries() {
+  const endpoint = window.VV_ADMIN_ENDPOINT || '';
+  const secret   = window.VV_ADMIN_SECRET   || '';
+  const bookList = $('#enq-book-list');
+  const cnList   = $('#enq-cn-list');
+  const bookN    = $('#enq-book-count');
+  const cnN      = $('#enq-cn-count');
+
+  if (/PASTE_YOUR|PASTE_SAME/.test(endpoint) || /PASTE_YOUR|PASTE_SAME/.test(secret) || !endpoint) {
+    bookList.innerHTML = '<div class="empty-state">Backend not configured — paste your admin secret locally.</div>';
+    cnList.innerHTML   = '<div class="empty-state">Backend not configured — paste your admin secret locally.</div>';
+    bookN.textContent = '0 enquiries';
+    cnN.textContent   = '0 messages';
+    setEnqStatus('Backend not configured — paste VV_ADMIN_SECRET into admin.html locally.', 'error');
+    return;
+  }
+
+  setEnqStatus('Fetching…', null);
+  try {
+    const url = endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') + 'secret=' + encodeURIComponent(secret);
+    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data || !data.ok) throw new Error(data && data.error ? data.error : 'unknown_error');
+
+    const bookings = Array.isArray(data.bookings) ? data.bookings : [];
+    const contacts = Array.isArray(data.contacts) ? data.contacts : [];
+    /* Newest first */
+    bookings.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    contacts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    VV_ENQ.bookings = bookings;
+    VV_ENQ.contacts = contacts;
+
+    bookList.innerHTML = bookings.length
+      ? bookings.map(renderBookingCard).join('')
+      : '<div class="empty-state">No booking enquiries yet.</div>';
+    cnList.innerHTML = contacts.length
+      ? contacts.map(renderContactCard).join('')
+      : '<div class="empty-state">No contact messages yet.</div>';
+
+    bookN.textContent = bookings.length + ' enquir' + (bookings.length === 1 ? 'y' : 'ies');
+    cnN.textContent   = contacts.length + ' message' + (contacts.length === 1 ? '' : 's');
+    setEnqStatus('Last fetched ' + new Date().toLocaleTimeString() + ' · '
+      + bookings.length + ' bookings, ' + contacts.length + ' contacts.', 'ok');
+  } catch (err) {
+    console.error('[enquiries] fetch failed:', err);
+    setEnqStatus('Fetch failed: ' + err.message + '. If the backend hasn\'t been redeployed with the enquiries endpoints yet, that would explain it.', 'error');
+  }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -5874,6 +6132,10 @@ function init() {
   if (subsCopyRecent) subsCopyRecent.addEventListener('click', () => copySubs(VV_SUBS.recent));
   const subsCopyArchive = $('#subs-copy-archive');
   if (subsCopyArchive) subsCopyArchive.addEventListener('click', () => copySubs(VV_SUBS.archive));
+
+  /* Enquiries view — refresh button */
+  const enqRefresh = $('#enq-refresh');
+  if (enqRefresh) enqRefresh.addEventListener('click', renderEnquiries);
 
   /* Bookings view — email composers */
   ['outreach', 'thanks'].forEach(kind => {
