@@ -25,7 +25,7 @@ I'd love to come back. Whenever you're programming [NEXT SEASON / MONTH / RESIDE
 Really appreciate you giving me the room. Talk soon.
 
 Cheers,
-Glenn Gallacher
+[YOUR NAME]
 Velvet Vibrance
 [YOUR EMAIL] · [YOUR PHONE]
 velvet-vibrance.com

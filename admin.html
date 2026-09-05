@@ -786,6 +786,46 @@
       color: var(--paper-dim);
     }
 
+    /* ── Tone picker (email composer) ── */
+    .tone-picker {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 0 1rem;
+      flex-wrap: wrap;
+    }
+    .tone-picker-label {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(245, 237, 224, 0.42);
+      margin-right: 0.3rem;
+    }
+    .tone-pill {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: rgba(245, 237, 224, 0.62);
+      padding: 0.42rem 0.9rem;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .tone-pill:hover {
+      color: var(--paper);
+      border-color: rgba(232, 181, 71, 0.35);
+    }
+    .tone-pill.active {
+      background: rgba(232, 181, 71, 0.14);
+      border-color: rgba(232, 181, 71, 0.55);
+      color: #E8B547;
+    }
+
     /* ── Form fields ── */
     .form-grid {
       display: grid;
@@ -2101,6 +2141,11 @@
 
       <div class="card">
         <div class="card-label">Cold outreach — first contact with a venue</div>
+        <div class="tone-picker" role="group" aria-label="Outreach tone">
+          <span class="tone-picker-label">Tone</span>
+          <button type="button" class="tone-pill active" data-tone-for="outreach" data-tone="casual" aria-pressed="true">Casual</button>
+          <button type="button" class="tone-pill"        data-tone-for="outreach" data-tone="formal" aria-pressed="false">Business formal</button>
+        </div>
         <div class="form-grid">
           <div class="field">
             <label>To (booker email)</label>
@@ -2119,12 +2164,17 @@
         <div class="actions-row">
           <button class="btn btn-ghost" id="outreach-reset">Reset to template</button>
           <button class="btn btn-ghost" id="outreach-copy">Copy body</button>
-          <button class="btn btn-primary" id="outreach-open">Open in mail app →</button>
+          <button class="btn btn-primary" id="outreach-open">Open in Gmail →</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-label">Post-gig thank-you — 24 hours after the set</div>
+        <div class="tone-picker" role="group" aria-label="Thank-you tone">
+          <span class="tone-picker-label">Tone</span>
+          <button type="button" class="tone-pill active" data-tone-for="thanks" data-tone="casual" aria-pressed="true">Casual</button>
+          <button type="button" class="tone-pill"        data-tone-for="thanks" data-tone="formal" aria-pressed="false">Business formal</button>
+        </div>
         <div class="form-grid">
           <div class="field">
             <label>To (booker email)</label>
@@ -2143,7 +2193,7 @@
         <div class="actions-row">
           <button class="btn btn-ghost" id="thanks-reset">Reset to template</button>
           <button class="btn btn-ghost" id="thanks-copy">Copy body</button>
-          <button class="btn btn-primary" id="thanks-open">Open in mail app →</button>
+          <button class="btn btn-primary" id="thanks-open">Open in Gmail →</button>
         </div>
       </div>
 
@@ -6043,60 +6093,131 @@ function saveToken() {
    .md files are the canonical human-readable version; this JS is
    what the admin UI actually loads into the composer textareas. */
 
-const OUTREACH_SUBJECT = 'Booking enquiry — Velvet Vibrance (house DJ)';
-const OUTREACH_BODY =
-  'Hi [BOOKER FIRST NAME],\n' +
-  '\n' +
-  "I'm Glenn — the DJ behind Velvet Vibrance, a house music project based in [YOUR CITY].\n" +
-  '\n' +
-  "I've been paying attention to what you're doing at [VENUE NAME] — [ONE SPECIFIC THING: a night you run, a recent booking that caught your ear, the room's sound, the residents]. Felt like there might be a fit, so wanted to introduce myself.\n" +
-  '\n' +
-  'Quick sense of what I bring:\n' +
-  '- Sound: [deep / afro / progressive / melodic] house — [ONE-LINE FEEL]\n' +
-  '- Sets: [SET LENGTH]-hour, comfortable in warm-up, peak, or closing slots\n' +
-  '- Format: [USBs / vinyl / hybrid], [CDJ-3000s / XDJ / turntables] all fine\n' +
-  '- Recent mix: [MIX LINK]\n' +
-  '- Full presence: velvet-vibrance.com · [INSTAGRAM HANDLE]\n' +
-  '\n' +
-  "I'm open for dates across [MONTH RANGE], and happy to work around what you've already got booked — support slots, opening, back-to-backs, whatever fits.\n" +
-  '\n' +
-  'Would love to have a proper chat if there\'s an opening. Happy to send more mixes, references, or come by for a night to introduce myself in person.\n' +
-  '\n' +
-  'Cheers,\n' +
-  'Glenn Gallacher\n' +
-  'Velvet Vibrance\n' +
-  '[YOUR EMAIL] · [YOUR PHONE]\n' +
-  'velvet-vibrance.com';
-
-const THANKS_SUBJECT = 'Thank you — Velvet Vibrance @ [VENUE], [DATE]';
-const THANKS_BODY =
-  'Hi [BOOKER FIRST NAME],\n' +
-  '\n' +
-  'Thanks for having me at [VENUE NAME] on [DATE] — genuinely one of the highlights of my month.\n' +
-  '\n' +
-  'The [ROOM / SOUND SYSTEM / CROWD] was excellent, and the energy through [SPECIFIC MOMENT: "the last hour", "the peak-time transition into X track", "the closing set"] made it a night I won\'t forget. Massive thanks to [SPECIFIC PERSON: sound engineer / door team / green room / other DJ on the bill if it applies] as well — they made the whole thing run smoothly.\n' +
-  '\n' +
-  "Invoice attached for the [DATE] set. Payment details are on the PDF — happy to send bank details another way if you'd prefer, or invoice through a different system if that's easier on your side.\n" +
-  '\n' +
-  "I'd love to come back. Whenever you're programming [NEXT SEASON / MONTH / RESIDENCY / SPECIAL], let me know and I'll block out dates around it. Also happy to bring [SUPPORT / GUEST / B2B PROPOSAL] to the table for future bookings if that's ever of interest.\n" +
-  '\n' +
-  'Really appreciate you giving me the room. Talk soon.\n' +
-  '\n' +
-  'Cheers,\n' +
-  'Glenn Gallacher\n' +
-  'Velvet Vibrance\n' +
-  '[YOUR EMAIL] · [YOUR PHONE]\n' +
-  'velvet-vibrance.com';
+/* Two email types (outreach, thanks) × two tones (casual, formal).
+   Nested by kind → tone. Add a third tone later by dropping in a
+   new key here; the tone-pill UI reads from Object.keys(). */
 
 const EMAIL_TEMPLATES = {
-  outreach: { subject: OUTREACH_SUBJECT, body: OUTREACH_BODY },
-  thanks:   { subject: THANKS_SUBJECT,   body: THANKS_BODY }
+  outreach: {
+    casual: {
+      subject: 'Booking enquiry — Velvet Vibrance (house DJ)',
+      body:
+        'Hi [BOOKER FIRST NAME],\n' +
+        '\n' +
+        "I'm Glenn — the DJ behind Velvet Vibrance, a house music project based in [YOUR CITY].\n" +
+        '\n' +
+        "I've been paying attention to what you're doing at [VENUE NAME] — [ONE SPECIFIC THING: a night you run, a recent booking that caught your ear, the room's sound, the residents]. Felt like there might be a fit, so wanted to introduce myself.\n" +
+        '\n' +
+        'Quick sense of what I bring:\n' +
+        '- Sound: [deep / afro / progressive / melodic] house — [ONE-LINE FEEL]\n' +
+        '- Sets: [SET LENGTH]-hour, comfortable in warm-up, peak, or closing slots\n' +
+        '- Format: [USBs / vinyl / hybrid], [CDJ-3000s / XDJ / turntables] all fine\n' +
+        '- Recent mix: [MIX LINK]\n' +
+        '- Full presence: velvet-vibrance.com · [INSTAGRAM HANDLE]\n' +
+        '\n' +
+        "I'm open for dates across [MONTH RANGE], and happy to work around what you've already got booked — support slots, opening, back-to-backs, whatever fits.\n" +
+        '\n' +
+        'Would love to have a proper chat if there\'s an opening. Happy to send more mixes, references, or come by for a night to introduce myself in person.\n' +
+        '\n' +
+        'Cheers,\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
+    },
+    formal: {
+      subject: 'Booking enquiry — Velvet Vibrance ([YOUR NAME], house DJ)',
+      body:
+        'Dear [BOOKER NAME],\n' +
+        '\n' +
+        'My name is [YOUR NAME], and I run Velvet Vibrance — a house music project and DJ collective based in [YOUR CITY].\n' +
+        '\n' +
+        'I am writing to enquire about performance opportunities at [VENUE NAME]. Having followed your programming closely, I have been particularly impressed by [ONE SPECIFIC THING: a recent booking, a residency, the room\'s sound design]. My style aligns well with what you are building there, and I would welcome the opportunity to be considered for a future date.\n' +
+        '\n' +
+        'For your reference, a brief overview of my offering:\n' +
+        '\n' +
+        '- Genre: [deep / afro / progressive / melodic] house\n' +
+        '- Set length: [SET LENGTH] hours; comfortable in warm-up, peak-time, or closing positions\n' +
+        '- Technical requirements: [USB / vinyl / hybrid] format; standard club set-up (CDJs, mixer)\n' +
+        '- Recent mix: [MIX LINK]\n' +
+        '- Portfolio: velvet-vibrance.com · [INSTAGRAM HANDLE]\n' +
+        '\n' +
+        'I am currently available for dates across [MONTH RANGE], and would be happy to discuss format, fee, and any other requirements at your convenience.\n' +
+        '\n' +
+        'Please let me know whether you would be open to a further conversation. I would be glad to provide additional references or attend an upcoming event in person.\n' +
+        '\n' +
+        'Kind regards,\n' +
+        '\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
+    }
+  },
+  thanks: {
+    casual: {
+      subject: 'Thank you — Velvet Vibrance @ [VENUE], [DATE]',
+      body:
+        'Hi [BOOKER FIRST NAME],\n' +
+        '\n' +
+        'Thanks for having me at [VENUE NAME] on [DATE] — genuinely one of the highlights of my month.\n' +
+        '\n' +
+        'The [ROOM / SOUND SYSTEM / CROWD] was excellent, and the energy through [SPECIFIC MOMENT: "the last hour", "the peak-time transition into X track", "the closing set"] made it a night I won\'t forget. Massive thanks to [SPECIFIC PERSON: sound engineer / door team / green room / other DJ on the bill if it applies] as well — they made the whole thing run smoothly.\n' +
+        '\n' +
+        "Invoice attached for the [DATE] set. Payment details are on the PDF — happy to send bank details another way if you'd prefer, or invoice through a different system if that's easier on your side.\n" +
+        '\n' +
+        "I'd love to come back. Whenever you're programming [NEXT SEASON / MONTH / RESIDENCY / SPECIAL], let me know and I'll block out dates around it. Also happy to bring [SUPPORT / GUEST / B2B PROPOSAL] to the table for future bookings if that's ever of interest.\n" +
+        '\n' +
+        'Really appreciate you giving me the room. Talk soon.\n' +
+        '\n' +
+        'Cheers,\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
+    },
+    formal: {
+      subject: 'Post-event correspondence — Velvet Vibrance at [VENUE], [DATE]',
+      body:
+        'Dear [BOOKER NAME],\n' +
+        '\n' +
+        'Thank you for the opportunity to perform at [VENUE NAME] on [DATE]. It was a pleasure to work with your team, and I appreciated the professionalism throughout the evening.\n' +
+        '\n' +
+        'The [ROOM / SOUND SYSTEM / CROWD] was excellent, and specific credit is due to [SPECIFIC PERSON: sound engineer / door team / production] for their contribution to the smooth running of the night.\n' +
+        '\n' +
+        'Please find attached the invoice for the performance. Payment details are included on the document. Should you require an alternative format or payment via a different system, I would be happy to accommodate.\n' +
+        '\n' +
+        'I would very much welcome the opportunity to return. When you are next programming [SEASON / RESIDENCY / SPECIAL EVENT], please do consider me. I am also open to discussing potential support slots, guest appearances, or a back-to-back arrangement for future dates.\n' +
+        '\n' +
+        'Thank you again for the booking.\n' +
+        '\n' +
+        'Kind regards,\n' +
+        '\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
+    }
+  }
 };
+
+/* Which tone each composer is currently showing. Default = casual
+   (that's what the composer used to always show before this change). */
+const emailTone = { outreach: 'casual', thanks: 'casual' };
+const TONE_LABELS = { casual: 'Casual', formal: 'Business formal' };
+
+/* Look up { subject, body } for the tone currently selected on
+   the given composer. */
+function currentTemplate(kind) {
+  const bucket = EMAIL_TEMPLATES[kind];
+  const tone   = emailTone[kind] || 'casual';
+  return bucket && (bucket[tone] || bucket.casual);
+}
 
 /* Pre-fill on first paint, but only if the field is empty — so an
    in-progress edit is never blown away by re-entering the view. */
 function primeEmailTemplate(kind) {
-  const t = EMAIL_TEMPLATES[kind];
+  const t = currentTemplate(kind);
   if (!t) return;
   const s = $('#' + kind + '-subject');
   const b = $('#' + kind + '-body');
@@ -6105,13 +6226,41 @@ function primeEmailTemplate(kind) {
 }
 
 function resetEmailTemplate(kind) {
-  const t = EMAIL_TEMPLATES[kind];
+  const t = currentTemplate(kind);
   if (!t) return;
   $('#' + kind + '-subject').value = t.subject;
   $('#' + kind + '-body').value = t.body;
   const toEl = $('#' + kind + '-to');
   if (toEl) toEl.value = '';
-  toast('Template reset', 'success');
+  toast('Reset to ' + (TONE_LABELS[emailTone[kind]] || 'template'), 'success');
+}
+
+/* Switch tone for a composer and refill subject + body with that
+   tone's template. If the user has edited the body since loading,
+   confirm before overwriting so a mid-composition draft isn't lost. */
+function switchEmailTone(kind, tone) {
+  const bucket = EMAIL_TEMPLATES[kind];
+  if (!bucket || !bucket[tone]) return;
+
+  const currentBody = ($('#' + kind + '-body') || {}).value || '';
+  const previousTpl = currentTemplate(kind);
+  const dirty = previousTpl && currentBody && currentBody !== previousTpl.body;
+  if (dirty) {
+    const ok = confirm('You\'ve edited this email. Load the ' + (TONE_LABELS[tone] || tone) + ' template anyway? (edits will be lost)');
+    if (!ok) return;
+  }
+
+  emailTone[kind] = tone;
+  const t = bucket[tone];
+  $('#' + kind + '-subject').value = t.subject;
+  $('#' + kind + '-body').value    = t.body;
+
+  /* Sync pill active state — visually mark which tone is loaded. */
+  document.querySelectorAll('[data-tone-for="' + kind + '"]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tone === tone);
+    btn.setAttribute('aria-pressed', btn.dataset.tone === tone ? 'true' : 'false');
+  });
+  toast('Switched to ' + (TONE_LABELS[tone] || tone), 'success');
 }
 
 function copyEmailBody(kind) {
@@ -6123,20 +6272,25 @@ function copyEmailBody(kind) {
   );
 }
 
+/* Which Gmail account to compose from. Gmail's URL respects the
+   ?authuser= parameter, so opening this URL in a new tab picks the
+   right inbox even when the browser is signed into multiple Google
+   accounts. */
+const GMAIL_ADDRESS = 'velvetvibrance@gmail.com';
+
 function openInMail(kind) {
   const to      = ($('#' + kind + '-to')      || {}).value || '';
   const subject = ($('#' + kind + '-subject') || {}).value || '';
   const body    = ($('#' + kind + '-body')    || {}).value || '';
-  const url = 'mailto:' + encodeURIComponent(to.trim()) +
-    '?subject=' + encodeURIComponent(subject) +
-    '&body=' + encodeURIComponent(body);
-  /* Anchor+click keeps the current page loaded — assigning to
-     location.href risks the browser navigating away if the OS mail
-     handler is misconfigured. */
-  const a = document.createElement('a');
-  a.href = url;
-  a.rel = 'noopener';
-  a.click();
+  /* Gmail web compose URL. `view=cm&fs=1` = compose in fullscreen.
+     `authuser=` selects the right account. New tab so the admin
+     session stays intact. */
+  const url = 'https://mail.google.com/mail/?authuser=' + encodeURIComponent(GMAIL_ADDRESS)
+    + '&view=cm&fs=1'
+    + '&to=' + encodeURIComponent(to.trim())
+    + '&su=' + encodeURIComponent(subject)
+    + '&body=' + encodeURIComponent(body);
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -6191,6 +6345,12 @@ function init() {
     if (copy)  copy.addEventListener('click',  () => copyEmailBody(kind));
     const open  = $('#' + kind + '-open');
     if (open)  open.addEventListener('click',  () => openInMail(kind));
+  });
+  /* Tone-pill click handlers — swap the template for the picked tone. */
+  document.querySelectorAll('.tone-pill[data-tone-for]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchEmailTone(btn.dataset.toneFor, btn.dataset.tone);
+    });
   });
 
   /* Token error modal */

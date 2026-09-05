@@ -29,7 +29,7 @@ I'm open for dates across [MONTH RANGE], and happy to work around what you've al
 Would love to have a proper chat if there's an opening. Happy to send more mixes, references, or come by for a night to introduce myself in person.
 
 Cheers,
-Glenn Gallacher
+[YOUR NAME]
 Velvet Vibrance
 [YOUR EMAIL] · [YOUR PHONE]
 velvet-vibrance.com
