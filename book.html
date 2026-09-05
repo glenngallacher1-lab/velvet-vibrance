@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Velvet Vibrance — Get in touch for press, collabs, and general enquiries." />
+  <meta name="description" content="Velvet Vibrance — Book a Stanzza DJ set at your venue." />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="canonical" href="https://glenngallacher1-lab.github.io/velvet-vibrance/contact.html" />
+  <link rel="canonical" href="https://glenngallacher1-lab.github.io/velvet-vibrance/book.html" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Velvet Vibrance" />
-  <meta property="og:url" content="https://glenngallacher1-lab.github.io/velvet-vibrance/contact.html" />
-  <meta property="og:title" content="VELVET VIBRANCE — Get in Touch" />
-  <meta property="og:description" content="Reach out for press, collabs, or just to say hi." />
+  <meta property="og:url" content="https://glenngallacher1-lab.github.io/velvet-vibrance/book.html" />
+  <meta property="og:title" content="VELVET VIBRANCE — Book a DJ Set" />
+  <meta property="og:description" content="Book a Stanzza set at your venue. Bookings land direct with the team." />
   <meta property="og:image" content="https://glenngallacher1-lab.github.io/velvet-vibrance/crowd-pink.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data:; media-src 'self' https://raw.githubusercontent.com; connect-src 'self' https://raw.githubusercontent.com https://script.google.com https://script.googleusercontent.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <title>VELVET VIBRANCE — Get in Touch</title>
+  <title>VELVET VIBRANCE — Book a DJ Set</title>
   <link rel="stylesheet" href="style.css?v=fade1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -53,43 +53,68 @@
 
   <section class="gallery-hero">
     <div class="gallery-hero-inner">
-      <p class="section-eyebrow">Contact</p>
-      <h1>GET IN <em>TOUCH</em></h1>
+      <p class="section-eyebrow">Bookings</p>
+      <h1>BOOK A <em>SET</em></h1>
     </div>
   </section>
 
   <section class="contact-section">
     <div class="contact-wrap">
 
-      <form class="contact-form active" id="form-contact" novalidate>
+      <form class="contact-form active" id="form-book" novalidate>
         <div class="cf-grid">
           <div class="cf-field">
-            <label for="cn-name">Your name</label>
-            <input type="text" id="cn-name" name="name" required autocomplete="name" />
+            <label for="bk-name">Your name</label>
+            <input type="text" id="bk-name" name="name" required autocomplete="name" />
           </div>
           <div class="cf-field">
-            <label for="cn-email">Email</label>
-            <input type="email" id="cn-email" name="email" required autocomplete="email" />
+            <label for="bk-email">Email</label>
+            <input type="email" id="bk-email" name="email" required autocomplete="email" />
           </div>
-          <div class="cf-field cf-full">
-            <label for="cn-subject">Subject</label>
-            <select id="cn-subject" name="subject">
+          <div class="cf-field">
+            <label for="bk-venue">Venue name</label>
+            <input type="text" id="bk-venue" name="venue" required />
+          </div>
+          <div class="cf-field">
+            <label for="bk-city">City</label>
+            <input type="text" id="bk-city" name="city" autocomplete="address-level2" />
+          </div>
+          <div class="cf-field">
+            <label for="bk-date">Event date</label>
+            <input type="date" id="bk-date" name="date" />
+          </div>
+          <div class="cf-field">
+            <label for="bk-type">Event type</label>
+            <select id="bk-type" name="type">
               <option value="">Choose…</option>
-              <option>Press / interview</option>
-              <option>Collaboration</option>
-              <option>Feedback</option>
-              <option>Just saying hi</option>
+              <option>Club night</option>
+              <option>Festival</option>
+              <option>Private event</option>
+              <option>Brand event</option>
+              <option>Warehouse / underground</option>
               <option>Other</option>
             </select>
           </div>
           <div class="cf-field cf-full">
-            <label for="cn-message">Message</label>
-            <textarea id="cn-message" name="message" rows="6" required></textarea>
+            <label for="bk-budget">Budget range</label>
+            <select id="bk-budget" name="budget">
+              <option value="">Choose…</option>
+              <option>Under $500</option>
+              <option>$500 – $1,500</option>
+              <option>$1,500 – $3,000</option>
+              <option>$3,000 – $6,000</option>
+              <option>$6,000+</option>
+              <option>Let's discuss</option>
+            </select>
+          </div>
+          <div class="cf-field cf-full">
+            <label for="bk-message">Tell me about the night</label>
+            <textarea id="bk-message" name="message" rows="6" required placeholder="Room capacity, expected crowd, other DJs on the bill, vibe, anything else…"></textarea>
           </div>
         </div>
         <div class="cf-actions">
-          <button type="submit" class="cf-submit">Send message →</button>
-          <p class="cf-status" id="cn-status" role="status" aria-live="polite"></p>
+          <button type="submit" class="cf-submit">Send enquiry →</button>
+          <p class="cf-status" id="bk-status" role="status" aria-live="polite"></p>
         </div>
       </form>
 
@@ -119,12 +144,12 @@
   <script src="script.js" defer></script>
 
   <script>
-    /* Contact form submitter — POSTs to the same Apps Script deployment
-       as every other form on the site; `form: 'contact'` selects the
-       Contact sheet + owner-email trigger on the backend. */
-    async function submitContactForm(form) {
-      const statusEl = document.getElementById('cn-status');
-      const data = { form: 'contact' };
+    /* Book form submitter — POSTs to the same Apps Script deployment
+       as every other form on the site; the `form: 'booking'` field
+       tells the backend which sheet + email handler to run. */
+    async function submitBookForm(form) {
+      const statusEl = document.getElementById('bk-status');
+      const data = { form: 'booking' };
       new FormData(form).forEach((val, key) => { data[key] = val; });
 
       const btn = form.querySelector('.cf-submit');
@@ -136,7 +161,7 @@
 
       const endpoint = window.VV_ENDPOINT;
       if (!endpoint || /PASTE_YOUR/.test(endpoint)) {
-        statusEl.textContent = 'Contact form is being set up — email velvetvibrance@gmail.com in the meantime.';
+        statusEl.textContent = 'Bookings are being set up — email velvetvibrance@gmail.com in the meantime.';
         statusEl.classList.add('error');
         btn.disabled = false; btn.textContent = origLabel;
         return;
@@ -173,9 +198,9 @@
         btn.textContent = origLabel;
       }
     }
-    document.getElementById('form-contact').addEventListener('submit', e => {
+    document.getElementById('form-book').addEventListener('submit', e => {
       e.preventDefault();
-      submitContactForm(e.target);
+      submitBookForm(e.target);
     });
   </script>
 </body>
