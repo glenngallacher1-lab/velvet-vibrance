@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Velvet Vibrance Presents · O.D.A × Stanzza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100vh;
+    background: #000;
+    color: #f5ede0;
+    font-family: 'Playfair Display', Georgia, serif;
+    overflow: hidden;
+    cursor: none;
+  }
+  body.show-cursor { cursor: default; }
+
+  canvas#grid {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    z-index: 0;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3vh;
+    pointer-events: none;
+    transition: opacity 0.6s;
+    z-index: 2;
+  }
+  .overlay.hidden { opacity: 0; }
+
+  /* Title — top of the stack. All caps, smaller than the first
+     pass, still the only element carrying the warm red glow. */
+  .venue-text {
+    font-size: clamp(24px, 4.8vw, 72px);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #f5ede0;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 40px rgba(255,20,90,0.7),
+      0 0 90px rgba(255,20,90,0.35);
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* DJ line — same italic serif style as the site's Stanzza tagline. */
+  .dj-line {
+    font-size: clamp(18px, 2.6vw, 40px);
+    letter-spacing: 0.32em;
+    color: #f5ede0;
+    opacity: 0.9;
+    font-weight: 400;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.1;
+  }
+  .dj-line .x {
+    /* Small filler around the "×" so it reads as a collab marker,
+       not a maths sign. */
+    opacity: 0.55;
+    letter-spacing: 0.18em;
+    padding: 0 0.25em;
+    font-style: italic;
+  }
+
+  /* Row underneath with the two brand marks side by side. */
+  .marks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2rem, 5vw, 5rem);
+    margin-top: 1.5vh;
+  }
+  .marks img {
+    max-height: 26vh;
+    max-width: 30vw;
+    /* PNG already has transparency (black background stripped) so
+       no blend-mode trick needed. No drop-shadow — the title
+       carries the only glow on the overlay. */
+  }
+  .marks .vv-mark {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(80px, 14vw, 220px);
+    letter-spacing: -0.06em;
+    color: #f5ede0;
+    line-height: 1;
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 10px;
+    color: rgba(245,237,224,0.5);
+    letter-spacing: 0.18em;
+    opacity: 0;
+    transition: opacity 0.5s;
+    text-transform: uppercase;
+    white-space: nowrap;
+    z-index: 3;
+  }
+  body.show-cursor .hint { opacity: 0.75; }
+
+</style>
+</head>
+<body>
+
+<canvas id="grid"></canvas>
+
+<div class="overlay" id="overlay">
+  <div class="venue-text">Velvet Vibrance<br>Presents</div>
+  <div class="dj-line">O.D.A<span class="x">×</span>Stanzza</div>
+  <div class="marks">
+    <img src="../oda-logo.png" alt="O.D.A"
+         onerror="this.remove()">
+    <div class="vv-mark">VV</div>
+  </div>
+</div>
+
+<div class="hint">F fullscreen · H hide logos · Esc exit</div>
+
+<script>
+/* ─── Retro perspective grid ─────────────────────────────────────
+   Ported from a React canvas component into vanilla JS. Runs a
+   requestAnimationFrame loop drawing a receding tron-style grid
+   with a sunset-gradient sky, CRT scanlines, and a vignette.
+   Colour is fixed to a hot pink-red so this reads as "red" while
+   keeping the vaporwave character. */
+
+const GRID_COLOR      = '#ff0d5c';
+const SHOW_SCANLINES  = true;
+const GLOW_EFFECT     = true;
+
+const canvas = document.getElementById('grid');
+const ctx    = canvas.getContext('2d');
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function hexToRgb(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m
+    ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) }
+    : { r: 255, g: 13, b: 92 };
+}
+
+const cellWidth    = 120;
+const cellDepth    = 80;
+const numCellsWide = 16;
+const numCellsDeep = 20;
+
+const cameraX     = 0;
+const cameraY     = 60;
+const cameraZ     = 400;
+const focalLength = 500;
+
+const speed = 1.5;
+let offset  = 0;
+
+function project(x, y, z) {
+  const relZ = z - cameraZ;
+  if (relZ <= 10) return null;
+  const scale = focalLength / relZ;
+  return {
+    x: canvas.width / 2 + (x - cameraX) * scale,
+    y: canvas.height * 0.5 - (y - cameraY) * scale,
+    scale,
+    z: relZ
+  };
+}
+
+function drawCell(x, z, zOffset) {
+  const actualZ = z - zOffset;
+  if (actualZ < -cellDepth || actualZ > numCellsDeep * cellDepth) return;
+  if (actualZ < 0) return;
+
+  const tL = project(x - cellWidth / 2, 0, actualZ);
+  const tR = project(x + cellWidth / 2, 0, actualZ);
+  const bL = project(x - cellWidth / 2, 0, actualZ + cellDepth);
+  const bR = project(x + cellWidth / 2, 0, actualZ + cellDepth);
+  if (!tL || !tR || !bL || !bR) return;
+
+  const distanceFactor = Math.min(1, actualZ / (numCellsDeep * cellDepth));
+  const alpha     = Math.max(0.3, 1 - distanceFactor * 0.7);
+  const lineWidth = Math.max(1, 2.5 * (1 - distanceFactor * 0.5));
+
+  if (GLOW_EFFECT) {
+    ctx.shadowBlur  = 10 * (1 - distanceFactor);
+    ctx.shadowColor = GRID_COLOR;
+  }
+
+  ctx.lineWidth   = lineWidth;
+  ctx.strokeStyle = GRID_COLOR;
+  ctx.globalAlpha = alpha;
+
+  ctx.beginPath();
+  ctx.moveTo(bL.x, bL.y);
+  ctx.lineTo(bR.x, bR.y);
+  ctx.lineTo(tR.x, tR.y);
+  ctx.lineTo(tL.x, tL.y);
+  ctx.closePath();
+  ctx.stroke();
+
+  ctx.shadowBlur  = 0;
+  ctx.globalAlpha = 1;
+}
+
+function drawScanlines() {
+  if (!SHOW_SCANLINES) return;
+  ctx.globalAlpha = 0.1;
+  ctx.fillStyle   = '#000';
+  for (let y = 0; y < canvas.height; y += 4) {
+    ctx.fillRect(0, y, canvas.width, 2);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const rgb = hexToRgb(GRID_COLOR);
+
+  /* Sky — deep at top, hotter toward the horizon. */
+  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.55);
+  sky.addColorStop(0,    `rgba(${rgb.r * 0.05}, ${rgb.g * 0.05}, ${rgb.b * 0.15}, 1)`);
+  sky.addColorStop(0.30, `rgba(${rgb.r * 0.10}, ${rgb.g * 0.08}, ${rgb.b * 0.20}, 1)`);
+  sky.addColorStop(0.50, `rgba(${rgb.r * 0.20}, ${rgb.g * 0.15}, ${rgb.b * 0.30}, 1)`);
+  sky.addColorStop(0.70, `rgba(${rgb.r * 0.35}, ${rgb.g * 0.25}, ${rgb.b * 0.40}, 1)`);
+  sky.addColorStop(0.85, `rgba(${rgb.r * 0.55}, ${rgb.g * 0.40}, ${rgb.b * 0.60}, 1)`);
+  sky.addColorStop(1,    `rgba(${rgb.r * 0.70}, ${rgb.g * 0.50}, ${rgb.b * 0.75}, 1)`);
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, canvas.width, canvas.height * 0.55);
+
+  /* Ground — fades to black. */
+  const ground = ctx.createLinearGradient(0, canvas.height * 0.55, 0, canvas.height);
+  ground.addColorStop(0,   `rgba(${rgb.r * 0.10}, ${rgb.g * 0.08}, ${rgb.b * 0.15}, 1)`);
+  ground.addColorStop(0.3, `rgba(${rgb.r * 0.05}, ${rgb.g * 0.03}, ${rgb.b * 0.08}, 1)`);
+  ground.addColorStop(1,   '#000');
+  ctx.fillStyle = ground;
+  ctx.fillRect(0, canvas.height * 0.55, canvas.width, canvas.height * 0.45);
+
+  offset += speed;
+  if (offset >= cellDepth) offset = 0;
+
+  for (let row = -5; row < numCellsDeep + 5; row++) {
+    const z = row * cellDepth;
+    for (let col = -Math.floor(numCellsWide / 2); col <= Math.floor(numCellsWide / 2); col++) {
+      drawCell(col * cellWidth, z, offset);
+    }
+  }
+
+  drawScanlines();
+
+  /* Vignette to focus attention on the logo overlay in the middle. */
+  const vignette = ctx.createRadialGradient(
+    canvas.width / 2, canvas.height / 2, canvas.height * 0.3,
+    canvas.width / 2, canvas.height / 2, canvas.height * 0.8
+  );
+  vignette.addColorStop(0, 'rgba(0,0,0,0)');
+  vignette.addColorStop(1, 'rgba(0,0,0,0.5)');
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ─── Stage controls ───────────────────────────── */
+
+let cursorTimer = null;
+function bumpCursor() {
+  document.body.classList.add('show-cursor');
+  clearTimeout(cursorTimer);
+  cursorTimer = setTimeout(() => document.body.classList.remove('show-cursor'), 2500);
+}
+document.addEventListener('mousemove', bumpCursor);
+document.addEventListener('touchstart', bumpCursor);
+bumpCursor();
+
+const overlay = document.getElementById('overlay');
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (k === 'f') {
+    const el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    }
+  } else if (k === 'h') {
+    overlay.classList.toggle('hidden');
+  }
+});
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { await navigator.wakeLock.request('screen'); } catch (e) {}
+}
+document.addEventListener('click',   requestWakeLock, { once: true });
+document.addEventListener('keydown', requestWakeLock, { once: true });
+
+</script>
+</body>
+</html>
