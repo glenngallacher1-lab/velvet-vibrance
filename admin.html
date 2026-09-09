@@ -2258,8 +2258,10 @@
         <div class="card-label">Cold outreach — first contact with a venue</div>
         <div class="tone-picker" role="group" aria-label="Outreach tone">
           <span class="tone-picker-label">Tone</span>
-          <button type="button" class="tone-pill active" data-tone-for="outreach" data-tone="casual" aria-pressed="true">Casual</button>
-          <button type="button" class="tone-pill"        data-tone-for="outreach" data-tone="formal" aria-pressed="false">Business formal</button>
+          <button type="button" class="tone-pill active" data-tone-for="outreach" data-tone="casual"  aria-pressed="true">Casual</button>
+          <button type="button" class="tone-pill"        data-tone-for="outreach" data-tone="formal"  aria-pressed="false">Business formal</button>
+          <button type="button" class="tone-pill"        data-tone-for="outreach" data-tone="club"    aria-pressed="false">Club</button>
+          <button type="button" class="tone-pill"        data-tone-for="outreach" data-tone="brewery" aria-pressed="false">Brewery / local</button>
         </div>
         <div class="form-grid">
           <div class="field">
@@ -2287,8 +2289,10 @@
         <div class="card-label">Post-gig thank-you — 24 hours after the set</div>
         <div class="tone-picker" role="group" aria-label="Thank-you tone">
           <span class="tone-picker-label">Tone</span>
-          <button type="button" class="tone-pill active" data-tone-for="thanks" data-tone="casual" aria-pressed="true">Casual</button>
-          <button type="button" class="tone-pill"        data-tone-for="thanks" data-tone="formal" aria-pressed="false">Business formal</button>
+          <button type="button" class="tone-pill active" data-tone-for="thanks" data-tone="casual"  aria-pressed="true">Casual</button>
+          <button type="button" class="tone-pill"        data-tone-for="thanks" data-tone="formal"  aria-pressed="false">Business formal</button>
+          <button type="button" class="tone-pill"        data-tone-for="thanks" data-tone="club"    aria-pressed="false">Club</button>
+          <button type="button" class="tone-pill"        data-tone-for="thanks" data-tone="brewery" aria-pressed="false">Brewery / local</button>
         </div>
         <div class="form-grid">
           <div class="field">
@@ -6289,6 +6293,58 @@ const EMAIL_TEMPLATES = {
         'Velvet Vibrance\n' +
         '[YOUR EMAIL] · [YOUR PHONE]\n' +
         'velvet-vibrance.com'
+    },
+    club: {
+      subject: 'Booking enquiry — Velvet Vibrance (house DJ)',
+      body:
+        'Hey [BOOKER FIRST NAME],\n' +
+        '\n' +
+        '[YOUR NAME] here — I run Velvet Vibrance, a house music project out of [YOUR CITY].\n' +
+        '\n' +
+        "I've had my eye on what you're doing at [VENUE NAME] for a minute. The energy you're pulling on [DAY / EVENT / RESIDENCY] is exactly the room I'd love to play. Sounds like a natural fit.\n" +
+        '\n' +
+        'Quick hits on the set:\n' +
+        '- Sound: [deep / afro / progressive / tech] house that builds properly\n' +
+        '- Length: [SET LENGTH] hours — warm-up through peak, closing all comfortable\n' +
+        '- Format: USBs, CDJ-3000s standard\n' +
+        '- Recent mix: [MIX LINK]\n' +
+        '- IG: [INSTAGRAM HANDLE]\n' +
+        '\n' +
+        'Open across [MONTH RANGE]. Slot me in wherever the night needs — support, opening, B2B, closing.\n' +
+        '\n' +
+        'Down to jump on a call, or I can swing through a night and introduce myself in person.\n' +
+        '\n' +
+        'Talk soon,\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
+    },
+    brewery: {
+      subject: 'Live house set at [VENUE NAME] — Velvet Vibrance',
+      body:
+        'Hi [BOOKER FIRST NAME],\n' +
+        '\n' +
+        "[YOUR NAME] here — I run Velvet Vibrance, a house music project based in [YOUR CITY]. I keep hearing good things about [VENUE NAME] and the community you've built there, so wanted to reach out.\n" +
+        '\n' +
+        "Places that back local music and let a night breathe feel rare — I'd love to be part of one.\n" +
+        '\n' +
+        'What I bring:\n' +
+        '- Warm, groove-first house — meets people where they are, doesn\'t force it\n' +
+        '- [SET LENGTH]-hour sets, works as background or full centre-stage\n' +
+        '- Just USBs, no big rider\n' +
+        '- Recent mix: [MIX LINK]\n' +
+        '- velvet-vibrance.com · [INSTAGRAM HANDLE]\n' +
+        '\n' +
+        'Open for dates across [MONTH RANGE]. Happy to come by first, hear the room, meet the team — no pressure.\n' +
+        '\n' +
+        'Would love to chat if there\'s room in the calendar.\n' +
+        '\n' +
+        'Cheers,\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
     }
   },
   thanks: {
@@ -6334,6 +6390,46 @@ const EMAIL_TEMPLATES = {
         'Velvet Vibrance\n' +
         '[YOUR EMAIL] · [YOUR PHONE]\n' +
         'velvet-vibrance.com'
+    },
+    club: {
+      subject: 'Massive thanks — Velvet Vibrance @ [VENUE], [DATE]',
+      body:
+        'Hey [BOOKER FIRST NAME],\n' +
+        '\n' +
+        'Wild night. Thanks for having me at [VENUE NAME] on [DATE] — the crowd was locked in and the [SOUND SYSTEM / ROOM / LIGHTS] made it easy to push. [SPECIFIC MOMENT: the peak-time drop, the last hour, the transition into X] was one of my favourite moments of the year.\n' +
+        '\n' +
+        'Big shout to [SPECIFIC PERSON] as well for making everything run — from the moment I loaded in, it was smooth.\n' +
+        '\n' +
+        'Invoice attached. Payment details on the PDF; happy to switch to another method if easier your side.\n' +
+        '\n' +
+        'Would love to come back — hit me up whenever you\'re mapping out the next block and I\'ll clear the date. Down to bring a support or go B2B if that\'s ever a fit too.\n' +
+        '\n' +
+        'Appreciate the room. Talk soon.\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
+    },
+    brewery: {
+      subject: 'Thanks for the room — Velvet Vibrance @ [VENUE], [DATE]',
+      body:
+        'Hi [BOOKER FIRST NAME],\n' +
+        '\n' +
+        "Thanks for having me at [VENUE NAME] on [DATE] — really enjoyed the room. The vibe you've built there is exactly what I love playing to: people who are listening, having a good time, no attitude.\n" +
+        '\n' +
+        'Massive thanks to [SPECIFIC PERSON] as well for making the whole thing easy.\n' +
+        '\n' +
+        "Invoice attached. Bank details are on the PDF, or I can send them another way if that's easier.\n" +
+        '\n' +
+        "Would love to come back — whenever you're planning the next stretch of music nights, let me know and I'll clear the date. Happy to help program the room too if that's ever useful.\n" +
+        '\n' +
+        'Appreciate the vibe.\n' +
+        '\n' +
+        'Cheers,\n' +
+        '[YOUR NAME]\n' +
+        'Velvet Vibrance\n' +
+        '[YOUR EMAIL] · [YOUR PHONE]\n' +
+        'velvet-vibrance.com'
     }
   }
 };
@@ -6341,7 +6437,32 @@ const EMAIL_TEMPLATES = {
 /* Which tone each composer is currently showing. Default = casual
    (that's what the composer used to always show before this change). */
 const emailTone = { outreach: 'casual', thanks: 'casual' };
-const TONE_LABELS = { casual: 'Casual', formal: 'Business formal' };
+const TONE_LABELS = {
+  casual:  'Casual',
+  formal:  'Business formal',
+  club:    'Club',
+  brewery: 'Brewery / local'
+};
+
+/* Which tone matches which venue type. Used to auto-swap the
+   outreach template when the operator clicks Load in outreach
+   from the Venues list. Types not in the map fall back to
+   `casual` (the site-wide default). */
+const VENUE_TYPE_TO_TONE = {
+  'nightclub':      'club',
+  'live music':     'casual',
+  'bar':            'casual',
+  'sports bar':    'casual',
+  'dive bar':      'casual',
+  'pub':            'casual',
+  'brewery':        'brewery',
+  'taproom':        'brewery',
+  'gastropub':      'brewery',
+  'supperclub':     'formal',
+  'cocktail bar':   'formal',
+  'wine bar':       'formal',
+  'entertainment': 'casual'
+};
 
 /* Look up { subject, body } for the tone currently selected on
    the given composer. */
@@ -6373,18 +6494,21 @@ function resetEmailTemplate(kind) {
 }
 
 /* Switch tone for a composer and refill subject + body with that
-   tone's template. If the user has edited the body since loading,
-   confirm before overwriting so a mid-composition draft isn't lost. */
-function switchEmailTone(kind, tone) {
+   tone's template. If `force` is true, skip the dirty-body
+   confirm (used by Load in outreach where the operator has
+   explicitly opted into swapping via the venue button). */
+function switchEmailTone(kind, tone, opts) {
   const bucket = EMAIL_TEMPLATES[kind];
-  if (!bucket || !bucket[tone]) return;
+  if (!bucket || !bucket[tone]) return false;
+  const force = opts && opts.force;
+  const silent = opts && opts.silent;
 
   const currentBody = ($('#' + kind + '-body') || {}).value || '';
   const previousTpl = currentTemplate(kind);
   const dirty = previousTpl && currentBody && currentBody !== previousTpl.body;
-  if (dirty) {
+  if (dirty && !force) {
     const ok = confirm('You\'ve edited this email. Load the ' + (TONE_LABELS[tone] || tone) + ' template anyway? (edits will be lost)');
-    if (!ok) return;
+    if (!ok) return false;
   }
 
   emailTone[kind] = tone;
@@ -6397,7 +6521,8 @@ function switchEmailTone(kind, tone) {
     btn.classList.toggle('active', btn.dataset.tone === tone);
     btn.setAttribute('aria-pressed', btn.dataset.tone === tone ? 'true' : 'false');
   });
-  toast('Switched to ' + (TONE_LABELS[tone] || tone), 'success');
+  if (!silent) toast('Switched to ' + (TONE_LABELS[tone] || tone), 'success');
+  return true;
 }
 
 function copyEmailBody(kind) {
@@ -6502,7 +6627,11 @@ function renderVenues() {
 
   list.innerHTML = rows.map(renderVenueRow).join('');
   list.querySelectorAll('.venue-load[data-email]').forEach(btn => {
-    btn.addEventListener('click', () => loadVenueInOutreach(btn.dataset.email, btn.dataset.name));
+    btn.addEventListener('click', () => loadVenueInOutreach(
+      btn.dataset.email,
+      btn.dataset.name,
+      btn.dataset.type
+    ));
   });
 }
 
@@ -6524,7 +6653,7 @@ function renderVenueRow(v) {
     ? '<a href="' + escVen(v.website) + '" target="_blank" rel="noopener">' + escVen(v.website.replace(/^https?:\/\//, '')) + '</a>'
     : '<span class="missing">no website</span>';
   const loadBtn = v.email
-    ? '<button class="venue-load" data-email="' + escVen(v.email) + '" data-name="' + name + '">Load in outreach</button>'
+    ? '<button class="venue-load" data-email="' + escVen(v.email) + '" data-name="' + name + '" data-type="' + escVen(v.type || '') + '">Load in outreach</button>'
     : '<button class="venue-load" disabled title="No email on file">No email</button>';
 
   return '<div class="venue-row">'
@@ -6545,20 +6674,31 @@ function renderVenueRow(v) {
     + '</div>';
 }
 
-function loadVenueInOutreach(email, venueName) {
+function loadVenueInOutreach(email, venueName, venueType) {
   const toEl = $('#outreach-to');
   if (!toEl) { toast('Outreach composer not found', 'error'); return; }
+
+  /* Auto-pick a tone that matches this venue type so the pitch
+     already speaks the room's language before the operator edits.
+     Force + silent because they just clicked Load — no need to
+     confirm or double-toast. */
+  const tone = VENUE_TYPE_TO_TONE[(venueType || '').toLowerCase()] || 'casual';
+  if (tone !== emailTone.outreach) {
+    switchEmailTone('outreach', tone, { force: true, silent: true });
+  }
+
   toEl.value = email;
   /* Best-effort personalisation: swap [VENUE NAME] in the body/subject
-     with the picked venue so you don't have to. Leaves other brackets
-     alone. */
+     with the picked venue so you don't have to. Runs AFTER the tone
+     swap so the fresh template gets the venue name too. */
   ['outreach-subject', 'outreach-body'].forEach(id => {
     const el = document.getElementById(id);
     if (el && venueName) {
       el.value = el.value.split('[VENUE NAME]').join(venueName);
     }
   });
-  toast('Loaded ' + (venueName || 'venue') + ' into outreach', 'success');
+  const toneLabel = TONE_LABELS[tone] || tone;
+  toast('Loaded ' + (venueName || 'venue') + ' · ' + toneLabel + ' tone', 'success');
   /* Scroll the composer into view. */
   document.getElementById('outreach-to')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   toEl.focus();
