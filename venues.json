@@ -1,0 +1,282 @@
+[
+  {
+    "name": "The LIQ Beach Bar & Nightclub",
+    "city": "Panama City Beach",
+    "type": "nightclub",
+    "priority": "high",
+    "website": "https://liqpcb.com",
+    "phone": "850-234-6341",
+    "email": "",
+    "notes": "Beach bar by day, dance club by night. 11am-3am daily. Top-tier DJ fit."
+  },
+  {
+    "name": "Coyote Ugly Saloon",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://coyoteuglysaloon.com",
+    "phone": "850-236-5965",
+    "email": "",
+    "notes": "High-energy party bar. Contact via bookcoyote.com general form."
+  },
+  {
+    "name": "Tootsie's Orchid Lounge",
+    "city": "Panama City Beach",
+    "type": "live music",
+    "priority": "high",
+    "website": "https://www.tootsiesflorida.com",
+    "phone": "850-775-4755",
+    "email": "parties@tootsiesflorida.com",
+    "notes": "Nashville honky-tonk transplant. New beachfront location on Thomas Drive."
+  },
+  {
+    "name": "Harpoon Harry's",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://harpoonharry.com",
+    "phone": "850-234-6060",
+    "email": "info@harpoonharry.com",
+    "notes": "Front Beach Rd. Nightly live music, event-driven schedule."
+  },
+  {
+    "name": "Sharky's Beachfront Restaurant",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://www.sharkysbeach.com",
+    "phone": "850-235-2420",
+    "email": "",
+    "notes": "Beachfront, seasonal. Wide crowd."
+  },
+  {
+    "name": "Schooners",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://www.schooners.com",
+    "phone": "850-235-3555",
+    "email": "",
+    "notes": "\"Last Local Beach Club\". Nightly sunset celebrations, live music."
+  },
+  {
+    "name": "Pineapple Willy's",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://pineapplewillys.com",
+    "phone": "850-235-0928",
+    "email": "",
+    "notes": "Since 1984. Live music, on-pier seating."
+  },
+  {
+    "name": "Willy's Pier Bar",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://pineapplewillys.com",
+    "phone": "850-235-0298",
+    "email": "",
+    "notes": "Sister bar to Pineapple Willy's."
+  },
+  {
+    "name": "Runaway Island",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://runawayisland.com",
+    "phone": "",
+    "email": "",
+    "notes": "Two-story beachside. Karaoke, trivia, fish fry."
+  },
+  {
+    "name": "Hammerhead Fred's",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://hammerheadfreds.com",
+    "phone": "850-233-3907",
+    "email": "rob@hammerheadfreds.com",
+    "notes": "Direct email to Rob (owner/manager)."
+  },
+  {
+    "name": "Donovan's Reef",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://www.donovansreefpcb.com",
+    "phone": "850-230-6900",
+    "email": "beachlease@gmail.com",
+    "notes": "Next to Pier Park. Email is a lease/booking contact \u2014 verify use before cold-emailing."
+  },
+  {
+    "name": "Donovan's Supper Club & Cocktails",
+    "city": "Panama City Beach",
+    "type": "supperclub",
+    "priority": "high",
+    "website": "https://www.donovansupperclubcocktails.com",
+    "phone": "850-785-9617",
+    "email": "dining@donovansupperclub.com",
+    "notes": "Mon-Sat 11am-10pm. Cocktail-forward."
+  },
+  {
+    "name": "Sandbar Seafood & BBQ Joint",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "high",
+    "website": "https://sandbarpcb.com",
+    "phone": "850-249-7200",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "name": "Sandpiper Beacon Tiki Bar",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "med",
+    "website": "https://www.sandpiperbeacon.com",
+    "phone": "850-234-2154",
+    "email": "info@sandpiperbeacon.com",
+    "notes": "Resort tiki bar. Info@ contact goes to resort front desk."
+  },
+  {
+    "name": "The Craft Bar",
+    "city": "Panama City Beach",
+    "type": "gastropub",
+    "priority": "med",
+    "website": "https://www.thecraftbarfl.com/panama-city-beach",
+    "phone": "",
+    "email": "",
+    "notes": "Pier Park North. Craft beer + cocktails + food."
+  },
+  {
+    "name": "Ms. Newby's Liquors",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "med",
+    "website": "https://msnewbys.com",
+    "phone": "850-234-0030",
+    "email": "",
+    "notes": "Newby's group \u2014 5 locations under this brand."
+  },
+  {
+    "name": "Newby's Too Package & Bar",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "med",
+    "website": "https://msnewbys.com/locations/newbys-too/",
+    "phone": "850-234-6203",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "name": "Newby's Brew & Booze House",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "med",
+    "website": "https://msnewbys.com",
+    "phone": "850-230-5549",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "name": "Newby's Endzone",
+    "city": "Panama City Beach",
+    "type": "sports bar",
+    "priority": "low",
+    "website": "https://msnewbys.com",
+    "phone": "850-234-6203",
+    "email": "",
+    "notes": "On the Curve."
+  },
+  {
+    "name": "The Office At Ms. Newby's",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "med",
+    "website": "https://msnewbys.com/locations/office-bar/",
+    "phone": "850-234-0030",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "name": "Patches Pub & Grill",
+    "city": "Panama City Beach",
+    "type": "sports bar",
+    "priority": "med",
+    "website": "https://patchespub.com",
+    "phone": "850-233-8879",
+    "email": "",
+    "notes": "Beach Access #1. Local favourite since 90s. Bingo, sports, food."
+  },
+  {
+    "name": "St. Andy's Sports Pub",
+    "city": "Panama City",
+    "type": "sports bar",
+    "priority": "low",
+    "website": "https://standyspub.com",
+    "phone": "850-249-3260",
+    "email": "",
+    "notes": "1123 Beck Ave. St Andrews district."
+  },
+  {
+    "name": "Uncle Ernie's Bayfront Grill",
+    "city": "Panama City",
+    "type": "bar",
+    "priority": "med",
+    "website": "https://www.uncleerniesbayfrontgrill.com",
+    "phone": "850-763-8427",
+    "email": "",
+    "notes": "1151 Bayview Ave. St Andrews district. Top-deck bar."
+  },
+  {
+    "name": "El Rodeo Tequila Bar & Grill",
+    "city": "Panama City Beach",
+    "type": "bar",
+    "priority": "low",
+    "website": "https://elrodeotequilabargrillfl.com",
+    "phone": "850-238-8500",
+    "email": "",
+    "notes": "Two locations, across from Navy Base."
+  },
+  {
+    "name": "Rock'it Lanes",
+    "city": "Panama City Beach",
+    "type": "entertainment",
+    "priority": "low",
+    "website": "https://rockitlanes.com",
+    "phone": "850-249-2695",
+    "email": "",
+    "notes": "Bowling + bar + games. DJ nights possible."
+  },
+  {
+    "name": "History Class Brewing Co.",
+    "city": "Panama City",
+    "type": "brewery",
+    "priority": "med",
+    "website": "https://historyclass.beer",
+    "phone": "850-801-2337",
+    "email": "friends@historyclass.beer",
+    "notes": "Historic Downtown. Warm brand, likely open to house-music events."
+  },
+  {
+    "name": "House of Henry Irish Pub",
+    "city": "Panama City",
+    "type": "pub",
+    "priority": "med",
+    "website": "",
+    "phone": "850-481-1602",
+    "email": "",
+    "notes": "461 Harrison Ave. Live music, Guinness on tap. Downtown."
+  },
+  {
+    "name": "Little Village",
+    "city": "Panama City",
+    "type": "live music",
+    "priority": "high",
+    "website": "https://littlevillagepc.com",
+    "phone": "850-215-8780",
+    "email": "littlevillagepc@aol.com",
+    "notes": "2808 W 12th St. Outdoor waterfront market. Live music Tue-Sun."
+  }
+]

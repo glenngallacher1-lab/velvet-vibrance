@@ -1389,6 +1389,121 @@
       padding-top: 0.6rem;
       border-top: 1px solid var(--line);
     }
+
+    /* ── Venues target list (Bookings view) ── */
+    .venue-filter {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: var(--paper);
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.6rem;
+    }
+    .venue-filter:focus { outline: none; border-color: rgba(232,181,71,0.55); }
+    #venues-search { min-width: 140px; }
+    .venues-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 0.4rem;
+    }
+    .venue-row {
+      display: grid;
+      grid-template-columns: 3fr 1.6fr 2.4fr 1.2fr;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 0.9rem;
+      background: rgba(20,9,11,0.4);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .venue-row:hover { border-color: rgba(232,181,71,0.35); background: rgba(20,9,11,0.6); }
+    .venue-name {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+    .venue-name .n {
+      font-weight: 600;
+      color: var(--paper);
+      font-size: 0.9rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .venue-name .t {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(245,237,224,0.42);
+    }
+    .venue-city {
+      font-size: 0.78rem;
+      color: rgba(245,237,224,0.68);
+    }
+    .venue-city .prio {
+      display: inline-block;
+      margin-top: 0.15rem;
+      padding: 0.1rem 0.45rem;
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      border: 1px solid;
+    }
+    .venue-city .prio.high { color: #E8B547; border-color: rgba(232,181,71,0.55); background: rgba(232,181,71,0.1); }
+    .venue-city .prio.med  { color: rgba(245,237,224,0.7); border-color: rgba(245,237,224,0.25); }
+    .venue-city .prio.low  { color: rgba(245,237,224,0.42); border-color: rgba(245,237,224,0.15); }
+    .venue-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      font-size: 0.75rem;
+      min-width: 0;
+    }
+    .venue-contact a,
+    .venue-contact span {
+      color: rgba(245,237,224,0.75);
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .venue-contact a:hover { color: #E8B547; text-decoration: underline; }
+    .venue-contact .missing { color: rgba(245,237,224,0.32); font-style: italic; }
+    .venue-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .venue-load {
+      background: transparent;
+      border: 1px solid rgba(232,181,71,0.35);
+      color: #E8B547;
+      padding: 0.4rem 0.7rem;
+      font-family: inherit;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .venue-load:hover:not(:disabled) {
+      background: rgba(232,181,71,0.14);
+      border-color: rgba(232,181,71,0.7);
+    }
+    .venue-load:disabled { opacity: 0.35; cursor: not-allowed; }
+    @media (max-width: 900px) {
+      .venue-row { grid-template-columns: 1fr; gap: 0.4rem; }
+      .venue-actions { justify-content: flex-start; }
+    }
+
     .note {
       break-inside: avoid;
       page-break-inside: avoid;
@@ -2205,6 +2320,28 @@
         <div class="actions-row">
           <a class="btn btn-primary" href="templates/invoice.html" target="_blank" rel="noopener">Open invoice builder →</a>
         </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">
+          Venues · target list
+          <span class="count-badge" id="venues-count">…</span>
+          <span style="margin-left:auto;display:flex;gap:0.5rem;">
+            <select id="venues-filter-priority" class="venue-filter">
+              <option value="">All priorities</option>
+              <option value="high">High only</option>
+              <option value="med">Med+</option>
+            </select>
+            <select id="venues-filter-city" class="venue-filter">
+              <option value="">All cities</option>
+            </select>
+            <input type="search" id="venues-search" placeholder="Search name…" />
+          </span>
+        </div>
+        <p class="muted" style="margin:0 0 0.9rem;">
+          Bars, clubs, and live-music venues within 30mi of Panama City, FL. Click <strong>Load in outreach</strong> on a row to jump that venue's email into the cold-outreach composer above. Edit <code>venues.json</code> in the repo to add/remove.
+        </p>
+        <div class="venues-list" id="venues-list"></div>
       </div>
     </div>
   </section>
@@ -6294,6 +6431,140 @@ function openInMail(kind) {
 }
 
 /* ════════════════════════════════════════════════════════════
+   VENUES — target list for cold outreach.
+   Loaded from /venues.json in the repo. Rendered into the
+   Bookings view with filter + search. "Load in outreach" pastes
+   the venue's email into the outreach composer's To field and
+   switches to that view.
+   ════════════════════════════════════════════════════════════ */
+let VENUES = [];
+
+async function loadVenues() {
+  try {
+    const res = await fetch('venues.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    VENUES = await res.json();
+    populateCityFilter();
+    renderVenues();
+  } catch (err) {
+    console.warn('[venues] load failed:', err);
+    const list = $('#venues-list');
+    if (list) list.innerHTML = '<div class="empty-state">Could not load venues.json.</div>';
+  }
+}
+
+function populateCityFilter() {
+  const sel = $('#venues-filter-city');
+  if (!sel) return;
+  const cities = Array.from(new Set(VENUES.map(v => v.city).filter(Boolean))).sort();
+  cities.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    sel.appendChild(opt);
+  });
+}
+
+function renderVenues() {
+  const list = $('#venues-list');
+  const count = $('#venues-count');
+  if (!list) return;
+
+  const prio = ($('#venues-filter-priority') || {}).value || '';
+  const city = ($('#venues-filter-city')     || {}).value || '';
+  const q    = (($('#venues-search')          || {}).value || '').trim().toLowerCase();
+
+  const priorityRank = { high: 3, med: 2, low: 1 };
+  const passesPrio = v => {
+    if (!prio) return true;
+    if (prio === 'high') return v.priority === 'high';
+    if (prio === 'med')  return priorityRank[v.priority] >= 2;
+    return true;
+  };
+  const passesCity = v => !city || v.city === city;
+  const passesQ = v => !q ||
+    (v.name || '').toLowerCase().includes(q) ||
+    (v.type || '').toLowerCase().includes(q) ||
+    (v.city || '').toLowerCase().includes(q);
+
+  const rows = VENUES
+    .filter(v => passesPrio(v) && passesCity(v) && passesQ(v))
+    /* Sort: priority desc, then name asc */
+    .sort((a, b) => (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0)
+                 || (a.name || '').localeCompare(b.name || ''));
+
+  count.textContent = rows.length + ' venue' + (rows.length === 1 ? '' : 's');
+
+  if (rows.length === 0) {
+    list.innerHTML = '<div class="empty-state">No venues match those filters.</div>';
+    return;
+  }
+
+  list.innerHTML = rows.map(renderVenueRow).join('');
+  list.querySelectorAll('.venue-load[data-email]').forEach(btn => {
+    btn.addEventListener('click', () => loadVenueInOutreach(btn.dataset.email, btn.dataset.name));
+  });
+}
+
+function escVen(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+}
+
+function renderVenueRow(v) {
+  const name = escVen(v.name);
+  const type = escVen(v.type || '');
+  const city = escVen(v.city || '');
+  const prio = escVen(v.priority || 'low');
+  const emailHtml = v.email
+    ? '<a href="mailto:' + encodeURIComponent(v.email) + '">' + escVen(v.email) + '</a>'
+    : '<span class="missing">no email — DM Instagram / call</span>';
+  const websiteHtml = v.website
+    ? '<a href="' + escVen(v.website) + '" target="_blank" rel="noopener">' + escVen(v.website.replace(/^https?:\/\//, '')) + '</a>'
+    : '<span class="missing">no website</span>';
+  const loadBtn = v.email
+    ? '<button class="venue-load" data-email="' + escVen(v.email) + '" data-name="' + name + '">Load in outreach</button>'
+    : '<button class="venue-load" disabled title="No email on file">No email</button>';
+
+  return '<div class="venue-row">'
+    +    '<div class="venue-name">'
+    +      '<span class="n">' + name + '</span>'
+    +      (type ? '<span class="t">' + type + '</span>' : '')
+    +    '</div>'
+    +    '<div class="venue-city">'
+    +      city
+    +      '<br><span class="prio ' + prio + '">' + prio + '</span>'
+    +    '</div>'
+    +    '<div class="venue-contact">'
+    +      emailHtml
+    +      websiteHtml
+    +      (v.phone ? '<span>' + escVen(v.phone) + '</span>' : '')
+    +    '</div>'
+    +    '<div class="venue-actions">' + loadBtn + '</div>'
+    + '</div>';
+}
+
+function loadVenueInOutreach(email, venueName) {
+  const toEl = $('#outreach-to');
+  if (!toEl) { toast('Outreach composer not found', 'error'); return; }
+  toEl.value = email;
+  /* Best-effort personalisation: swap [VENUE NAME] in the body/subject
+     with the picked venue so you don't have to. Leaves other brackets
+     alone. */
+  ['outreach-subject', 'outreach-body'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && venueName) {
+      el.value = el.value.split('[VENUE NAME]').join(venueName);
+    }
+  });
+  toast('Loaded ' + (venueName || 'venue') + ' into outreach', 'success');
+  /* Scroll the composer into view. */
+  document.getElementById('outreach-to')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  toEl.focus();
+}
+
+/* ════════════════════════════════════════════════════════════
    WIRE-UP
    ════════════════════════════════════════════════════════════ */
 function init() {
@@ -6352,6 +6623,12 @@ function init() {
       switchEmailTone(btn.dataset.toneFor, btn.dataset.tone);
     });
   });
+
+  /* Bookings view — venues target list. */
+  loadVenues();
+  $('#venues-filter-priority')?.addEventListener('change', renderVenues);
+  $('#venues-filter-city')?.addEventListener('change', renderVenues);
+  $('#venues-search')?.addEventListener('input', renderVenues);
 
   /* Token error modal */
   $('#tm-close').addEventListener('click', hideTokenModal);
