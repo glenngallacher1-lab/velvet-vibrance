@@ -1863,16 +1863,55 @@ body:not(:has(#side-rail)) .nav-hamburger { display: flex; }
   display: flex; align-items: center; justify-content: center;
   padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 6vw, 6rem);
   overflow: hidden;
-  background: #3a0a0a;
+  background: #0a0505;
   text-align: center;
 }
-.gallery-hero::before {
+/* Legacy red gradient — only when the hero has NO slideshow. Pages
+   that use the new .has-slideshow variant get an image sequence
+   underneath the text instead of the flat red panel. */
+.gallery-hero:not(.has-slideshow)::before {
   content: "";
   position: absolute; inset: 0;
   background: radial-gradient(ellipse at 30% 40%, rgba(139,26,26,0.55) 0%, transparent 65%),
               linear-gradient(180deg, #2a0707 0%, #3a0a0a 55%, var(--bg) 100%);
   z-index: 0;
 }
+/* Light scrim so the hero H1 stays legible over any photo in the
+   slideshow, but the images still read clearly through. */
+.gallery-hero.has-slideshow::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.35) 90%),
+    linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.4) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Hero slideshow ──
+   Container fills the .gallery-hero. Each .hero-slide is absolutely
+   positioned and cross-fades. JS in script.js reads the container's
+   data-photos attribute, creates one slide per photo, and rotates
+   .active every ~6s. */
+.hero-slideshow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #0a0505;
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.6s ease-in-out;
+  filter: saturate(0.9);
+}
+.hero-slide.active { opacity: 1; }
+/* Text layer needs to be above scrim (z-index 1). */
+.gallery-hero.has-slideshow .gallery-hero-inner { z-index: 2; }
 .gallery-hero-inner {
   position: relative;
   z-index: 1;
@@ -1890,9 +1929,22 @@ body:not(:has(#side-rail)) .nav-hamburger { display: flex; }
   padding-bottom: 0.12em;
   color: var(--text-primary);
 }
+/* On pages where the H1 is a full sentence (Book), size it down so
+   it doesn't wrap into 5+ lines. Detected by any h1 with a <br>
+   inside — sentence heros will always break line manually. */
+.gallery-hero h1:has(br) {
+  font-size: clamp(1.8rem, 4.5vw, 3.6rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.15;
+  max-width: 44rem;
+  margin-inline: auto;
+}
 .gallery-hero h1 em {
   font-style: italic; font-weight: 700;
-  background: linear-gradient(180deg, #e6c14c 0%, #8b1a1a 95%);
+  /* All-gold gradient — no red end stop. Was reading too dark red on
+     the slideshow pages. */
+  background: linear-gradient(180deg, #f5d576 0%, #d19a2a 100%);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;

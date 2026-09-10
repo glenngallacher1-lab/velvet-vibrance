@@ -542,6 +542,43 @@ function splitWords(el) {
   });
 })();
 
+/* ── O2. Hero Slideshows ──────────────────────────────────────
+   Reads data-photos from each .hero-slideshow container, builds
+   one .hero-slide per photo, and cross-fades between them on a
+   6s interval. Runs on any page with a slideshow container —
+   currently book.html, events.html, gallery.html. */
+(function initHeroSlideshows() {
+  var containers = document.querySelectorAll('.hero-slideshow[data-photos]');
+  containers.forEach(function (container) {
+    var photos = (container.getAttribute('data-photos') || '')
+      .split(',')
+      .map(function (s) { return s.trim(); })
+      .filter(Boolean);
+    if (photos.length === 0) return;
+
+    /* Randomise the starting photo so visitors on different pages —
+       or the same visitor on subsequent visits — don't always land
+       on the same shot first. */
+    var start = Math.floor(Math.random() * photos.length);
+    var slides = photos.map(function (src, i) {
+      var slide = document.createElement('div');
+      slide.className = 'hero-slide' + (i === start ? ' active' : '');
+      slide.style.backgroundImage = "url('" + src.replace(/'/g, "\\'") + "')";
+      container.appendChild(slide);
+      return slide;
+    });
+
+    if (photos.length === 1) return; /* nothing to rotate */
+
+    var idx = start;
+    setInterval(function () {
+      slides[idx].classList.remove('active');
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add('active');
+    }, 6000);
+  });
+})();
+
 /* ── P. Join Form ─────────────────────────────────────────────
    Posts the visitor's email to the Google Apps Script backend
    (see WEBAPP.gs). Uses text/plain body to avoid CORS preflight.
