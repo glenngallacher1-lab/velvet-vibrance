@@ -1929,16 +1929,22 @@ body:not(:has(#side-rail)) .nav-hamburger { display: flex; }
   padding-bottom: 0.12em;
   color: var(--text-primary);
 }
-/* On pages where the H1 is a full sentence (Book), size it down so
-   it doesn't wrap into 5+ lines. Detected by any h1 with a <br>
-   inside — sentence heros will always break line manually. */
-.gallery-hero h1:has(br) {
-  font-size: clamp(1.8rem, 4.5vw, 3.6rem);
-  font-weight: 700;
+/* Sentence-length hero titles (like Book: "Bring the house vibes...")
+   need to size WAY down from the 8rem short-title default so they
+   don't blow past the viewport. Applied via .hero-sentence class
+   rather than :has(br) so it works in every browser. */
+.gallery-hero h1.hero-sentence {
+  font-size: clamp(1.6rem, 3.8vw, 3rem);
+  font-weight: 400;
   font-style: italic;
-  line-height: 1.15;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
   max-width: 44rem;
-  margin-inline: auto;
+  margin: 0 auto;
+  padding-bottom: 0.12em;
+}
+.gallery-hero h1.hero-sentence em {
+  font-weight: 700;
 }
 .gallery-hero h1 em {
   font-style: italic; font-weight: 700;
