@@ -38,6 +38,8 @@ const CONTACT_SHEET  = 'Contact';
 /* Only origins in this list may POST. Add a preview/staging origin
    here if you ever deploy one. */
 const ALLOWED_ORIGINS = [
+  'https://velvetvibrance.com',
+  'https://www.velvetvibrance.com',
   'https://glenngallacher1-lab.github.io',
   'http://localhost:8765',
   'http://127.0.0.1:8765'
