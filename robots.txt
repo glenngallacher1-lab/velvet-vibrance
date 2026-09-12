@@ -6,4 +6,4 @@ Disallow: /templates/
 Disallow: /stage/
 Disallow: /maintenance.html
 
-Sitemap: https://glenngallacher1-lab.github.io/velvet-vibrance/sitemap.xml
+Sitemap: https://velvetvibrance.com/sitemap.xml

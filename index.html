@@ -23,6 +23,41 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>VELVET VIBRANCE — Where Art Bleeds Into Gold</title>
+
+  <!-- Structured data — tells Google this is a music/DJ collective
+       so it can render a brand knowledge panel and link the site
+       to the Instagram/Spotify/SoundCloud profiles as one entity. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "name": "Velvet Vibrance",
+    "alternateName": "Stanzza",
+    "url": "https://velvetvibrance.com",
+    "logo": "https://velvetvibrance.com/favicon.svg",
+    "image": "https://velvetvibrance.com/crowd-pink.jpg",
+    "description": "A house music, art, fashion and events collective. Book Stanzza sets, catch upcoming nights, and read the frequency.",
+    "genre": ["House", "Deep House", "Electronic"],
+    "sameAs": [
+      "https://www.instagram.com/stanzzaofficial",
+      "https://open.spotify.com/user/trystanbucar",
+      "https://soundcloud.com/user-411773767"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Velvet Vibrance",
+    "url": "https://velvetvibrance.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://velvetvibrance.com/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <link rel="stylesheet" href="style.css?v=fade1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
