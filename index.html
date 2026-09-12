@@ -140,30 +140,40 @@
       <span class="scroll-comet"></span>
     </div>
     <script>
-      /* Hero intro: hold the crowd photo for 2.8s (showing DANCE IS
-         LOVE / LOVE IS THE ANSWER...), then slide it off to reveal
-         the video and fade the third headline line
-         ("SO DO YOU DANCE...?") in over the video. */
-      (function heroIntro(){
+      /* Hero loop: swap between the crowd photo (with DANCE IS LOVE
+         / LOVE IS THE ANSWER... showing) and the Beta video (with
+         SO DO YOU DANCE...? showing), forever, so the hero keeps
+         moving as long as the user is on the page. Kicks off once
+         the entry preloader dismisses. */
+      (function heroLoop(){
         var photo = document.getElementById('hero-photo');
         var dance = document.getElementById('hero-line-dance');
+        var earlyLines = document.querySelectorAll('.hl-line-early');
         if (!photo) return;
-        var HOLD_MS = 2800;
 
-        function reveal(){
-          setTimeout(function(){
-            photo.classList.add('is-out');
-            document.querySelectorAll('.hl-line-early').forEach(function(el){
-              el.classList.add('is-out');
-            });
-            if (dance) dance.classList.add('is-in');
-          }, HOLD_MS);
+        var PHOTO_HOLD = 2800; // ms photo is up before swapping to video
+        var VIDEO_HOLD = 5500; // ms video is up before swapping back
+        var timer = 0;
+
+        function toVideo(){
+          photo.classList.add('is-out');
+          earlyLines.forEach(function(el){ el.classList.add('is-out'); });
+          if (dance) dance.classList.add('is-in');
+          timer = setTimeout(toPhoto, VIDEO_HOLD);
+        }
+        function toPhoto(){
+          photo.classList.remove('is-out');
+          earlyLines.forEach(function(el){ el.classList.remove('is-out'); });
+          if (dance) dance.classList.remove('is-in');
+          timer = setTimeout(toVideo, PHOTO_HOLD);
         }
 
+        function start(){ timer = setTimeout(toVideo, PHOTO_HOLD); }
+
         var entry = document.getElementById('entry-screen');
-        if (!entry || entry.style.display === 'none') { reveal(); return; }
+        if (!entry || entry.style.display === 'none') { start(); return; }
         var mo = new MutationObserver(function(){
-          if (entry.style.display === 'none') { mo.disconnect(); reveal(); }
+          if (entry.style.display === 'none') { mo.disconnect(); start(); }
         });
         mo.observe(entry, { attributes: true, attributeFilter: ['style'] });
       })();
