@@ -124,20 +124,50 @@
       </nav>
     </aside>
 
-    <!-- HERO-BG-START --><div class="hero-bg" id="hero-bg" role="img" aria-label="Crowd bathed in warm pink light at a Velvet Vibrance night" style="background-image:url('crowd-pink.jpg')"></div><!-- HERO-BG-END -->
+    <!-- HERO-BG-START --><video class="hero-bg hero-bg-video" id="hero-bg" autoplay muted loop playsinline preload="auto" poster="crowd-pink.jpg" aria-label="Velvet Vibrance — Beta Nightclub set"><source src="hero-beta.mp4" type="video/mp4" /></video><!-- HERO-BG-END -->
+    <div class="hero-photo" id="hero-photo" role="img" aria-label="Crowd bathed in warm pink light at a Velvet Vibrance night" style="background-image:url('crowd-pink.jpg')"></div>
     <div class="hero-overlay"></div>
     <div class="hero-vignette" id="hero-vignette"></div>
     <div class="hero-noise"></div>
     <div class="hero-content">
       <h1 class="hero-headline">
-        <span class="hl-line"><span>DANCE IS LOVE</span></span>
-        <span class="hl-line"><span>LOVE IS THE ANSWER</span></span>
-        <span class="hl-line"><span>SO DO YOU DANCE</span></span>
+        <span class="hl-line hl-line-early"><span>DANCE IS LOVE</span></span>
+        <span class="hl-line hl-line-early"><span>LOVE IS THE ANSWER...</span></span>
+        <span class="hl-line hl-line-late" id="hero-line-dance"><span>SO DO YOU DANCE...?</span></span>
       </h1>
     </div>
     <div class="hero-scroll-cue">
       <span class="scroll-comet"></span>
     </div>
+    <script>
+      /* Hero intro: hold the crowd photo for 2.8s (showing DANCE IS
+         LOVE / LOVE IS THE ANSWER...), then slide it off to reveal
+         the video and fade the third headline line
+         ("SO DO YOU DANCE...?") in over the video. */
+      (function heroIntro(){
+        var photo = document.getElementById('hero-photo');
+        var dance = document.getElementById('hero-line-dance');
+        if (!photo) return;
+        var HOLD_MS = 2800;
+
+        function reveal(){
+          setTimeout(function(){
+            photo.classList.add('is-out');
+            document.querySelectorAll('.hl-line-early').forEach(function(el){
+              el.classList.add('is-out');
+            });
+            if (dance) dance.classList.add('is-in');
+          }, HOLD_MS);
+        }
+
+        var entry = document.getElementById('entry-screen');
+        if (!entry || entry.style.display === 'none') { reveal(); return; }
+        var mo = new MutationObserver(function(){
+          if (entry.style.display === 'none') { mo.disconnect(); reveal(); }
+        });
+        mo.observe(entry, { attributes: true, attributeFilter: ['style'] });
+      })();
+    </script>
   </section>
 
   <!-- ══════════════════════════════════════════════════════════
@@ -154,6 +184,9 @@
           <p>The feeling is as if blood runs through your veins as Velvet Gold not from music alone, but from a deeper understanding of this brand and collective.</p>
           <p>Abundance is our number one pillar. Through music, art, fashion, events, dinners, radio, and collaborations we will flow with abundance, creating something born entirely from love. Love is what the world needs, and it will live at every level of Velvet Vibrance.</p>
         </div>
+        <figure class="about-body-photo reveal-up" style="--delay:0.25s">
+          <img src="DSC08736.jpg" alt="Stanzza at the decks — Velvet Vibrance in session" loading="lazy" />
+        </figure>
       </div>
 
       <div class="about-image reveal-right">
