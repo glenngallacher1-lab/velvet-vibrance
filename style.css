@@ -734,32 +734,14 @@ body:not(:has(#side-rail)) .nav-hamburger { display: flex; }
   line-height: 1.05;
   color: var(--text-primary);
 }
-/* Horizontal variant — both questions read as separate italic
-   phrases sitting side by side across the column, with generous
-   whitespace between them. Wraps to two lines naturally on narrow
-   viewports rather than being force-crammed onto one line. */
+/* Horizontal one-line quote — plain text, flows left-to-right,
+   wraps naturally. No spans, no clip animation, no manual layout
+   tricks — just readable italic type. */
 .about-quote.about-quote-line {
-  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
-  line-height: 1.35;
-  display: block;
-  /* Override the default .about-quote.reveal-clip span display: block
-     so the two questions sit inline instead of stacking. */
-}
-.about-quote.about-quote-line span {
-  display: inline-block;
-  margin-right: 1.6rem;
-  /* The default .reveal-clip animation slides spans up from below a
-     mask, but that only makes sense when spans are block-level. For
-     the inline-block variant just fade in place. */
-  overflow: visible;
-  transform: none;
-}
-.about-quote.about-quote-line span:last-child { margin-right: 0; }
-@media (max-width: 640px) {
-  .about-quote.about-quote-line {
-    font-size: clamp(1.3rem, 5vw, 1.9rem);
-  }
-  .about-quote.about-quote-line span { margin-right: 1rem; }
+  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+  line-height: 1.4;
+  white-space: normal;
+  word-spacing: 0.05em;
 }
 
 .about-body {
